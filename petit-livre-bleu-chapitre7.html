@@ -78,45 +78,17 @@ blockquote::before{content:'\201C';position:absolute;top:-0.5rem;left:0.5rem;fon
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--void);}::-webkit-scrollbar-thumb{background:var(--blue-dim);border-radius:2px;}
-footer.site-footer{position:relative;z-index:1;background:rgba(1,5,10,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
-.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
-.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,12,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 1.6rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:100px;max-width:175px;}
-.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
-.fd-home::before,.fd-intro::before,.fd-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.fd-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
-.fd-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
-.fd-ch4::before{background:linear-gradient(to right,transparent,rgba(200,120,248,0.5),transparent);}
-.fd-ch5::before{background:linear-gradient(to right,transparent,rgba(64,208,176,0.5),transparent);}
-.fd-ch6::before{background:linear-gradient(to right,transparent,rgba(56,216,144,0.5),transparent);}
-.fd-ch7::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.footer-dalle:hover{background:rgba(2,10,20,0.9);}
-.fd-ch7:hover{border-color:rgba(77,143,212,0.2);}
-.fd-ch2:hover{border-color:rgba(201,168,76,0.2);}
-.fd-ch3:hover{border-color:rgba(60,190,120,0.2);}
-.fd-ch6:hover{border-color:rgba(56,216,144,0.2);}
-.footer-sphere{width:26px;height:26px;border-radius:50%;flex-shrink:0;position:relative;}
-.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
-.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.4);}
+footer.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.4);}
 .fsp-amber{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 10px rgba(201,168,76,0.4);}
 .fsp-green{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 10px rgba(60,190,120,0.4);}
 .fsp-violet{background:radial-gradient(circle at 38% 32%,#e0a0ff,#8840d0,#1a0440);box-shadow:0 0 10px rgba(200,120,248,0.4);}
 .fsp-cyan{background:radial-gradient(circle at 38% 32%,#80f0e0,#20a888,#041410);box-shadow:0 0 10px rgba(64,208,176,0.4);}
 .fsp-emerald{background:radial-gradient(circle at 38% 32%,#a0ffc8,#20a860,#041408);box-shadow:0 0 10px rgba(56,216,144,0.4);}
 .fsp-earth{background:radial-gradient(circle at 38% 32%,#a8d8f8,#4d8fd4,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.4);}
-.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
-.footer-num{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;}
-.fd-home .footer-num,.fd-intro .footer-num,.fd-ch1 .footer-num{color:#4d8fd4;}
-.fd-ch2 .footer-num{color:#c9a84c;}.fd-ch3 .footer-num{color:#3cbe78;}.fd-ch4 .footer-num{color:#c878f8;}.fd-ch5 .footer-num{color:#40d0b0;}.fd-ch6 .footer-num{color:#38d890;}.fd-ch7 .footer-num{color:#4d8fd4;}
-.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.6rem;letter-spacing:0.16em;color:rgba(200,220,230,0.65);text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
-.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(140,170,190,0.65);text-transform:uppercase;}
-.footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.62rem;letter-spacing:0.22em;color:rgba(120,150,170,0.5);}
-
-/* ══════════════ CHAPTER NAV ══════════════ */
-.chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
-.chapter-nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:stretch;gap:1.5rem;}
-.chapter-nav-link{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem 2.2rem;text-decoration:none;background:rgba(4,8,20,0.5);border:1px solid rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;transition:background 0.4s,border-color 0.4s,transform 0.3s;}
+/* Chapter navigation */
+.chapter-nav{width:100%;max-width:960px;margin:3rem auto 0;position:relative;z-index:1;}
+.chapter-nav-inner{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;}
+.chapter-nav-link{position:relative;flex:1;min-width:220px;max-width:460px;padding:2rem 2.5rem;background:rgba(4,8,18,0.65);border:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:background 0.35s,transform 0.3s,border-color 0.3s;}
 .chapter-nav-link:hover{background:rgba(8,14,32,0.85);transform:translateY(-2px);}
 .chapter-nav-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;transition:opacity 0.3s;}
 .chapter-nav-link:hover::before{opacity:1;}
@@ -132,24 +104,18 @@ footer.site-footer{position:relative;z-index:1;background:rgba(1,5,10,0.98);bord
 .chapter-nav-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;line-height:1.4;opacity:0.6;transition:opacity 0.3s;}
 .chapter-nav-link:hover .chapter-nav-sub{opacity:0.85;}
 .chapter-nav-spacer{flex:1;}
-
-/* Separator line */
 .chapter-nav-sep{width:100%;max-width:960px;margin:0 auto 0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
-
-/* Footer bottom */
 .chapter-footer-bottom{text-align:center;padding:2rem 2rem 2.5rem;position:relative;z-index:1;}
 .chapter-footer-brand{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.25em;color:rgba(100,140,180,0.4);margin-bottom:0.3rem;}
 .chapter-footer-brand a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(100,140,180,0.15);transition:color 0.2s,border-color 0.2s;}
 .chapter-footer-brand a:hover{color:rgba(140,180,220,0.7);border-color:rgba(140,180,220,0.3);}
 .chapter-footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.58rem;letter-spacing:0.22em;color:rgba(120,150,170,0.35);}
-
 @media(max-width:600px){
   .chapter-nav-inner{flex-direction:column;gap:1rem;}
   .chapter-nav-link--prev,.chapter-nav-link--next{text-align:left;}
   .chapter-nav-link--next .chapter-nav-label{justify-content:flex-start;}
   .chapter-nav-link{padding:1.5rem 1.5rem;}
 }
-
 </style>
 </head>
 <body>
@@ -158,26 +124,131 @@ footer.site-footer{position:relative;z-index:1;background:rgba(1,5,10,0.98);bord
 <div class="tooltip" id="tooltip"></div>
 <canvas id="starfield"></canvas>
 
+<!-- COVER -->
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu · Partie I — La Biosphère</div>
+  <div class="chapter-num">Chapitre VII</div>
+  <h1 class="title">La Biosphère</h1>
+  <div class="title-tag">Vernadsky · Gaïa · Superorganisme</div>
+  <p class="title-sub">L'enveloppe fragile où tout ce qui compte existe</p>
+  <div class="scroll-hint"><span>Défiler</span><div class="scroll-line"></div></div>
+</section>
 
-<!-- ══ CHAPTER NAV ══ -->
+<!-- EPIGRAPH -->
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>Je regardais au-dehors la noirceur de l'espace. Je vis sa majesté, mais nulle bienveillance. C'est en dessous qu'il y avait une planète accueillante — enclos dans la fine et mouvante coque de sa biosphère, si étonnamment fragile, il y a tout ce qui est cher à nos cœurs.</blockquote>
+    <div class="quote-source">— Loren Acton, astronaute</div>
+  </div>
+</section>
+
+<!-- SECTION 1 -->
+<div class="section reveal">
+  <div class="section-label">La biosphère · Une enveloppe vivante</div>
+  <p>Au fil des chapitres précédents, nous avons suivi les grands sauts de complexité qui ont jalonné l'histoire du vivant. Mais la transition décrite ici est d'une tout autre nature. Elle ne concerne plus un organisme, ni même un groupe d'espèces, mais un niveau d'organisation bien supérieur : <span class="hl">celle de la totalité du vivant</span>.</p>
+  <p>L'ensemble de la vie sur Terre forme une enveloppe fine et fragile, qui s'étend des profondeurs des océans jusqu'aux couches basses de l'atmosphère. Cette enveloppe porte un nom : <span class="hl">la biosphère</span>. Un système global, intégré, où le vivant, l'air, l'eau et les roches interagissent en permanence.</p>
+</div>
+
+<!-- VIZ 1 : NIVEAUX D'ORGANISATION -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Les niveaux d'organisation du vivant</div>
+  <div class="viz-subtitle">Des briques élémentaires jusqu'à la biosphère — chaque niveau émerge du précédent</div>
+  <canvas id="levels-canvas" style="width:100%;max-width:960px;height:340px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Chaque saut de complexité crée un nouveau niveau d'organisation irréductible au précédent</div>
+</div>
+
+<!-- SECTION 2 : VERNADSKY -->
+<div class="section reveal">
+  <div class="section-label">Vernadsky · La vie comme force géologique</div>
+  <p>Dans <em>La Biosphère</em> (1926), le scientifique russe Vladimir Vernadsky introduit une rupture majeure. Il montre que le vivant n'est pas un simple occupant de cette enveloppe, mais <span class="hl">une force géologique à part entière</span>. Les organismes vivants transforment durablement la planète : ils modifient la composition de l'atmosphère, la chimie des océans, la structure des sols.</p>
+  <div class="pull-quote">"Avec Vernadsky, la biosphère cesse d'être un décor. Elle devient un système dynamique, capable de transformer les conditions mêmes de son existence."</div>
+</div>
+
+<!-- VIZ 2 : CYCLES BIOGÉOCHIMIQUES -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Les grands cycles biogéochimiques</div>
+  <div class="viz-subtitle">Le vivant pilote la chimie de la planète entière</div>
+  <canvas id="cycles-canvas" style="width:100%;max-width:960px;height:380px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Carbone · Azote · Eau · Oxygène — quatre cycles planétaires orchestrés par le vivant</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card reveal"><div class="stat-number">9 M</div><div class="stat-label">Espèces estimées<br>sur Terre</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.1s"><div class="stat-number">20 km</div><div class="stat-label">Épaisseur<br>de la biosphère</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.2s"><div class="stat-number">1926</div><div class="stat-label">La Biosphère<br>par Vernadsky</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.3s"><div class="stat-number">25 000</div><div class="stat-label">Ans — Vénus<br>de Willendorf</div></div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 3 : GAÏA -->
+<div class="section reveal">
+  <div class="section-label">Gaïa · L'hypothèse du superorganisme</div>
+  <p>Dans les années 1970, James Lovelock et Lynn Margulis poussent cette idée bien plus loin avec <span class="hl">l'hypothèse Gaïa</span>. Selon eux, la biosphère formerait un tout cohérent, comparable à un superorganisme, capable de maintenir des conditions favorables à sa propre existence.</p>
+  <p>De manière totalement invisible à nos yeux, une gigantesque créature — <span class="hl-gold">sans centre, sans conscience, mais avec des propriétés émergentes</span> — se serait formée et nous maintiendrait en vie. À la manière dont des cellules forment un corps sans en percevoir la totalité, l'humanité vivrait à l'intérieur d'un système qui la dépasse. Comme Pinocchio dans le ventre de la baleine Monstro.</p>
+</div>
+
+<!-- VIZ 3 : GAÏA — SUPERORGANISME -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Gaïa · La Terre comme superorganisme</div>
+  <div class="viz-subtitle">Sans centre, sans conscience — mais avec des propriétés émergentes à l'échelle planétaire</div>
+  <canvas id="gaia-canvas" style="width:100%;max-width:960px;height:400px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Les neuf millions d'espèces forment ensemble un système autorégulé — l'hypothèse la plus vertigineuse de la biologie</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 4 : DÉESSES MÈRES -->
+<div class="section reveal">
+  <div class="section-label">La Terre-Mère · Une intuition universelle</div>
+  <p>Cette idée n'est pas nouvelle. La notion de biosphère s'apparente au concept très ancien de <span class="hl-earth">Terre-mère nourricière</span>, que l'on retrouve dans la plupart des civilisations. Des peuples qui vénéraient la générosité et l'abondance de la nature, dont leur survie dépendait directement.</p>
+  <p>On en retrouve la trace jusqu'aux <span class="hl-gold">Vénus sculptées du paléolithique supérieur</span>, dont la fameuse Vénus de Willendorf, qui date de 25 000 ans. Une intuition universelle que la science redécouvre aujourd'hui.</p>
+</div>
+
+<!-- DÉESSES GRID -->
+<div class="deesses-grid reveal">
+  <div class="deesse-card"><div class="deesse-name">Gaïa</div><div class="deesse-peuple">Grecs</div><div class="deesse-desc">Déesse primordiale de la Terre</div></div>
+  <div class="deesse-card"><div class="deesse-name">Tellus</div><div class="deesse-peuple">Romains</div><div class="deesse-desc">La Terre fertile, corne d'abondance</div></div>
+  <div class="deesse-card"><div class="deesse-name">Pachamama</div><div class="deesse-peuple">Incas</div><div class="deesse-desc">Mère Terre, nourricière universelle</div></div>
+  <div class="deesse-card"><div class="deesse-name">Akna</div><div class="deesse-peuple">Mayas</div><div class="deesse-desc">Déesse de la naissance et de la terre</div></div>
+  <div class="deesse-card"><div class="deesse-name">Papatūānuku</div><div class="deesse-peuple">Maoris</div><div class="deesse-desc">La Terre-mère, source de toute vie</div></div>
+  <div class="deesse-card"><div class="deesse-name">Nokomis</div><div class="deesse-peuple">Algonquin</div><div class="deesse-desc">Grand-mère Terre, esprit protecteur</div></div>
+  <div class="deesse-card"><div class="deesse-name">Mattarahkka</div><div class="deesse-peuple">Samis</div><div class="deesse-desc">Mère primordiale de la Laponie</div></div>
+  <div class="deesse-card"><div class="deesse-name">Vénus de Willendorf</div><div class="deesse-peuple">Paléolithique · −25 000 ans</div><div class="deesse-desc">La plus ancienne représentation connue</div></div>
+</div>
+
+<!-- FINALE -->
+<section class="finale-section">
+  <p class="finale-text reveal">
+    Une enveloppe de vingt kilomètres.<br>
+    Neuf millions d'espèces.<br>
+    Un seul organisme.<br><br>
+    <em>La biosphère ne nous héberge pas.<br>
+    Elle nous constitue.</em>
+  </p>
+  <div style="margin-top:5rem;font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.5em;color:var(--text-dim);text-transform:uppercase;" class="reveal">↓ &nbsp; Chapitre VIII</div>
+</section>
+
+<!-- FOOTER -->
 <nav class="chapter-nav">
   <div class="chapter-nav-inner">
     <a href="petit-livre-bleu-chapitre6.html" class="chapter-nav-link chapter-nav-link--prev" style="--nav-accent:#38d890;">
       <div class="chapter-nav-label"><span class="chapter-nav-arrow chapter-nav-arrow--prev">←</span> Chapitre précédent</div>
-      <div class="chapter-nav-title" style="color:#38d890;text-shadow:0 0 30px rgba(56,216,144,0.4);">La multicellularité</div>
-      <div class="chapter-nav-sub">Quand les cellules ont appris à faire corps ensemble</div>
+      <div class="chapter-nav-title" style="color:#38d890;text-shadow:0 0 30px #38d89040;">La multicellularité</div>
+      <div class="chapter-nav-sub">L’union improbable qui changea tout</div>
     </a>
-    <a href="petit-livre-bleu-chapitre8.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#38c8d0;">
+        <a href="petit-livre-bleu-chapitre8.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#38c8d0;">
       <div class="chapter-nav-label">Chapitre suivant <span class="chapter-nav-arrow chapter-nav-arrow--next">→</span></div>
-      <div class="chapter-nav-title" style="color:#38c8d0;text-shadow:0 0 30px rgba(56,200,208,0.5);">À la rencontre de Gaïa</div>
-      <div class="chapter-nav-sub">Les preuves d'un système qui nous dépasse et nous soutient</div>
+      <div class="chapter-nav-title" style="color:#38c8d0;text-shadow:0 0 30px rgba(56,200,208,0.4);">A la rencontre de Gaïa</div>
+      <div class="chapter-nav-sub">Les preuves d’un système qui nous dépasse et nous soutient</div>
     </a>
   </div>
 </nav>
 <div class="chapter-nav-sep"></div>
 <div class="chapter-footer-bottom">
   <div class="chapter-footer-brand"><a href="index.html">Le Petit Livre Bleu</a> · Jean-Pierre Goux</div>
-  <div class="chapter-footer-copy">Une autre histoire de l'humanité</div>
+  <div class="chapter-footer-copy">Une autre histoire de l’humanité</div>
 </div>
 
 <script>
