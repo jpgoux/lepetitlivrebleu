@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 4 : L'ADN</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#02010a; --text-main:#d0c8e8; --text-dim:#7060a0; --star-white:#f0ecff;
+  --gold:#c9a84c; --gold-dim:#6a4f1a;
+  --dna-bright:#c878f8; --dna-mid:#8840d0; --dna-dim:#3a1060; --dna-pale:#e0b8ff;
+  --amino-col:#f0a040; --protein-col:#60d0c0;
+  --A:#e84060; --T:#40a8e8; --G:#60d080; --C:#f0c040;
+}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--text-main);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:6px;height:6px;background:var(--dna-bright);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 12px var(--dna-bright),0 0 28px rgba(200,120,248,0.70);}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(200,120,248,0.60);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* COVER */
+#cover{position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;text-align:center;overflow:hidden;}
+#cover-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+.book-label{font-family:'Raleway',sans-serif;font-weight:200;letter-spacing:0.5em;font-size:0.7rem;color:var(--dna-dim);text-transform:uppercase;margin-bottom:2.5rem;animation:fadeInDown 2s ease forwards;}
+.chapter-num{font-family:'Cinzel',serif;font-weight:400;font-size:0.75rem;letter-spacing:0.4em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:1.5rem;animation:fadeInDown 2s 0.3s ease both;}
+h1.title{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(4rem,10vw,9rem);letter-spacing:0.05em;line-height:1;background:linear-gradient(155deg,#f0e8ff 0%,#c878f8 35%,#3a1060 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;animation:fadeInUp 2s 0.5s ease both;}
+.title-tag{font-family:'Raleway',sans-serif;font-weight:100;font-size:clamp(0.55rem,1vw,0.72rem);letter-spacing:0.5em;color:var(--dna-dim);text-transform:uppercase;margin-bottom:1rem;animation:fadeInUp 2s 0.7s ease both;}
+.title-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--text-dim);letter-spacing:0.15em;animation:fadeInUp 2s 0.8s ease both;margin-bottom:4rem;}
+.scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.6rem;animation:fadeIn 3s 2s ease both;}
+.scroll-hint span{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.65rem;letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--dna-dim),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+
+/* EPIGRAPH */
+.epigraph-section{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:50vh;padding:5rem 2rem;}
+.epigraph-inner{max-width:640px;text-align:center;}
+blockquote{font-style:italic;font-size:clamp(1.2rem,2.5vw,1.65rem);font-weight:300;line-height:1.8;color:var(--star-white);position:relative;padding:2rem 3rem;}
+blockquote::before{content:'\201C';position:absolute;top:-0.5rem;left:0.5rem;font-size:5rem;line-height:1;color:var(--dna-dim);font-family:Georgia,serif;}
+.quote-source{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.75rem;letter-spacing:0.3em;color:var(--gold-dim);text-transform:uppercase;margin-top:1.5rem;}
+
+/* SECTIONS */
+.section{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:4rem 2rem;}
+.section-label{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.65rem;letter-spacing:0.5em;color:var(--dna-dim);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:1.5rem;}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--dna-dim),transparent);max-width:80px;}
+.section p{font-size:clamp(1rem,2vw,1.2rem);line-height:1.95;color:var(--text-main);font-weight:300;margin-bottom:1.8rem;}
+.section p:first-of-type::first-letter{font-family:'Cinzel',serif;font-size:4.5rem;line-height:0.75;float:left;margin-right:0.15em;margin-top:0.1em;color:var(--dna-bright);filter:drop-shadow(0 0 12px rgba(200,120,248,0.5));}
+.hl{color:var(--dna-pale);font-style:italic;}
+.hl-gold{color:var(--gold);font-style:italic;}
+.pull-quote{border-left:2px solid var(--dna-mid);padding:1.5rem 2rem;margin:3rem 0;font-size:clamp(1.2rem,2.5vw,1.55rem);font-style:italic;color:var(--star-white);background:linear-gradient(to right,rgba(200,120,248,0.37),transparent);line-height:1.6;}
+
+/* VIZ PANELS */
+.viz-panel{position:relative;z-index:1;padding:3rem 2rem 5rem;text-align:center;}
+.viz-title{font-family:'Cinzel',serif;font-size:clamp(0.8rem,1.8vw,0.95rem);letter-spacing:0.3em;color:var(--dna-bright);text-transform:uppercase;margin-bottom:0.6rem;}
+.viz-subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.95rem;color:var(--text-dim);margin-bottom:2.5rem;}
+.viz-caption{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.7rem;letter-spacing:0.2em;color:var(--text-dim);max-width:580px;margin:2rem auto 0;line-height:1.8;text-transform:uppercase;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;max-width:900px;margin:3rem auto;padding:0 2rem;position:relative;z-index:1;}
+.stat-card{background:linear-gradient(135deg,rgba(8,4,22,0.9),rgba(2,1,10,0.95));border:1px solid rgba(136,64,208,0.50);border-radius:2px;padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--dna-dim),transparent);}
+.stat-card:hover{border-color:rgba(200,120,248,0.70);}
+.stat-number{font-family:'Cinzel',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:600;color:var(--dna-bright);line-height:1;margin-bottom:0.6rem;filter:drop-shadow(0 0 10px rgba(200,120,248,0.65));}
+.stat-label{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;line-height:1.5;}
+
+/* DIVIDER */
+.cosmic-divider{display:flex;align-items:center;justify-content:center;padding:3rem 2rem;position:relative;z-index:1;gap:1.5rem;}
+.cosmic-divider::before,.cosmic-divider::after{content:'';flex:1;height:1px;max-width:200px;background:linear-gradient(to right,transparent,rgba(136,64,208,0.55));}
+.cosmic-divider::after{background:linear-gradient(to left,transparent,rgba(136,64,208,0.55));}
+.divider-star{color:var(--dna-dim);font-size:0.6rem;letter-spacing:0.5em;}
+
+/* FINALE */
+.finale-section{position:relative;z-index:1;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem;}
+.finale-text{max-width:700px;font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:2;color:var(--star-white);font-weight:300;}
+.finale-text em{color:var(--dna-pale);}
+.finale-cta{margin-top:5rem;font-family:'Raleway',sans-serif;font-weight:200;font-size:0.65rem;letter-spacing:0.5em;color:var(--text-dim);text-transform:uppercase;}
+
+/* TOOLTIP */
+.tooltip{position:fixed;background:rgba(4,2,16,0.97);border:1px solid rgba(136,64,208,0.65);padding:0.8rem 1.2rem;font-family:'Raleway',sans-serif;font-weight:300;font-size:0.75rem;letter-spacing:0.1em;color:var(--text-main);pointer-events:none;z-index:1000;max-width:260px;line-height:1.6;opacity:0;transition:opacity 0.2s;}
+.tooltip.show{opacity:1;}
+.tooltip strong{display:block;color:var(--dna-bright);margin-bottom:0.3rem;font-weight:400;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--void);}::-webkit-scrollbar-thumb{background:var(--dna-dim);border-radius:2px;}
+
+/* FOOTER */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,0,8,0.98);border-top:1px solid rgba(255,255,255,0.35);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,2,16,0.6);border:1px solid rgba(255,255,255,0.35);padding:1.4rem 1.6rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:130px;max-width:220px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.fd-home::before,.fd-intro::before,.fd-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.fd-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.fd-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.fd-ch4::before{background:linear-gradient(to right,transparent,rgba(200,120,248,0.5),transparent);}
+.footer-dalle:hover{background:rgba(8,4,24,0.9);}
+.fd-home:hover,.fd-intro:hover,.fd-ch1:hover{border-color:rgba(77,143,212,0.50);}
+.fd-ch2:hover{border-color:rgba(201,168,76,0.50);}
+.fd-ch3:hover{border-color:rgba(60,190,120,0.50);}
+.fd-ch4:hover{border-color:rgba(200,120,248,0.50);}
+.footer-sphere{width:28px;height:28px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.50);border-radius:50%;filter:blur(2px);}
+.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.70);}
+.fsp-amber{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 10px rgba(201,168,76,0.70);}
+.fsp-green{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 10px rgba(60,190,120,0.70);}
+.fsp-violet{background:radial-gradient(circle at 38% 32%,#e0a0ff,#8840d0,#1a0440);box-shadow:0 0 10px rgba(200,120,248,0.70);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;}
+.fd-home .footer-num,.fd-intro .footer-num,.fd-ch1 .footer-num{color:#4d8fd4;}
+.fd-ch2 .footer-num{color:#c9a84c;}
+.fd-ch3 .footer-num{color:#3cbe78;}
+.fd-ch4 .footer-num{color:#c878f8;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.62rem;letter-spacing:0.2em;color:rgba(200,216,240,0.5);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.34);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.5);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.65);}
+
+/* ══ SITE FOOTER ══ */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,0,8,0.98);border-top:1px solid rgba(255,255,255,0.35);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,2,16,0.6);border:1px solid rgba(255,255,255,0.35);padding:1.4rem 1.6rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:110px;max-width:190px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.fd-home::before,.fd-intro::before,.fd-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.fd-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.fd-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.fd-ch4::before{background:linear-gradient(to right,transparent,rgba(200,120,248,0.5),transparent);}
+.fd-ch5::before{background:linear-gradient(to right,transparent,rgba(64,208,176,0.5),transparent);}
+.footer-dalle:hover{background:rgba(4,12,10,0.9);}
+.fd-home:hover,.fd-intro:hover,.fd-ch1:hover{border-color:rgba(77,143,212,0.50);}
+.fd-ch2:hover{border-color:rgba(201,168,76,0.50);}
+.fd-ch3:hover{border-color:rgba(60,190,120,0.50);}
+.fd-ch4:hover{border-color:rgba(200,120,248,0.50);}
+.fd-ch5:hover{border-color:rgba(64,208,176,0.50);}
+.footer-sphere{width:26px;height:26px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.50);border-radius:50%;filter:blur(2px);}
+.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.70);}
+.fsp-amber{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 10px rgba(201,168,76,0.70);}
+.fsp-green{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 10px rgba(60,190,120,0.70);}
+.fsp-violet{background:radial-gradient(circle at 38% 32%,#e0a0ff,#8840d0,#1a0440);box-shadow:0 0 10px rgba(200,120,248,0.70);}
+.fsp-cyan{background:radial-gradient(circle at 38% 32%,#80f0e0,#20a888,#041410);box-shadow:0 0 10px rgba(64,208,176,0.70);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.3em;}
+.fd-home .footer-num,.fd-intro .footer-num,.fd-ch1 .footer-num{color:#4d8fd4;}
+.fd-ch2 .footer-num{color:#c9a84c;}
+.fd-ch3 .footer-num{color:#3cbe78;}
+.fd-ch4 .footer-num{color:#c878f8;}
+.fd-ch5 .footer-num{color:#40d0b0;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.58rem;letter-spacing:0.18em;color:rgba(200,220,210,0.5);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.34);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.5);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.65);}
+
+
+/* ══ LISIBILITÉ GLOBALE ══ */
+.viz-caption { color: rgba(180,210,200,0.75) !important; }
+.viz-subtitle { color: rgba(180,200,190,0.7) !important; }
+.section-label { color: rgba(160,200,180,0.75) !important; }
+.quote-source { color: rgba(200,168,80,0.8) !important; }
+.stat-label { color: rgba(180,200,190,0.75) !important; }
+.footer-name { color: rgba(200,220,215,0.72) !important; }
+.footer-num { opacity: 1 !important; }
+.footer-brand { color: rgba(160,180,200,0.65) !important; }
+.footer-copy { color: rgba(140,160,180,0.55) !important; }
+.book-label { color: rgba(100,160,140,0.7) !important; }
+.chapter-num { color: rgba(180,148,60,0.8) !important; }
+.title-tag { color: rgba(100,160,140,0.7) !important; }
+.title-sub { color: rgba(160,190,180,0.65) !important; }
+.scroll-hint span { color: rgba(140,180,170,0.65) !important; }
+.entry-title { color: rgba(190,210,200,0.75) !important; }
+.entry-page { color: rgba(160,180,170,0.65) !important; }
+.partie-label { opacity: 1 !important; }
+.bridge-text { color: rgba(210,230,220,0.85) !important; }
+.dalle-sub { color: rgba(185,205,200,0.65) !important; }
+.hero-desc { color: rgba(195,215,230,0.8) !important; }
+.hero-main-sub { color: rgba(170,195,215,0.65) !important; }
+.caption-sub { color: rgba(170,195,215,0.55) !important; }
+
+
+/* ══════════════ CHAPTER NAV ══════════════ */
+.chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
+.chapter-nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:stretch;gap:1.5rem;}
+.chapter-nav-link{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem 2.2rem;text-decoration:none;background:rgba(4,8,20,0.5);border:1px solid rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;transition:background 0.4s,border-color 0.4s,transform 0.3s;}
+.chapter-nav-link:hover{background:rgba(8,14,32,0.85);transform:translateY(-2px);}
+.chapter-nav-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;transition:opacity 0.3s;}
+.chapter-nav-link:hover::before{opacity:1;}
+.chapter-nav-link--prev{text-align:left;padding-right:3rem;}
+.chapter-nav-link--next{text-align:right;padding-left:3rem;}
+.chapter-nav-label{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem;}
+.chapter-nav-link--prev .chapter-nav-label{color:rgba(140,170,200,0.5);}
+.chapter-nav-link--next .chapter-nav-label{color:rgba(140,170,200,0.5);justify-content:flex-end;}
+.chapter-nav-arrow{font-size:0.75rem;transition:transform 0.3s;}
+.chapter-nav-link:hover .chapter-nav-arrow--prev{transform:translateX(-4px);}
+.chapter-nav-link:hover .chapter-nav-arrow--next{transform:translateX(4px);}
+.chapter-nav-title{font-family:'Cinzel',serif;font-size:clamp(1rem,2vw,1.35rem);letter-spacing:0.04em;line-height:1.25;margin-bottom:0.35rem;transition:text-shadow 0.4s;}
+.chapter-nav-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;line-height:1.4;opacity:0.6;transition:opacity 0.3s;}
+.chapter-nav-link:hover .chapter-nav-sub{opacity:0.85;}
+.chapter-nav-spacer{flex:1;}
+
+/* Separator line */
+.chapter-nav-sep{width:100%;max-width:960px;margin:0 auto 0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
+
+/* Footer bottom */
+.chapter-footer-bottom{text-align:center;padding:2rem 2rem 2.5rem;position:relative;z-index:1;}
+.chapter-footer-brand{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.25em;color:rgba(100,140,180,0.4);margin-bottom:0.3rem;}
+.chapter-footer-brand a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(100,140,180,0.15);transition:color 0.2s,border-color 0.2s;}
+.chapter-footer-brand a:hover{color:rgba(140,180,220,0.7);border-color:rgba(140,180,220,0.3);}
+.chapter-footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.58rem;letter-spacing:0.22em;color:rgba(120,150,170,0.35);}
+
+@media(max-width:600px){
+  .chapter-nav-inner{flex-direction:column;gap:1rem;}
+  .chapter-nav-link--prev,.chapter-nav-link--next{text-align:left;}
+  .chapter-nav-link--next .chapter-nav-label{justify-content:flex-start;}
+  .chapter-nav-link{padding:1.5rem 1.5rem;}
+}
+
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+
+<!-- COVER -->
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu · Partie I — La Biosphère</div>
+  <div class="chapter-num">Chapitre IV</div>
+  <h1 class="title">L'ADN</h1>
+  <div class="title-tag">Un alphabet universel aux possibilités infinies</div>
+  <p class="title-sub">Quatre lettres pour écrire la totalité du vivant</p>
+  <div class="scroll-hint"><span>Défiler</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- EPIGRAPH -->
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>Pour moi, la science donne une explication partielle de la vie.</blockquote>
+    <div class="quote-source">— Rosalind Franklin · Co-découvreuse de l'ADN</div>
+  </div>
+</section>
+
+<!-- SECTION 1 -->
+<div class="section reveal">
+  <div class="section-label">De la chimie à la mémoire</div>
+  <p>À l'intérieur de cette anomalie qu'est la vie, la complexité ne surgit pas d'un coup. Elle s'élabore à partir d'éléments d'une simplicité déroutante. Une cellule n'est, en apparence, qu'une poche de graisse remplie d'eau et de molécules. Pourtant, certaines de ces molécules ont acquis des propriétés stupéfiantes : <span class="hl">les protéines</span>, constituées de longues chaînes d'acides aminés repliées en des formes précises.</p>
+  <p>Or ces acides aminés sont <span class="hl">seulement au nombre de vingt</span> — et leurs combinaisons suffisent à produire une infinité de séquences. La complexité ne vient pas du nombre, mais de l'organisation.</p>
+</div>
+
+<!-- VIZ 1 : LES 20 BRIQUES LEGO -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Les 20 briques du vivant</div>
+  <div class="viz-subtitle">Vingt acides aminés suffisent à construire toutes les protéines de tous les êtres vivants</div>
+  <canvas id="amino-canvas" style="width:100%;max-width:980px;height:480px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Survolez chaque brique — des molécules aux fonctions radicalement différentes construites avec les mêmes 20 pièces</div>
+</div>
+
+<!-- VIZ 2 : LES GRANDES PROTÉINES -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Des briques aux chefs-d'œuvre</div>
+  <div class="viz-subtitle">Cinq protéines majeures de votre corps — toutes faites des mêmes 20 acides aminés</div>
+  <canvas id="protein-canvas" style="width:100%;max-width:980px;height:420px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">La longueur de la chaîne et l'ordre des briques déterminent tout — la forme, la fonction, la vie</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card reveal"><div class="stat-number">20</div><div class="stat-label">Acides aminés<br>pour tout le vivant</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.1s"><div class="stat-number">4</div><div class="stat-label">Lettres dans<br>l'alphabet de l'ADN</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.2s"><div class="stat-number">34 000</div><div class="stat-label">Acides aminés dans<br>la Titine (la plus longue)</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.3s"><div class="stat-number">∞</div><div class="stat-label">Séquences possibles<br>avec ces 20 briques</div></div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 2 -->
+<div class="section reveal">
+  <div class="section-label">La mémoire du vivant</div>
+  <p>Pour que ces protéines existent, il fallait une mémoire capable d'en conserver la recette et de la transmettre. Cette mémoire est portée par <span class="hl">l'ADN</span>, une molécule extraordinairement stable, qui stocke l'information du vivant sous la forme d'un alphabet réduit à quatre lettres : A, T, G, C.</p>
+  <p>L'ADN reste protégé au cœur de la cellule, tandis que des copies temporaires, <span class="hl">l'ARN</span>, acheminent l'information vers les ribosomes où les protéines sont assemblées. Ce message y est lu par triplets de bases, appelés codons, chacun correspondant à un acide aminé donné.</p>
+</div>
+
+<!-- VIZ 3 : DOUBLE HÉLICE + CODE GÉNÉTIQUE -->
+<div class="viz-panel reveal">
+  <div class="viz-title">La double hélice</div>
+  <div class="viz-subtitle">A s'apparie avec T · G s'apparie avec C — la règle fondamentale de la vie</div>
+  <canvas id="helix-canvas" style="width:100%;max-width:900px;height:380px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Quatre lettres, une règle d'appariement, et toute l'information du vivant est stockée, copiée, transmise</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 3 -->
+<div class="section reveal">
+  <div class="section-label">Le paradoxe fondamental</div>
+  <p>Mais cette architecture soulève un paradoxe profond. <span class="hl">Les protéines sont nécessaires pour copier l'ADN, et l'ADN est nécessaire pour fabriquer les protéines.</span> La vie semble donc s'être engendrée dans une boucle.</p>
+  <p>Cette circularité suggère que les premières formes du vivant furent probablement imparfaites, hybrides, fondées sur des systèmes capables à la fois de porter de l'information et d'agir sur la matière. La vie n'est pas née complète. Elle s'est stabilisée progressivement, par essais, erreurs et sélection.</p>
+</div>
+
+<!-- VIZ 4 : LE PARADOXE POULE/ŒUF -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Le paradoxe de la boucle</div>
+  <div class="viz-subtitle">L'ADN fabrique les protéines · Les protéines copient l'ADN — qui est venu en premier ?</div>
+  <canvas id="paradox-canvas" style="width:100%;max-width:860px;height:400px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">L'ARN, capable des deux fonctions, est la clé de cette énigme — le monde ARN, hypothèse centrale de l'origine de la vie</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 4 -->
+<div class="section reveal">
+  <div class="section-label">Une information sans chef</div>
+  <p>Plus étonnant, malgré sa complexité, <span class="hl">la vie fonctionne comme un système distribué</span>, sans instance centrale de commandement. L'ADN constitue une bibliothèque commune, identique dans presque toutes les cellules, mais chaque type de cellule n'en consulte qu'une infime partie, selon sa fonction et son état.</p>
+  <p>Depuis quelques décennies, la biologie a mis en évidence un niveau supplémentaire de régulation : <span class="hl">l'épigénétique</span>. Sans modifier la séquence de l'ADN, des marques chimiques peuvent moduler l'expression des gènes en fonction de l'environnement, de l'alimentation, du stress, des relations sociales. <span class="hl-gold">L'ADN n'est pas un programme figé, mais une bibliothèque vivante.</span></p>
+</div>
+
+<!-- VIZ 5 : UNIVERSALITÉ DU CODE -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Une langue universelle</div>
+  <div class="viz-subtitle">Les mêmes codons codent les mêmes acides aminés chez une bactérie, un arbre ou un humain</div>
+  <canvas id="universal-canvas" style="width:100%;max-width:900px;height:320px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Le code génétique est la preuve d'une origine commune — tous les êtres vivants parlent la même langue</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- SECTION 5 -->
+<div class="section reveal">
+  <div class="section-label">Entre compétition et entrelacement</div>
+  <p>Ces histoires ne sont pas paisibles. Richard Dawkins a poussé cette logique jusqu'à sa limite avec la théorie du <span class="hl">gène égoïste</span> : les organismes ne seraient que des véhicules temporaires au service de gènes cherchant à se reproduire.</p>
+  <p>Mais cette vision est incomplète. Car si les gènes n'étaient que des compétiteurs impitoyables, la vie complexe n'aurait jamais existé. Les génomes sont des réseaux de gènes interdépendants. <span class="hl-gold">La vie ne progresse pas uniquement par la guerre, mais par l'entrelacement.</span></p>
+  <div class="pull-quote">"Savoir que nos gènes peuvent être égoïstes ne nous condamne pas à l'être. Cela ouvre une possibilité radicalement nouvelle : choisir consciemment la coopération avec le vivant."</div>
+</div>
+
+<!-- FINALE -->
+<section class="finale-section">
+  <p class="finale-text reveal">
+    Quatre lettres.<br>Vingt briques.<br>Une grammaire commune.<br><br>
+    <em>Et à partir de là — des forêts, des océans,<br>des neurones, des consciences.</em><br><br>
+    L'ADN est la preuve que la complexité infinie<br>peut naître de la simplicité absolue.
+  </p>
+  <div class="finale-cta reveal" style="transition-delay:0.5s">↓ &nbsp; Chapitre V</div>
+</section>
+
+<!-- FOOTER -->
+
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),cRing=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function ar(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;cRing.style.left=rx+'px';cRing.style.top=ry+'px';requestAnimationFrame(ar);})();
+
+// STARFIELD — violet tinted
+const sfC=document.getElementById('starfield'),sfX=sfC.getContext('2d');
+function rsf(){
+  const dpr=window.devicePixelRatio||1;
+  sfC.width=Math.round(window.innerWidth*dpr);
+  sfC.height=Math.round(window.innerHeight*dpr);
+  sfC.style.width=window.innerWidth+'px';
+  sfC.style.height=window.innerHeight+'px';
+  sfX.scale(dpr,dpr);
+}rsf();window.addEventListener('resize',rsf);
+const stars=Array.from({length:280},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+0.2,alpha:Math.random()*0.5+0.1,phase:Math.random()*Math.PI*2,speed:Math.random()*0.001+0.0003}));
+let sft=0;
+(function ds(){sfX.clearRect(0,0,sfC.width,sfC.height);sft+=0.01;
+  stars.forEach(s=>{const a=s.alpha*(0.5+0.5*Math.sin(sft*s.speed*300+s.phase));sfX.beginPath();sfX.arc(s.x*sfC.width,s.y*sfC.height,s.r,0,Math.PI*2);sfX.fillStyle=`rgba(180,150,220,${a})`;sfX.fill();});
+  requestAnimationFrame(ds);})();
+
+// COVER CANVAS — DNA strands drifting
+const cc=document.getElementById('cover-canvas'),cx0=cc.getContext('2d');
+function rcc(){
+  const dpr=window.devicePixelRatio||1;
+  const w=cc.offsetWidth,h=cc.offsetHeight;
+  cc.width=Math.round(w*dpr);cc.height=Math.round(h*dpr);
+  cc.style.width=w+'px';cc.style.height=h+'px';
+  cx0.scale(dpr,dpr);
+}rcc();window.addEventListener('resize',rcc);
+const BASES=['A','T','G','C'],BCOLS=['#e84060','#40a8e8','#60d080','#f0c040'];
+const coverPts=Array.from({length:40},()=>({x:Math.random()*1000,y:Math.random()*800,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5,base:Math.floor(Math.random()*4),r:3+Math.random()*3,alpha:Math.random()*0.4+0.1,phase:Math.random()*Math.PI*2}));
+let cct=0;
+(function dcc(){cx0.clearRect(0,0,cc.width,cc.height);cct+=0.01;
+  coverPts.forEach((p,i)=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=cc.width;if(p.x>cc.width)p.x=0;if(p.y<0)p.y=cc.height;if(p.y>cc.height)p.y=0;
+    coverPts.slice(i+1).forEach(q=>{const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){cx0.strokeStyle=`rgba(136,64,208,${(1-d/100)*0.1})`;cx0.lineWidth=0.8;cx0.beginPath();cx0.moveTo(p.x,p.y);cx0.lineTo(q.x,q.y);cx0.stroke();}});
+    cx0.globalAlpha=p.alpha*(0.6+0.4*Math.sin(cct*2+p.phase));
+    cx0.fillStyle=BCOLS[p.base];cx0.beginPath();cx0.arc(p.x,p.y,p.r,0,Math.PI*2);cx0.fill();
+    cx0.globalAlpha=1;
+  });
+  requestAnimationFrame(dcc);})();
+
+// SCROLL REVEAL
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// TOOLTIP
+const tooltip=document.getElementById('tooltip');
+function showTip(e,t,txt){tooltip.innerHTML=`<strong>${t}</strong>${txt}`;tooltip.classList.add('show');moveTip(e);}
+function moveTip(e){tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-10)+'px';}
+function hideTip(){tooltip.classList.remove('show');}
+document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))moveTip(e);});
+
+
+// ── DEVICE PIXEL RATIO FIX (anti-flou Retina) ──
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+
+// ═══════════════════════════════════════════════════════
+// VIZ 1 : LES 20 ACIDES AMINÉS — briques colorées
+// ═══════════════════════════════════════════════════════
+(function buildAmino(){
+  const canvas=document.getElementById('amino-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+  const dpr=window.devicePixelRatio||1;
+  const r=canvas.parentElement.getBoundingClientRect();
+  W=Math.min(r.width,980);
+  H=480;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+}
+  resize();window.addEventListener('resize',resize);
+
+  // 20 acides aminés avec propriétés
+  const amino=[
+    {name:'Glycine',   abbr:'Gly',let:'G',mass:75,  cat:'nonpolaire',   col:'#9090c0',fun:'Flexibilité des protéines'},
+    {name:'Alanine',   abbr:'Ala',let:'A',mass:89,  cat:'nonpolaire',   col:'#8080b0',fun:'Structure hélicoïdale'},
+    {name:'Valine',    abbr:'Val',let:'V',mass:117, cat:'nonpolaire',   col:'#7070a0',fun:'Cœur hydrophobe'},
+    {name:'Leucine',   abbr:'Leu',let:'L',mass:131, cat:'nonpolaire',   col:'#6060a0',fun:'Signal membranaire'},
+    {name:'Isoleucine',abbr:'Ile',let:'I',mass:131, cat:'nonpolaire',   col:'#5050a0',fun:'Métabolisme musculaire'},
+    {name:'Proline',   abbr:'Pro',let:'P',mass:115, cat:'nonpolaire',   col:'#a060c0',fun:'Coudes dans les protéines'},
+    {name:'Phénylalanine',abbr:'Phe',let:'F',mass:165,cat:'nonpolaire', col:'#b070d0',fun:'Signal aromatique'},
+    {name:'Tryptophane',abbr:'Trp',let:'W',mass:204,cat:'nonpolaire',   col:'#c080e0',fun:'Précurseur sérotonine'},
+    {name:'Méthionine',abbr:'Met',let:'M',mass:149, cat:'nonpolaire',   col:'#d090f0',fun:'Début de traduction'},
+    {name:'Sérine',    abbr:'Ser',let:'S',mass:105, cat:'polaire',      col:'#40c0e0',fun:'Phosphorylation'},
+    {name:'Thréonine', abbr:'Thr',let:'T',mass:119, cat:'polaire',      col:'#30b0d0',fun:'Signalisation'},
+    {name:'Cystéine',  abbr:'Cys',let:'C',mass:121, cat:'polaire',      col:'#f0d040',fun:'Ponts disulfure'},
+    {name:'Tyrosine',  abbr:'Tyr',let:'Y',mass:181, cat:'polaire',      col:'#e0c030',fun:'Signalisation enzymatique'},
+    {name:'Asparagine',abbr:'Asn',let:'N',mass:132, cat:'polaire',      col:'#50e090',fun:'Glycosylation'},
+    {name:'Glutamine', abbr:'Gln',let:'Q',mass:146, cat:'polaire',      col:'#40d080',fun:'Transport azote'},
+    {name:'Aspartate', abbr:'Asp',let:'D',mass:133, cat:'acide',        col:'#e84060',fun:'Site actif enzymatique'},
+    {name:'Glutamate', abbr:'Glu',let:'E',mass:147, cat:'acide',        col:'#d03050',fun:'Neurotransmetteur'},
+    {name:'Lysine',    abbr:'Lys',let:'K',mass:146, cat:'basique',      col:'#4080e0',fun:'Liaison ADN-histone'},
+    {name:'Arginine',  abbr:'Arg',let:'R',mass:174, cat:'basique',      col:'#3070d0',fun:'Sites de clivage'},
+    {name:'Histidine', abbr:'His',let:'H',mass:155, cat:'basique',      col:'#2060c0',fun:'pH-sensible · enzymes'},
+  ];
+
+  const CATS={nonpolaire:'#8070b0',polaire:'#40b0d0',acide:'#e84060',basique:'#4080e0'};
+  const CATNAMES={nonpolaire:'Hydrophobe',polaire:'Polaire',acide:'Acide',basique:'Basique'};
+
+  let t=0;
+  const cols=5,rows=4;
+  const pad=20;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.012;
+
+    const cellW=(W-pad*2)/cols;
+    const cellH=(H-pad*2-60)/rows;
+
+    // Legend
+    Object.entries(CATS).forEach(([k,c],i)=>{
+      const lx=pad+i*(W-pad*2)/4+30,ly=H-28;
+      ctx.beginPath();ctx.arc(lx-18,ly,7,0,Math.PI*2);ctx.fillStyle=c;ctx.globalAlpha=0.8;ctx.fill();ctx.globalAlpha=1;
+      ctx.font=`300 ${Math.min(9,W*0.011)}px 'Raleway',sans-serif`;ctx.fillStyle='rgba(190,170,220,0.5)';ctx.textAlign='left';
+      ctx.fillText(CATNAMES[k],lx-8,ly+4);
+    });
+
+    amino.forEach((aa,i)=>{
+      const col=i%cols, row=Math.floor(i/cols);
+      const cx=pad+col*cellW+cellW/2;
+      const cy=pad+row*cellH+cellH/2;
+      const wobble=Math.sin(t*1.2+i*0.4)*3;
+      const px=cx, py=cy+wobble;
+
+      // Background cell
+      ctx.fillStyle='rgba(136,64,208,0.34)';ctx.fillRect(pad+col*cellW+4,pad+row*cellH+4,cellW-8,cellH-8);
+
+      // Circle sized by mass
+      const r=12+aa.mass/20;
+      const gd=ctx.createRadialGradient(px-r*0.3,py-r*0.3,0,px,py,r);
+      gd.addColorStop(0,aa.col+'ff');gd.addColorStop(1,aa.col+'60');
+      ctx.fillStyle=gd;ctx.globalAlpha=0.85;
+      ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;
+
+      // Glow
+      const gl=ctx.createRadialGradient(px,py,r*0.5,px,py,r*2);
+      gl.addColorStop(0,aa.col+'30');gl.addColorStop(1,'transparent');
+      ctx.fillStyle=gl;ctx.beginPath();ctx.arc(px,py,r*2,0,Math.PI*2);ctx.fill();
+
+      // Shine
+      const sh=ctx.createRadialGradient(px-r*0.35,py-r*0.35,0,px,py,r);
+      sh.addColorStop(0,'rgba(255,255,255,0.65)');sh.addColorStop(1,'transparent');
+      ctx.fillStyle=sh;ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fill();
+
+      // Letter
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.font=`600 ${Math.min(r*0.9,14)}px 'Cinzel',serif`;
+      ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillText(aa.let,px,py);
+
+      // Name below
+      ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(180,160,210,0.6)';ctx.textBaseline='top';
+      ctx.fillText(aa.abbr,px,py+r+4);
+      ctx.textBaseline='alphabetic';
+
+      aa._x=px;aa._y=py;aa._r=r;
+    });
+
+    requestAnimationFrame(loop);
+  })();
+
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=W/rect.width,scaleY=H/rect.height;
+    const mx2=(e.clientX-rect.left)*scaleX,my2=(e.clientY-rect.top)*scaleY;
+    let hit=null;
+    amino.forEach(aa=>{if(!aa._x)return;const dx=mx2-aa._x,dy=my2-aa._y;if(Math.sqrt(dx*dx+dy*dy)<aa._r+8)hit=aa;});
+    if(hit)showTip(e,`${hit.name} (${hit.abbr})`,`<br>Masse : ${hit.mass} Da<br>Catégorie : ${CATNAMES[hit.cat]}<br><em>${hit.fun}</em>`);
+    else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+
+// ═══════════════════════════════════════════════════════
+// VIZ 2 : PROTÉINES — chaînes colorées
+// ═══════════════════════════════════════════════════════
+(function buildProteins(){
+  const canvas=document.getElementById('protein-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+  const dpr=window.devicePixelRatio||1;
+  const r=canvas.parentElement.getBoundingClientRect();
+  W=Math.min(r.width,980);
+  H=420;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+}
+  resize();window.addEventListener('resize',resize);
+
+  const proteins=[
+    {name:'Insuline',  aa:51,  col:'#e84060',sub:'Régule la glycémie',  fun:'Votre pancréas produit cette protéine après chaque repas sucré'},
+    {name:'Rhodopsine',aa:348, col:'#c878f8',sub:'Vision nocturne',     fun:'Capte un seul photon — vous permet de voir dans l\'obscurité'},
+    {name:'Collagène', aa:500, col:'#60d0c0',sub:'Structure du corps',  fun:'La protéine la plus abondante — peau, os, tendons'},
+    {name:'Amylase',   aa:500, col:'#f0c040',sub:'Digestion',           fun:'Active dès votre salive — transforme l\'amidon en sucre'},
+    {name:'Titine',    aa:34000,col:'#40a8e8',sub:'Élasticité musculaire',fun:'La plus longue protéine connue — ressort moléculaire de vos muscles'},
+  ];
+
+  const maxAA=34000;
+  let t=0;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.01;
+
+    const margin={l:140,r:40,t:30,b:40};
+    const iW=W-margin.l-margin.r;
+    const rowH=(H-margin.t-margin.b)/proteins.length;
+
+    // Log scale for visual fairness
+    const logMax=Math.log10(maxAA);
+    const xScale=aa=>margin.l+(Math.log10(Math.max(aa,1))/logMax)*iW;
+
+    // Axis
+    [1,10,50,100,500,1000,5000,34000].forEach(v=>{
+      const x=xScale(v);
+      ctx.strokeStyle='rgba(136,64,208,0.42)';ctx.lineWidth=1;ctx.setLineDash([2,4]);
+      ctx.beginPath();ctx.moveTo(x,margin.t);ctx.lineTo(x,H-margin.b);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(136,64,208,0.70)';ctx.textAlign='center';
+      ctx.fillText(v>999?Math.round(v/1000)+'k':v,x,H-margin.b+14);
+    });
+    ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+    ctx.fillStyle='rgba(136,64,208,0.65)';ctx.textAlign='center';
+    ctx.fillText('Nombre d\'acides aminés (échelle log)',W/2,H-4);
+
+    proteins.forEach((p,i)=>{
+      const y=margin.t+i*rowH+rowH/2;
+      const barW=xScale(p.aa)-margin.l;
+      const wobble=Math.sin(t+i*0.8)*1.5;
+
+      // Bar background track
+      ctx.fillStyle='rgba(136,64,208,0.35)';
+      ctx.fillRect(margin.l,y-8,iW,16);
+
+      // Bar — segments colored like amino acids
+      const segW=Math.max(barW/Math.min(p.aa,80),2);
+      const nSeg=Math.min(p.aa,80);
+      const segColors=['#9090c0','#8080b0','#40c0e0','#e84060','#f0c040','#60d080','#c878f8','#40a8e8'];
+      for(let s=0;s<nSeg;s++){
+        ctx.fillStyle=segColors[s%segColors.length];
+        ctx.globalAlpha=0.7;
+        ctx.fillRect(margin.l+s*(barW/nSeg),y-7+wobble*0.3,(barW/nSeg)-1,14);
+      }
+      ctx.globalAlpha=1;
+
+      // Protein name
+      ctx.font=`300 ${Math.min(11,W*0.013)}px 'Raleway',sans-serif`;
+      ctx.fillStyle=p.col;ctx.textAlign='right';
+      ctx.fillText(p.name,margin.l-12,y+4);
+
+      // AA count
+      ctx.font=`200 ${Math.min(9,W*0.011)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(180,160,220,0.5)';ctx.textAlign='left';
+      ctx.fillText(p.aa.toLocaleString()+' aa',xScale(p.aa)+8,y+4);
+
+      // Sub
+      ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(140,120,180,0.70)';ctx.textAlign='right';
+      ctx.fillText(p.sub,margin.l-12,y+16);
+
+      p._y=y;p._barW=barW;
+    });
+
+    requestAnimationFrame(loop);
+  })();
+
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const scaleY=H/rect.height;
+    const my2=(e.clientY-rect.top)*scaleY;
+    let hit=null;
+    proteins.forEach(p=>{if(p._y&&Math.abs(my2-p._y)<20)hit=p;});
+    if(hit)showTip(e,hit.name,`<br>${hit.aa.toLocaleString()} acides aminés<br><em>${hit.fun}</em>`);
+    else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+
+// ═══════════════════════════════════════════════════════
+// VIZ 3 : DOUBLE HÉLICE
+// ═══════════════════════════════════════════════════════
+(function buildHelix(){
+  const canvas=document.getElementById('helix-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+  const dpr=window.devicePixelRatio||1;
+  const r=canvas.parentElement.getBoundingClientRect();
+  W=Math.min(r.width,900);
+  H=380;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+}
+  resize();window.addEventListener('resize',resize);
+
+  const PAIRS=[['A','T','#e84060','#40a8e8'],['T','A','#40a8e8','#e84060'],['G','C','#60d080','#f0c040'],['C','G','#f0c040','#60d080'],
+               ['A','T','#e84060','#40a8e8'],['G','C','#60d080','#f0c040'],['T','A','#40a8e8','#e84060'],['C','G','#f0c040','#60d080'],
+               ['A','T','#e84060','#40a8e8'],['G','C','#60d080','#f0c040'],['T','A','#40a8e8','#e84060'],['C','G','#f0c040','#60d080'],
+               ['A','T','#e84060','#40a8e8'],['T','A','#40a8e8','#e84060'],['G','C','#60d080','#f0c040']];
+  let t=0;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.015;
+
+    const cy=H/2;
+    const amplitude=70;
+    const period=W/2;
+    const nPairs=PAIRS.length;
+    const spacing=W/(nPairs+1);
+
+    // Draw backbone curves
+    ctx.save();
+    ctx.strokeStyle='rgba(136,64,208,0.60)';ctx.lineWidth=2;
+    // Strand 1
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=2){
+      const y=cy+Math.sin((x/period)*Math.PI*2+t)*amplitude;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }ctx.stroke();
+    // Strand 2
+    ctx.strokeStyle='rgba(200,120,248,0.60)';
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=2){
+      const y=cy+Math.sin((x/period)*Math.PI*2+t+Math.PI)*amplitude;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }ctx.stroke();
+    ctx.restore();
+
+    // Draw base pairs
+    PAIRS.forEach(([b1,b2,c1,c2],i)=>{
+      const x=(i+1)*spacing;
+      const y1=cy+Math.sin((x/period)*Math.PI*2+t)*amplitude;
+      const y2=cy+Math.sin((x/period)*Math.PI*2+t+Math.PI)*amplitude;
+
+      // Connector
+      ctx.strokeStyle='rgba(200,200,200,0.45)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Base 1
+      const g1=ctx.createRadialGradient(x,y1,0,x,y1,12);
+      g1.addColorStop(0,c1);g1.addColorStop(1,c1+'40');
+      ctx.fillStyle=g1;ctx.beginPath();ctx.arc(x,y1,12,0,Math.PI*2);ctx.fill();
+      ctx.font=`600 11px 'Cinzel',serif`;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(b1,x,y1);
+
+      // Base 2
+      const g2=ctx.createRadialGradient(x,y2,0,x,y2,12);
+      g2.addColorStop(0,c2);g2.addColorStop(1,c2+'40');
+      ctx.fillStyle=g2;ctx.beginPath();ctx.arc(x,y2,12,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillText(b2,x,y2);
+    });
+
+    // Legend
+    [['A','#e84060','Adénine'],['T','#40a8e8','Thymine'],['G','#60d080','Guanine'],['C','#f0c040','Cytosine']].forEach(([l,c,n],i)=>{
+      const lx=W/2-120+i*70,ly=H-18;
+      ctx.beginPath();ctx.arc(lx,ly,9,0,Math.PI*2);
+      const gl=ctx.createRadialGradient(lx,ly,0,lx,ly,9);gl.addColorStop(0,c);gl.addColorStop(1,c+'40');
+      ctx.fillStyle=gl;ctx.fill();
+      ctx.font=`600 9px 'Cinzel',serif`;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(l,lx,ly);
+    });
+
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════
+// VIZ 4 : PARADOXE ADN ↔ PROTÉINES
+// ═══════════════════════════════════════════════════════
+(function buildParadox(){
+  const canvas=document.getElementById('paradox-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+  const dpr=window.devicePixelRatio||1;
+  const r=canvas.parentElement.getBoundingClientRect();
+  W=Math.min(r.width,860);
+  H=400;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+}
+  resize();window.addEventListener('resize',resize);
+  let t=0;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.012;
+
+    const cx=W/2,cy=H/2;
+
+    // 3 nodes: ADN, ARN, Protéines
+    const nodes=[
+      {label:'ADN',sub:'Mémoire stable',col:'#c878f8',x:cx,y:cy-120,r:42},
+      {label:'ARN',sub:'Messager hybride',col:'#40c0e0',x:cx+140,y:cy+60,r:34},
+      {label:'Protéines',sub:'Action moléculaire',col:'#60d080',x:cx-140,y:cy+60,r:38},
+    ];
+
+    // Arrows between nodes with labels
+    const arrows=[
+      {from:0,to:1,label:'Transcription',col:'rgba(200,120,248,0.6)',offset:-15},
+      {from:1,to:2,label:'Traduction',col:'rgba(64,192,224,0.6)',offset:-15},
+      {from:2,to:0,label:'Nécessaire\npour copier',col:'rgba(96,208,128,0.6)',offset:-15},
+    ];
+
+    arrows.forEach(a=>{
+      const from=nodes[a.from],to=nodes[a.to];
+      const dx=to.x-from.x,dy=to.y-from.y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      const ux=dx/d,uy=dy/d;
+      const sx=from.x+ux*from.r,sy=from.y+uy*from.r;
+      const ex=to.x-ux*to.r,ey=to.y-uy*to.r;
+      // Curved arrow
+      const pulse=0.5+0.5*Math.sin(t*2+a.from);
+      ctx.strokeStyle=a.col.replace('0.6',`${pulse*0.8}`);
+      ctx.lineWidth=2+pulse;
+      ctx.setLineDash([6,4]);
+      const mx2=(sx+ex)/2-uy*40,my2=(sy+ey)/2+ux*40;
+      ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo(mx2,my2,ex,ey);ctx.stroke();
+      ctx.setLineDash([]);
+      // Arrowhead
+      const angle=Math.atan2(ey-my2,ex-mx2);
+      ctx.fillStyle=a.col;ctx.save();ctx.translate(ex,ey);ctx.rotate(angle);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-10,-5);ctx.lineTo(-10,5);ctx.closePath();ctx.fill();ctx.restore();
+      // Label
+      ctx.font=`200 ${Math.min(9,W*0.011)}px 'Raleway',sans-serif`;ctx.fillStyle=a.col;ctx.textAlign='center';
+      ctx.fillText(a.label.split('\n')[0],mx2,my2-6);
+      if(a.label.includes('\n'))ctx.fillText(a.label.split('\n')[1],mx2,my2+8);
+    });
+
+    // Nodes
+    nodes.forEach((n,i)=>{
+      const pulse=0.8+0.2*Math.sin(t*1.5+i*2);
+      const g=ctx.createRadialGradient(n.x-n.r*0.3,n.y-n.r*0.3,0,n.x,n.y,n.r*pulse*1.2);
+      g.addColorStop(0,n.col+'cc');g.addColorStop(1,n.col+'20');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(n.x,n.y,n.r*pulse,0,Math.PI*2);ctx.fill();
+      // Glow ring
+      ctx.strokeStyle=n.col+'50';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r*pulse+8*Math.sin(t+i),0,Math.PI*2);ctx.stroke();
+      // Labels
+      ctx.font=`600 ${Math.min(12,W*0.015)}px 'Cinzel',serif`;
+      ctx.fillStyle='rgba(255,255,255,0.9)';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(n.label,n.x,n.y-5);
+      ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(200,180,240,0.5)';ctx.textBaseline='top';
+      ctx.fillText(n.sub,n.x,n.y+n.r*pulse+6);
+      ctx.textBaseline='alphabetic';
+    });
+
+    // Central question
+    ctx.font=`300 ${Math.min(11,W*0.013)}px 'Cormorant Garamond',serif`;
+    ctx.fillStyle=`rgba(200,180,240,${0.2+0.1*Math.sin(t*0.5)})`;
+    ctx.textAlign='center';ctx.fillText('Qui est venu en premier ?',cx,cy+8);
+
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════
+// VIZ 5 : UNIVERSALITÉ DU CODE
+// ═══════════════════════════════════════════════════════
+(function buildUniversal(){
+  const canvas=document.getElementById('universal-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+  const dpr=window.devicePixelRatio||1;
+  const r=canvas.parentElement.getBoundingClientRect();
+  W=Math.min(r.width,900);
+  H=320;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+}
+  resize();window.addEventListener('resize',resize);
+
+  const beings=[
+    {name:'Bactérie',    icon:'⬡',col:'#60d080',x:0},
+    {name:'Champignon',  icon:'⬡',col:'#f0c040',x:0},
+    {name:'Plante',      icon:'⬡',col:'#50e070',x:0},
+    {name:'Insecte',     icon:'⬡',col:'#e0a040',x:0},
+    {name:'Poisson',     icon:'⬡',col:'#40c0e0',x:0},
+    {name:'Oiseau',      icon:'⬡',col:'#c878f8',x:0},
+    {name:'Humain',      icon:'⬡',col:'#7ab8f5',x:0},
+  ];
+
+  // Sample codons
+  const codons=[
+    {codon:'AUG',aa:'Met',col:'#e84060',note:'Début universel'},
+    {codon:'GGU',aa:'Gly',col:'#9090c0',note:'Identique partout'},
+    {codon:'UAA',aa:'Stop',col:'rgba(200,200,200,0.5)',note:'Signal d\'arrêt universel'},
+    {codon:'CCU',aa:'Pro',col:'#a060c0',note:'Identique partout'},
+  ];
+
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.01;
+
+    const N=beings.length;
+    const spacing=W/(N+1);
+    beings.forEach((b,i)=>{b.x=spacing*(i+1);});
+
+    const cy=H*0.45;
+
+    // Central DNA strand
+    ctx.save();
+    ctx.strokeStyle='rgba(136,64,208,0.50)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(40,cy);ctx.lineTo(W-40,cy);ctx.stroke();
+    ctx.restore();
+
+    // Codons on the strand
+    codons.forEach((c,i)=>{
+      const x=W*0.15+i*(W*0.7/codons.length)+W*0.07;
+      // Codon box
+      ctx.fillStyle=`rgba(8,4,22,0.9)`;ctx.fillRect(x-24,cy-14,48,28);
+      ctx.strokeStyle=c.col;ctx.lineWidth=1;ctx.strokeRect(x-24,cy-14,48,28);
+      ctx.font=`600 ${Math.min(10,W*0.012)}px 'Cinzel',serif`;
+      ctx.fillStyle=c.col;ctx.textAlign='center';ctx.fillText(c.codon,x,cy+2);
+      ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(160,140,200,0.5)';ctx.fillText(c.aa,x,cy+18);
+    });
+
+    // Beings at top and bottom, connected to strand
+    beings.forEach((b,i)=>{
+      const above=i%2===0;
+      const by=above?H*0.12:H*0.78;
+      const pulse=0.7+0.3*Math.sin(t+i*0.7);
+
+      // Line to strand
+      ctx.strokeStyle=`${b.col}40`;ctx.lineWidth=1;ctx.setLineDash([2,4]);
+      ctx.beginPath();ctx.moveTo(b.x,above?by+20:by-20);ctx.lineTo(b.x,cy);ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Node
+      const gr=ctx.createRadialGradient(b.x,by,0,b.x,by,18*pulse);
+      gr.addColorStop(0,b.col+'cc');gr.addColorStop(1,b.col+'20');
+      ctx.fillStyle=gr;ctx.beginPath();ctx.arc(b.x,by,18*pulse,0,Math.PI*2);ctx.fill();
+
+      ctx.font=`200 ${Math.min(9,W*0.011)}px 'Raleway',sans-serif`;
+      ctx.fillStyle='rgba(200,180,240,0.7)';ctx.textAlign='center';
+      ctx.fillText(b.name,b.x,above?by-24:by+30);
+    });
+
+    // Label
+    ctx.font=`200 ${Math.min(8,W*0.01)}px 'Raleway',sans-serif`;
+    ctx.fillStyle='rgba(136,64,208,0.70)';ctx.textAlign='center';
+    ctx.fillText('LE MÊME CODE GÉNÉTIQUE CHEZ TOUS',W/2,H-6);
+
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+
+<!-- ══ CHAPTER NAV ══ -->
+<nav class="chapter-nav">
+  <div class="chapter-nav-inner">
+    <a href="petit-livre-bleu-chapitre3.html" class="chapter-nav-link chapter-nav-link--prev" style="--nav-accent:#3cbe78;">
+      <div class="chapter-nav-label"><span class="chapter-nav-arrow chapter-nav-arrow--prev">←</span> Chapitre précédent</div>
+      <div class="chapter-nav-title" style="color:#3cbe78;text-shadow:0 0 30px rgba(60,190,120,0.4);">La Vie</div>
+      <div class="chapter-nav-sub">L'anomalie dynamique qui refuse de disparaître</div>
+    </a>
+    <a href="petit-livre-bleu-chapitre5.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#40d0b0;">
+      <div class="chapter-nav-label">Chapitre suivant <span class="chapter-nav-arrow chapter-nav-arrow--next">→</span></div>
+      <div class="chapter-nav-title" style="color:#40d0b0;text-shadow:0 0 30px rgba(64,208,176,0.4);">Une première crise planétaire</div>
+      <div class="chapter-nav-sub">Quand la vie faillit se tuer elle-même</div>
+    </a>
+  </div>
+</nav>
+<div class="chapter-nav-sep"></div>
+<div class="chapter-footer-bottom">
+  <div class="chapter-footer-brand"><a href="index.html">Le Petit Livre Bleu</a> · Jean-Pierre Goux</div>
+  <div class="chapter-footer-copy">Une autre histoire de l'humanité</div>
+</div>
+</body>
+</html>

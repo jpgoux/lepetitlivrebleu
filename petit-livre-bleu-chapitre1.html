@@ -620,6 +620,44 @@ footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);bord
 .footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
 .footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
 
+
+/* ══════════════ CHAPTER NAV ══════════════ */
+.chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
+.chapter-nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:stretch;gap:1.5rem;}
+.chapter-nav-link{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem 2.2rem;text-decoration:none;background:rgba(4,8,20,0.5);border:1px solid rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;transition:background 0.4s,border-color 0.4s,transform 0.3s;}
+.chapter-nav-link:hover{background:rgba(8,14,32,0.85);transform:translateY(-2px);}
+.chapter-nav-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;transition:opacity 0.3s;}
+.chapter-nav-link:hover::before{opacity:1;}
+.chapter-nav-link--prev{text-align:left;padding-right:3rem;}
+.chapter-nav-link--next{text-align:right;padding-left:3rem;}
+.chapter-nav-label{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem;}
+.chapter-nav-link--prev .chapter-nav-label{color:rgba(140,170,200,0.5);}
+.chapter-nav-link--next .chapter-nav-label{color:rgba(140,170,200,0.5);justify-content:flex-end;}
+.chapter-nav-arrow{font-size:0.75rem;transition:transform 0.3s;}
+.chapter-nav-link:hover .chapter-nav-arrow--prev{transform:translateX(-4px);}
+.chapter-nav-link:hover .chapter-nav-arrow--next{transform:translateX(4px);}
+.chapter-nav-title{font-family:'Cinzel',serif;font-size:clamp(1rem,2vw,1.35rem);letter-spacing:0.04em;line-height:1.25;margin-bottom:0.35rem;transition:text-shadow 0.4s;}
+.chapter-nav-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;line-height:1.4;opacity:0.6;transition:opacity 0.3s;}
+.chapter-nav-link:hover .chapter-nav-sub{opacity:0.85;}
+.chapter-nav-spacer{flex:1;}
+
+/* Separator line */
+.chapter-nav-sep{width:100%;max-width:960px;margin:0 auto 0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
+
+/* Footer bottom */
+.chapter-footer-bottom{text-align:center;padding:2rem 2rem 2.5rem;position:relative;z-index:1;}
+.chapter-footer-brand{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.25em;color:rgba(100,140,180,0.4);margin-bottom:0.3rem;}
+.chapter-footer-brand a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(100,140,180,0.15);transition:color 0.2s,border-color 0.2s;}
+.chapter-footer-brand a:hover{color:rgba(140,180,220,0.7);border-color:rgba(140,180,220,0.3);}
+.chapter-footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.58rem;letter-spacing:0.22em;color:rgba(120,150,170,0.35);}
+
+@media(max-width:600px){
+  .chapter-nav-inner{flex-direction:column;gap:1rem;}
+  .chapter-nav-link--prev,.chapter-nav-link--next{text-align:left;}
+  .chapter-nav-link--next .chapter-nav-label{justify-content:flex-start;}
+  .chapter-nav-link{padding:1.5rem 1.5rem;}
+}
+
 </style>
 </head>
 <body>
@@ -1339,51 +1377,27 @@ document.addEventListener('mousemove', e => {
 })();
 </script>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <nav class="footer-nav">
-      <a href="index.html" class="footer-dalle footer-dalle-intro">
-        <div class="footer-sphere fsp-intro"></div>
-        <div class="footer-dalle-text">
-          <div class="footer-num">Accueil</div>
-          <div class="footer-name">Le Petit Livre Bleu</div>
-        </div>
-      </a>
-      <a href="petit-livre-bleu-intro.html" class="footer-dalle footer-dalle-intro">
-        <div class="footer-sphere fsp-intro"></div>
-        <div class="footer-dalle-text">
-          <div class="footer-num">Introduction</div>
-          <div class="footer-name">Homo biospheris</div>
-        </div>
-      </a>
-      <a href="petit-livre-bleu-chapitre1.html" class="footer-dalle footer-dalle-ch1">
-        <div class="footer-sphere fsp-ch1"></div>
-        <div class="footer-dalle-text">
-          <div class="footer-num">I</div>
-          <div class="footer-name">La Terre</div>
-        </div>
-      </a>
-      <a href="petit-livre-bleu-chapitre2.html" class="footer-dalle footer-dalle-ch2">
-        <div class="footer-sphere fsp-ch2"></div>
-        <div class="footer-dalle-text">
-          <div class="footer-num">II</div>
-          <div class="footer-name">La Matière</div>
-        </div>
-      </a>
-      <a href="petit-livre-bleu-chapitre3.html" class="footer-dalle footer-dalle-ch3">
-        <div class="footer-sphere fsp-ch3"></div>
-        <div class="footer-dalle-text">
-          <div class="footer-num">III</div>
-          <div class="footer-name">La Vie</div>
-        </div>
-      </a>
-    </nav>
-    <div class="footer-bottom">
-      <div class="footer-brand">Le Petit Livre Bleu · Jean-Pierre Goux</div>
-      <div class="footer-copy">Une autre histoire de l'humanité</div>
-    </div>
+
+<!-- ══ CHAPTER NAV ══ -->
+<nav class="chapter-nav">
+  <div class="chapter-nav-inner">
+    <a href="petit-livre-bleu-intro.html" class="chapter-nav-link chapter-nav-link--prev" style="--nav-accent:#4d8fd4;">
+      <div class="chapter-nav-label"><span class="chapter-nav-arrow chapter-nav-arrow--prev">←</span> Chapitre précédent</div>
+      <div class="chapter-nav-title" style="color:#4d8fd4;text-shadow:0 0 30px rgba(77,143,212,0.4);">Homo biospheris</div>
+      <div class="chapter-nav-sub">En route vers une métamorphose</div>
+    </a>
+    <a href="petit-livre-bleu-chapitre2.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#c9a84c;">
+      <div class="chapter-nav-label">Chapitre suivant <span class="chapter-nav-arrow chapter-nav-arrow--next">→</span></div>
+      <div class="chapter-nav-title" style="color:#c9a84c;text-shadow:0 0 30px rgba(201,168,76,0.4);">La Matière</div>
+      <div class="chapter-nav-sub">Des quarks aux noyaux — le miracle de la complexité</div>
+    </a>
   </div>
-</footer>
+</nav>
+<div class="chapter-nav-sep"></div>
+<div class="chapter-footer-bottom">
+  <div class="chapter-footer-brand"><a href="index.html">Le Petit Livre Bleu</a> · Jean-Pierre Goux</div>
+  <div class="chapter-footer-copy">Une autre histoire de l'humanité</div>
+</div>
 
 </body>
 </html>

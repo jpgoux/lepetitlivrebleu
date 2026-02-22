@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 6 : La multicellularité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root{--void:#01050a;--text-main:#d0e8c8;--text-dim:#5a8060;--star-white:#eaf5e0;--gold:#c9a84c;--gold-pale:#f0d888;--emerald:#38d890;--emerald-mid:#20a860;--emerald-dim:#0a4828;--emerald-pale:#a0f0c0;--amber:#e8a030;--amber-pale:#f8d080;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--text-main);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:6px;height:6px;background:var(--emerald);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 12px var(--emerald),0 0 28px rgba(56,216,144,0.5);}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(56,216,144,0.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#cover{position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;text-align:center;overflow:hidden;}
+#cover-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+.book-label{font-family:'Raleway',sans-serif;font-weight:200;letter-spacing:0.5em;font-size:0.72rem;color:var(--emerald-mid);text-transform:uppercase;margin-bottom:2.5rem;animation:fadeInDown 2s ease forwards;}
+.chapter-num{font-family:'Cinzel',serif;font-weight:400;font-size:0.78rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;animation:fadeInDown 2s 0.3s ease both;}
+h1.title{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(2rem,5vw,4.5rem);letter-spacing:0.04em;line-height:1.1;background:linear-gradient(155deg,#f0ffe8 0%,#38d890 35%,#0a3820 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;animation:fadeInUp 2s 0.5s ease both;}
+.title-tag{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.74rem;letter-spacing:0.4em;color:var(--emerald-mid);text-transform:uppercase;margin-bottom:1rem;animation:fadeInUp 2s 0.7s ease both;}
+.title-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--text-dim);letter-spacing:0.1em;animation:fadeInUp 2s 0.8s ease both;margin-bottom:4rem;}
+.scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.6rem;animation:fadeIn 3s 2s ease both;}
+.scroll-hint span{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--emerald-dim),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+.epigraph-section{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:50vh;padding:5rem 2rem;}
+.epigraph-inner{max-width:680px;text-align:center;}
+blockquote{font-style:italic;font-size:clamp(1.1rem,2.2vw,1.5rem);font-weight:300;line-height:1.85;color:var(--star-white);position:relative;padding:2rem 3rem;}
+blockquote::before{content:'\201C';position:absolute;top:-0.5rem;left:0.5rem;font-size:5rem;line-height:1;color:var(--emerald-dim);font-family:Georgia,serif;}
+.quote-source{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.78rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-top:1.5rem;}
+.section{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:4rem 2rem;}
+.section-label{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.7rem;letter-spacing:0.4em;color:var(--emerald-mid);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:1.5rem;}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--emerald-dim),transparent);max-width:80px;}
+.section p{font-size:clamp(1rem,2vw,1.2rem);line-height:1.95;color:var(--text-main);font-weight:300;margin-bottom:1.8rem;}
+.section p:first-of-type::first-letter{font-family:'Cinzel',serif;font-size:4.5rem;line-height:0.75;float:left;margin-right:0.15em;margin-top:0.1em;color:var(--emerald);}
+.hl{color:var(--emerald-pale);font-style:italic;}.hl-amber{color:var(--amber-pale);font-style:italic;}.hl-gold{color:var(--gold-pale);font-style:italic;}.hl-tension{color:#f09878;font-style:italic;}
+.pull-quote{border-left:2px solid var(--emerald-mid);padding:1.5rem 2rem;margin:3rem 0;font-size:clamp(1.1rem,2.3vw,1.45rem);font-style:italic;color:var(--star-white);background:linear-gradient(to right,rgba(56,216,144,0.06),transparent);line-height:1.7;}
+.viz-panel{position:relative;z-index:1;padding:3rem 2rem 5rem;text-align:center;}
+.viz-title{font-family:'Cinzel',serif;font-size:0.95rem;letter-spacing:0.3em;color:var(--emerald);text-transform:uppercase;margin-bottom:0.6rem;}
+.viz-subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:rgba(160,230,190,0.85);margin-bottom:2.5rem;}
+.viz-caption{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.78rem;letter-spacing:0.18em;color:rgba(160,230,190,0.8);max-width:640px;margin:2rem auto 0;line-height:1.8;text-transform:uppercase;}
+/* Canvas wrapper — hauteur fixe garantie */
+.canvas-wrap{width:100%;max-width:960px;margin:0 auto;display:block;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;max-width:900px;margin:3rem auto;padding:0 2rem;position:relative;z-index:1;}
+.stat-card{background:linear-gradient(135deg,rgba(4,20,10,0.9),rgba(1,5,10,0.95));border:1px solid rgba(32,168,96,0.2);border-radius:2px;padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--emerald-dim),transparent);}
+.stat-card:hover{border-color:rgba(56,216,144,0.4);}
+.stat-number{font-family:'Cinzel',serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;color:var(--emerald);line-height:1;margin-bottom:0.6rem;}
+.stat-label{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.72rem;letter-spacing:0.22em;color:rgba(160,230,190,0.82);text-transform:uppercase;line-height:1.5;}
+.table-section{position:relative;z-index:1;max-width:860px;margin:4rem auto;padding:0 2rem;}
+.compare-table{width:100%;border-collapse:collapse;font-family:'Raleway',sans-serif;}
+.compare-table th{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.25em;color:var(--emerald);text-transform:uppercase;padding:1rem 1.5rem;border-bottom:1px solid rgba(56,216,144,0.25);text-align:left;}
+.compare-table th:not(:first-child){text-align:center;}
+.compare-table td{font-size:0.88rem;font-weight:300;padding:0.85rem 1.5rem;border-bottom:1px solid rgba(56,216,144,0.08);color:rgba(200,230,210,0.88);line-height:1.5;}
+.compare-table td:not(:first-child){text-align:center;}
+.compare-table tr:hover td{background:rgba(56,216,144,0.04);}
+.td-yes{color:var(--emerald);font-size:1rem;font-weight:400;}
+.td-no{color:rgba(180,180,180,0.4);font-size:1rem;}
+.cosmic-divider{display:flex;align-items:center;justify-content:center;padding:3rem 2rem;position:relative;z-index:1;gap:1.5rem;}
+.cosmic-divider::before,.cosmic-divider::after{content:'';flex:1;height:1px;max-width:200px;background:linear-gradient(to right,transparent,rgba(32,168,96,0.25));}
+.cosmic-divider::after{background:linear-gradient(to left,transparent,rgba(32,168,96,0.25));}
+.divider-star{color:var(--emerald-dim);font-size:0.6rem;letter-spacing:0.5em;}
+.finale-section{position:relative;z-index:1;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem;}
+.finale-text{max-width:700px;font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:2;color:var(--star-white);font-weight:300;}
+.finale-text em{color:var(--emerald-pale);}
+.tooltip{position:fixed;background:rgba(1,8,4,0.97);border:1px solid rgba(32,168,96,0.35);padding:0.8rem 1.2rem;font-family:'Raleway',sans-serif;font-weight:300;font-size:0.8rem;color:var(--text-main);pointer-events:none;z-index:1000;max-width:280px;line-height:1.7;opacity:0;transition:opacity 0.2s;border-radius:2px;}
+.tooltip.show{opacity:1;}
+.tooltip strong{display:block;color:var(--emerald);margin-bottom:0.3rem;font-weight:400;font-size:0.88rem;}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--void);}::-webkit-scrollbar-thumb{background:var(--emerald-dim);border-radius:2px;}
+footer.site-footer{position:relative;z-index:1;background:rgba(1,5,10,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,12,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 1.6rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:100px;max-width:175px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.fd-home::before,.fd-intro::before,.fd-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.fd-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.fd-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.fd-ch4::before{background:linear-gradient(to right,transparent,rgba(200,120,248,0.5),transparent);}
+.fd-ch5::before{background:linear-gradient(to right,transparent,rgba(64,208,176,0.5),transparent);}
+.fd-ch6::before{background:linear-gradient(to right,transparent,rgba(56,216,144,0.5),transparent);}
+.footer-dalle:hover{background:rgba(4,16,10,0.9);}
+.fd-home:hover,.fd-intro:hover,.fd-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.fd-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.fd-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.fd-ch4:hover{border-color:rgba(200,120,248,0.2);}
+.fd-ch5:hover{border-color:rgba(64,208,176,0.2);}
+.fd-ch6:hover{border-color:rgba(56,216,144,0.2);}
+.footer-sphere{width:26px;height:26px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.4);}
+.fsp-amber{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 10px rgba(201,168,76,0.4);}
+.fsp-green{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 10px rgba(60,190,120,0.4);}
+.fsp-violet{background:radial-gradient(circle at 38% 32%,#e0a0ff,#8840d0,#1a0440);box-shadow:0 0 10px rgba(200,120,248,0.4);}
+.fsp-cyan{background:radial-gradient(circle at 38% 32%,#80f0e0,#20a888,#041410);box-shadow:0 0 10px rgba(64,208,176,0.4);}
+.fsp-emerald{background:radial-gradient(circle at 38% 32%,#a0ffc8,#20a860,#041408);box-shadow:0 0 10px rgba(56,216,144,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;}
+.fd-home .footer-num,.fd-intro .footer-num,.fd-ch1 .footer-num{color:#4d8fd4;}
+.fd-ch2 .footer-num{color:#c9a84c;}.fd-ch3 .footer-num{color:#3cbe78;}.fd-ch4 .footer-num{color:#c878f8;}.fd-ch5 .footer-num{color:#40d0b0;}.fd-ch6 .footer-num{color:#38d890;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.6rem;letter-spacing:0.16em;color:rgba(200,230,210,0.65);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(140,180,150,0.65);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.62rem;letter-spacing:0.22em;color:rgba(120,160,130,0.5);}
+
+/* ══════════════ CHAPTER NAV ══════════════ */
+.chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
+.chapter-nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:stretch;gap:1.5rem;}
+.chapter-nav-link{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem 2.2rem;text-decoration:none;background:rgba(4,8,20,0.5);border:1px solid rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;transition:background 0.4s,border-color 0.4s,transform 0.3s;}
+.chapter-nav-link:hover{background:rgba(8,14,32,0.85);transform:translateY(-2px);}
+.chapter-nav-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;transition:opacity 0.3s;}
+.chapter-nav-link:hover::before{opacity:1;}
+.chapter-nav-link--prev{text-align:left;padding-right:3rem;}
+.chapter-nav-link--next{text-align:right;padding-left:3rem;}
+.chapter-nav-label{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem;}
+.chapter-nav-link--prev .chapter-nav-label{color:rgba(140,170,200,0.5);}
+.chapter-nav-link--next .chapter-nav-label{color:rgba(140,170,200,0.5);justify-content:flex-end;}
+.chapter-nav-arrow{font-size:0.75rem;transition:transform 0.3s;}
+.chapter-nav-link:hover .chapter-nav-arrow--prev{transform:translateX(-4px);}
+.chapter-nav-link:hover .chapter-nav-arrow--next{transform:translateX(4px);}
+.chapter-nav-title{font-family:'Cinzel',serif;font-size:clamp(1rem,2vw,1.35rem);letter-spacing:0.04em;line-height:1.25;margin-bottom:0.35rem;transition:text-shadow 0.4s;}
+.chapter-nav-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;line-height:1.4;opacity:0.6;transition:opacity 0.3s;}
+.chapter-nav-link:hover .chapter-nav-sub{opacity:0.85;}
+.chapter-nav-spacer{flex:1;}
+
+/* Separator line */
+.chapter-nav-sep{width:100%;max-width:960px;margin:0 auto 0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
+
+/* Footer bottom */
+.chapter-footer-bottom{text-align:center;padding:2rem 2rem 2.5rem;position:relative;z-index:1;}
+.chapter-footer-brand{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.25em;color:rgba(100,140,180,0.4);margin-bottom:0.3rem;}
+.chapter-footer-brand a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(100,140,180,0.15);transition:color 0.2s,border-color 0.2s;}
+.chapter-footer-brand a:hover{color:rgba(140,180,220,0.7);border-color:rgba(140,180,220,0.3);}
+.chapter-footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.58rem;letter-spacing:0.22em;color:rgba(120,150,170,0.35);}
+
+@media(max-width:600px){
+  .chapter-nav-inner{flex-direction:column;gap:1rem;}
+  .chapter-nav-link--prev,.chapter-nav-link--next{text-align:left;}
+  .chapter-nav-link--next .chapter-nav-label{justify-content:flex-start;}
+  .chapter-nav-link{padding:1.5rem 1.5rem;}
+}
+
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu · Partie I — La Biosphère</div>
+  <div class="chapter-num">Chapitre VI</div>
+  <h1 class="title">La multicellularité</h1>
+  <div class="title-tag">Respiration · Reproduction · Coopération</div>
+  <p class="title-sub">Quand les cellules ont appris à faire corps ensemble</p>
+  <div class="scroll-hint"><span>Défiler</span><div class="scroll-line"></div></div>
+</section>
+
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>La coopération peut impliquer des compromis, mais si elle permet un progrès à l'échelle du monde, alors elle constitue un gain pour chaque nation prise individuellement.</blockquote>
+    <div class="quote-source">— Eleanor Roosevelt</div>
+  </div>
+</section>
+
+<div class="section reveal">
+  <div class="section-label">La respiration · Transformer le poison en carburant</div>
+  <p>Au cours de la Grande Oxydation, une part très importante des organismes a disparu ou s'est réfugiée dans des niches extrêmes. Mais certaines lignées ont accompli quelque chose de remarquable : elles ont appris à <span class="hl">utiliser l'oxygène comme une ressource</span>. La respiration était née.</p>
+  <p>L'oxygène, jusque-là destructeur, est devenu une source d'énergie. En l'utilisant, ces organismes ont pu extraire <span class="hl-amber">beaucoup plus d'énergie de la même quantité de matière</span>. Sans la respiration, ni cellules complexes à noyau, ni organismes multicellulaires, ni animaux, ni humains n'auraient pu voir le jour.</p>
+</div>
+
+<div class="viz-panel reveal">
+  <div class="viz-title">Fermentation vs Respiration · Le bond énergétique</div>
+  <div class="viz-subtitle">Ce que l'oxygène a changé dans le rendement du vivant</div>
+  <canvas id="energy-canvas" style="width:100%;max-width:960px;height:360px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">La respiration produit jusqu'à 18× plus d'énergie — le saut qui a rendu la complexité possible</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card reveal"><div class="stat-number">2</div><div class="stat-label">ATP par glucose<br>en fermentation</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.1s"><div class="stat-number">36–38</div><div class="stat-label">ATP par glucose<br>en respiration</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.2s"><div class="stat-number">× 18</div><div class="stat-label">Bond de rendement<br>énergétique</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.3s"><div class="stat-number">2 Mds</div><div class="stat-label">D'années depuis<br>l'apparition</div></div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<div class="section reveal">
+  <div class="section-label">La reproduction sexuée · Le hasard au cœur du vivant</div>
+  <p>Pendant des milliards d'années, la reproduction fut une affaire solitaire. Avec l'apparition des cellules à noyau, il y a un peu plus de deux milliards d'années, le vivant a inventé la <span class="hl">reproduction sexuée</span>. Deux individus distincts ont commencé à mêler leur information génétique pour engendrer un troisième être, différent des deux.</p>
+  <p>La reproduction sexuée transformait l'évolution en une <span class="hl-amber">expérimentation massive et collective</span>. Mais cette invention portait une double face : elle introduisait aussi la nécessité de trouver un partenaire — avec tout ce que cela implique de compétition, de souffrance, de séduction.</p>
+  <div class="pull-quote">"En échange, la reproduction sexuée a aussi offert le plaisir, l'attachement, la coopération durable et même l'amour."</div>
+</div>
+
+<div class="viz-panel reveal">
+  <div class="viz-title">Asexué vs Sexué · L'explosion des possibles</div>
+  <div class="viz-subtitle">La diversité génétique à chaque génération</div>
+  <canvas id="repro-canvas" style="width:100%;max-width:960px;height:360px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">La reproduction sexuée explore l'espace des possibles à chaque génération — clé de l'adaptation rapide</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<div class="section reveal">
+  <div class="section-label">La multicellularité · Le saut vers le Tout</div>
+  <p>L'avènement de la multicellularité est l'une des évolutions les plus fascinantes. Elle est apparue il y a environ <span class="hl">1,6 milliard d'années</span>. Dans un organisme multicellulaire, les cellules renoncent à leur autonomie, se spécialisent, et le <span class="hl-gold">« Tout » suit un programme de développement qui lui est propre</span>.</p>
+  <p>Vous êtes vous-même un organisme constitué d'environ <span class="hl">30 000 milliards de cellules</span> qui coopèrent à chaque instant. La multicellularité a émergé <span class="hl-amber">indépendamment dans plusieurs grands règnes du vivant</span> : animaux, plantes, champignons, algues.</p>
+</div>
+
+<div class="table-section reveal">
+  <table class="compare-table">
+    <thead><tr><th>Question</th><th>Coopération</th><th>Multicellularité</th></tr></thead>
+    <tbody>
+      <tr><td>Une cellule peut-elle vivre seule ?</td><td class="td-yes">Oui</td><td class="td-no">Non</td></tr>
+      <tr><td>Peut-elle se reproduire seule ?</td><td class="td-yes">Oui</td><td class="td-no">Non</td></tr>
+      <tr><td>Peut-elle quitter le collectif ?</td><td class="td-yes">Oui</td><td class="td-no">Non</td></tr>
+      <tr><td>Développement programmé ?</td><td class="td-no">Non</td><td class="td-yes">Oui</td></tr>
+      <tr><td>Information commune ?</td><td class="td-no">Non</td><td class="td-yes">Oui</td></tr>
+      <tr><td>L'ensemble est-il un individu ?</td><td class="td-no">Non</td><td class="td-yes">Oui</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="viz-panel reveal">
+  <div class="viz-title">Cellules libres vs Organisme multicellulaire</div>
+  <div class="viz-subtitle">La différence entre coopérer et faire corps — deux logiques radicalement distinctes</div>
+  <canvas id="multi-canvas" style="width:100%;max-width:960px;height:400px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">À gauche : cellules autonomes · À droite : un organisme — même matière, organisation radicalement différente</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<div class="section reveal">
+  <div class="section-label">L'explosion cambrienne · −540 millions d'années</div>
+  <p>Il y a environ 540 millions d'années, un seuil a été franchi. Lors de <span class="hl">l'explosion cambrienne</span>, la diversification du vivant s'est accélérée brutalement. En quelques dizaines de millions d'années, la plupart des grands plans d'organisation animale sont apparus.</p>
+  <p>À partir de là, le vivant a <span class="hl-gold">accéléré drastiquement la transformation de la Terre</span>. Des forêts d'arbres géants ont capté la lumière. Des vers ont aéré la terre. Des coraux ont bâti des récifs. Des insectes ont pollinisé, fragmenté, recyclé. Par l'ensemble de ces interactions, le vivant a modifié le visage et les grands équilibres de la planète.</p>
+</div>
+
+<div class="viz-panel reveal">
+  <div class="viz-title">L'explosion cambrienne · La grande accélération</div>
+  <div class="viz-subtitle">−540 millions d'années : l'émergence soudaine des grands plans d'organisation animale</div>
+  <canvas id="cambrian-canvas" style="width:100%;max-width:960px;height:360px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">En quelques millions d'années, la quasi-totalité des grands embranchements animaux apparaissent simultanément</div>
+</div>
+
+<section class="finale-section">
+  <p class="finale-text reveal">Trente mille milliards de cellules.<br>Chacune renonce à son autonomie.<br>Ensemble, elles font <em>quelqu'un</em>.<br><br><em>La coopération n'est pas un compromis.<br>C'est l'invention de la complexité.</em></p>
+  <div style="margin-top:5rem;font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.5em;color:var(--text-dim);text-transform:uppercase;" class="reveal">↓ &nbsp; Chapitre VII</div>
+</section>
+
+
+<!-- ══ CHAPTER NAV ══ -->
+<nav class="chapter-nav">
+  <div class="chapter-nav-inner">
+    <a href="petit-livre-bleu-chapitre5.html" class="chapter-nav-link chapter-nav-link--prev" style="--nav-accent:#40d0b0;">
+      <div class="chapter-nav-label"><span class="chapter-nav-arrow chapter-nav-arrow--prev">←</span> Chapitre précédent</div>
+      <div class="chapter-nav-title" style="color:#40d0b0;text-shadow:0 0 30px rgba(64,208,176,0.4);">Une première crise planétaire</div>
+      <div class="chapter-nav-sub">Quand la vie faillit se tuer elle-même</div>
+    </a>
+    <a href="petit-livre-bleu-chapitre7.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#4d8fd4;">
+      <div class="chapter-nav-label">Chapitre suivant <span class="chapter-nav-arrow chapter-nav-arrow--next">→</span></div>
+      <div class="chapter-nav-title" style="color:#4d8fd4;text-shadow:0 0 30px rgba(77,143,212,0.4);">La Biosphère</div>
+      <div class="chapter-nav-sub">L'enveloppe fragile où tout ce qui compte existe</div>
+    </a>
+  </div>
+</nav>
+<div class="chapter-nav-sep"></div>
+<div class="chapter-footer-bottom">
+  <div class="chapter-footer-brand"><a href="index.html">Le Petit Livre Bleu</a> · Jean-Pierre Goux</div>
+  <div class="chapter-footer-copy">Une autre histoire de l'humanité</div>
+</div>
+
+<script>
+// ══ HELPERS ══════════════════════════════════════════
+// Initialise un canvas Retina à partir de ses dimensions CSS réelles
+// Appelé UNE SEULE FOIS par canvas, puis le ctx est conservé
+function initCanvas(id) {
+  const canvas = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { canvas, ctx, W, H, dpr };
+}
+
+
+// Helper : hex #rrggbb vers rgba avec opacité
+function hexA(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+// ══ CURSOR ═══════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const cRing  = document.getElementById('cursorRing');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+(function animCursor(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; cRing.style.left=rx+'px'; cRing.style.top=ry+'px'; requestAnimationFrame(animCursor); })();
+
+// ══ STARFIELD ════════════════════════════════════════
+(function(){
+  const c = document.getElementById('starfield');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let W, H;
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    c.style.width=W+'px'; c.style.height=H+'px';
+    c.width=Math.round(W*dpr); c.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize(); window.addEventListener('resize', resize);
+  const stars = Array.from({length:260}, () => ({
+    x:Math.random(), y:Math.random(), r:Math.random()*1.2+0.2,
+    a:Math.random()*0.4+0.08, ph:Math.random()*Math.PI*2,
+    hue: Math.random()<0.4 ? 145 : Math.random()<0.5 ? 45 : 180
+  }));
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H); t+=0.01;
+    stars.forEach(s => {
+      const a = s.a*(0.5+0.5*Math.sin(t*0.3+s.ph));
+      ctx.fillStyle = `hsla(${s.hue},55%,70%,${a})`;
+      ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══ COVER CANVAS ══════════════════════════════════════
+(function(){
+  const c = document.getElementById('cover-canvas');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let W, H;
+  function resize(){
+    W = c.offsetWidth || window.innerWidth; H = c.offsetHeight || window.innerHeight;
+    c.style.width=W+'px'; c.style.height=H+'px';
+    c.width=Math.round(W*dpr); c.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize(); window.addEventListener('resize', resize);
+  const nodes = Array.from({length:35}, () => ({
+    x:Math.random()*1400, y:Math.random()*900,
+    vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.35,
+    r:2+Math.random()*4, ph:Math.random()*Math.PI*2,
+    g: Math.random()<0.6
+  }));
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H); t+=0.01;
+    nodes.forEach((p,i) => {
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      nodes.slice(i+1).forEach(q => {
+        const dx=q.x-p.x, dy=q.y-p.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){ ctx.strokeStyle=`rgba(56,216,144,${(1-d/120)*0.07})`; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+      });
+      const a = (0.1+0.08*Math.sin(t*1.5+p.ph));
+      ctx.fillStyle = p.g ? `rgba(56,216,144,${a})` : `rgba(200,168,60,${a})`;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══ SCROLL REVEAL ════════════════════════════════════
+const ro = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.07});
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ══ TOOLTIP ══════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+function showTip(e, t, txt){ tooltip.innerHTML=`<strong>${t}</strong>${txt}`; tooltip.classList.add('show'); moveTip(e); }
+function moveTip(e){ tooltip.style.left=(e.clientX+16)+'px'; tooltip.style.top=(e.clientY-10)+'px'; }
+function hideTip(){ tooltip.classList.remove('show'); }
+document.addEventListener('mousemove', e => { if(tooltip.classList.contains('show')) moveTip(e); });
+
+// ══ VIZ 1 : ÉNERGIE ══════════════════════════════════
+(function(){
+  const canvas = document.getElementById('energy-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  // Lire les dimensions CSS réelles — hauteur fixée par l'attribut height
+  const W = canvas.offsetWidth || 960;
+  const H = canvas.offsetHeight || 360;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const MODES = [
+    {label:'Fermentation', sub:'Sans oxygène', atp:2,  col:'#907050', pale:'#c09870'},
+    {label:'Respiration',  sub:'Avec oxygène', atp:38, col:'#38d890', pale:'#80f0b8'},
+  ];
+  const ml = {l:80, r:40, t:50, b:80};
+  const iW = W-ml.l-ml.r, iH = H-ml.t-ml.b;
+  const maxATP = 42;
+  const barW = Math.min(iW*0.25, 180);
+  const gap = (iW - barW*2) / 3;
+
+  let t = 0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H); t += 0.012;
+
+    MODES.forEach((m, i) => {
+      const x = ml.l + gap + i*(barW+gap);
+      const fullH = iH * (m.atp/maxATP);
+      const barH = fullH; // pas d'animation de croissance, juste stable
+      const y = ml.t + iH - barH;
+
+      // Glow
+      const glow = ctx.createRadialGradient(x+barW/2, ml.t+iH, 0, x+barW/2, ml.t+iH, barH*0.9);
+      glow.addColorStop(0, hexA(m.col,0.19)); glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow; ctx.fillRect(x-30, ml.t, barW+60, iH);
+
+      // Barre
+      const bg = ctx.createLinearGradient(0, y, 0, ml.t+iH);
+      bg.addColorStop(0, m.pale); bg.addColorStop(1, hexA(m.col,0.40));
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.moveTo(x+6, y); ctx.lineTo(x+barW-6, y);
+      ctx.quadraticCurveTo(x+barW, y, x+barW, y+6);
+      ctx.lineTo(x+barW, ml.t+iH); ctx.lineTo(x, ml.t+iH); ctx.lineTo(x, y+6);
+      ctx.quadraticCurveTo(x, y, x+6, y); ctx.fill();
+
+      // Particules montantes (respiration seulement)
+      if(i === 1) {
+        for(let p=0; p<5; p++){
+          const prog = (t*0.5 + p/5) % 1;
+          const px = x + barW*0.25 + Math.sin(t*2+p)*barW*0.3;
+          const py = ml.t+iH - prog*barH;
+          ctx.globalAlpha = Math.sin(prog*Math.PI)*0.7;
+          ctx.fillStyle = m.pale;
+          ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      // Valeur ATP
+      ctx.font = "600 15px 'Cinzel', serif";
+      ctx.fillStyle = m.pale; ctx.textAlign = 'center';
+      ctx.fillText(m.atp + ' ATP', x+barW/2, y-14);
+
+      // Label bas
+      ctx.font = "400 14px 'Cinzel', serif";
+      ctx.fillStyle = m.col; ctx.textAlign = 'center';
+      ctx.fillText(m.label, x+barW/2, ml.t+iH+24);
+      ctx.font = "300 12px 'Raleway', sans-serif";
+      ctx.fillStyle = 'rgba(180,220,185,0.78)';
+      ctx.fillText(m.sub, x+barW/2, ml.t+iH+42);
+    });
+
+    // × 18
+    ctx.font = "600 22px 'Cinzel', serif";
+    ctx.fillStyle = `rgba(240,216,100,${0.88+0.1*Math.sin(t*1.5)})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('× 18', W/2, H/2 - 8);
+    ctx.font = "200 12px 'Raleway', sans-serif";
+    ctx.fillStyle = 'rgba(220,190,80,0.72)';
+    ctx.fillText("plus d'énergie", W/2, H/2 + 10);
+
+    // Axe Y
+    ctx.save(); ctx.translate(16, ml.t+iH/2); ctx.rotate(-Math.PI/2);
+    ctx.font = "200 12px 'Raleway', sans-serif";
+    ctx.fillStyle = 'rgba(56,216,144,0.6)'; ctx.textAlign = 'center';
+    ctx.fillText('MOLÉCULES ATP PRODUITES', 0, 0); ctx.restore();
+
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══ VIZ 2 : REPRODUCTION ═════════════════════════════
+(function(){
+  const canvas = document.getElementById('repro-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 960;
+  const H = canvas.offsetHeight || 360;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const midX = W / 2;
+  const ROWS = 3, COLS = 5;
+  const cellR = Math.min(W*0.035, 18);
+  const spacingX = (midX - 60) / (COLS + 1);
+  const spacingY = (H - 100) / (ROWS + 1);
+
+  // Asexué — tous identiques
+  const asexCells = [];
+  for(let r=0; r<ROWS; r++) for(let c=0; c<COLS; c++){
+    asexCells.push({ x: 40+spacingX*(c+1), y: 80+spacingY*(r+1), ph: Math.random()*Math.PI*2 });
+  }
+  // Sexué — chacun une couleur unique
+  const sexCells = [];
+  for(let r=0; r<ROWS; r++) for(let c=0; c<COLS; c++){
+    const h = 80 + r*45 + c*15;
+    const l = 38 + c*5;
+    sexCells.push({
+      x: midX+40+spacingX*(c+1), y: 80+spacingY*(r+1),
+      ph: Math.random()*Math.PI*2,
+      col: `hsl(${h},65%,${l}%)`
+    });
+  }
+
+  let t = 0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H); t += 0.012;
+
+    // Fonds
+    ctx.fillStyle = 'rgba(30,48,20,0.18)';
+    ctx.fillRect(10, 10, midX-20, H-20);
+    ctx.fillStyle = 'rgba(10,48,22,0.24)';
+    ctx.fillRect(midX+10, 10, midX-20, H-20);
+
+    // Titres
+    ctx.font = "400 15px 'Cinzel', serif";
+    ctx.fillStyle = 'rgba(150,190,120,0.88)'; ctx.textAlign = 'center';
+    ctx.fillText('REPRODUCTION ASEXUÉE', midX*0.5, 40);
+    ctx.fillStyle = 'rgba(56,216,144,0.92)';
+    ctx.fillText('REPRODUCTION SEXUÉE', midX + midX*0.5, 40);
+
+    ctx.font = "300 12px 'Raleway', sans-serif";
+    ctx.fillStyle = 'rgba(140,180,110,0.7)'; ctx.textAlign = 'center';
+    ctx.fillText('Clones quasi-identiques', midX*0.5, 58);
+    ctx.fillStyle = 'rgba(80,210,150,0.78)';
+    ctx.fillText('Individus tous différents', midX+midX*0.5, 58);
+
+    // Labels génération
+    for(let r=0; r<ROWS; r++){
+      ctx.font = "200 11px 'Raleway', sans-serif";
+      ctx.fillStyle = 'rgba(130,170,120,0.62)'; ctx.textAlign = 'left';
+      ctx.fillText('Gén. '+(r+1), 14, 80+spacingY*(r+1)+4);
+    }
+
+    // Connexions division asexuée
+    ctx.setLineDash([2,5]); ctx.strokeStyle = 'rgba(120,170,90,0.2)'; ctx.lineWidth = 1;
+    for(let r=0; r<ROWS-1; r++){
+      for(let c=0; c<COLS; c++){
+        const a = asexCells[r*COLS+c], b = asexCells[(r+1)*COLS+c];
+        ctx.beginPath(); ctx.moveTo(a.x, a.y+cellR); ctx.lineTo(b.x, b.y-cellR); ctx.stroke();
+      }
+    }
+    ctx.setLineDash([]);
+
+    // Cellules asexuées — toutes vertes identiques
+    asexCells.forEach(c => {
+      const pulse = 0.92 + 0.08*Math.sin(t*1.2+c.ph);
+      const g = ctx.createRadialGradient(c.x-cellR*0.3, c.y-cellR*0.3, 0, c.x, c.y, cellR*pulse);
+      g.addColorStop(0, '#90c878'); g.addColorStop(1, '#507848aa');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, cellR*pulse, 0, Math.PI*2); ctx.fill();
+    });
+
+    // Connexions recombinaison sexuée
+    ctx.setLineDash([2,5]); ctx.strokeStyle = 'rgba(56,216,144,0.18)'; ctx.lineWidth = 1;
+    for(let r=0; r<ROWS-1; r++){
+      for(let c=0; c<COLS; c++){
+        const a = sexCells[r*COLS+c];
+        // connecte à 1-2 cellules différentes de la génération suivante
+        const targets = [c, (c+1)%COLS];
+        targets.forEach(tc => {
+          const b = sexCells[(r+1)*COLS+tc];
+          ctx.beginPath(); ctx.moveTo(a.x, a.y+cellR); ctx.lineTo(b.x, b.y-cellR); ctx.stroke();
+        });
+      }
+    }
+    ctx.setLineDash([]);
+
+    // Cellules sexuées — toutes différentes
+    sexCells.forEach(c => {
+      const pulse = 0.92 + 0.08*Math.sin(t*1.3+c.ph);
+      const g = ctx.createRadialGradient(c.x-cellR*0.3, c.y-cellR*0.3, 0, c.x, c.y, cellR*pulse);
+      // Utiliser le col hsl directement sans concaténation
+      g.addColorStop(0, c.col);
+      g.addColorStop(1, c.col.replace('hsl(', 'hsla(').replace(')', ',0.3)'));
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, cellR*pulse, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = c.col.replace('hsl(', 'hsla(').replace(')', ',0.4)');
+      ctx.lineWidth = 1; ctx.stroke();
+    });
+
+    // Séparateur
+    ctx.strokeStyle = 'rgba(56,216,144,0.14)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(midX,10); ctx.lineTo(midX,H-10); ctx.stroke();
+
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══ VIZ 3 : MULTICELLULAIRE ══════════════════════════
+(function(){
+  const canvas = document.getElementById('multi-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 960;
+  const H = canvas.offsetHeight || 400;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const midX = W/2;
+
+  // Cellules libres — mouvement brownien
+  const free = Array.from({length:9}, () => ({
+    x: 50 + Math.random()*(midX-100), y: 80 + Math.random()*(H-160),
+    vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4,
+    r: 14+Math.random()*8, ph: Math.random()*Math.PI*2
+  }));
+
+  // Organisme — cellules spécialisées
+  const OCX = midX + midX*0.5, OCY = H*0.5;
+  const orgR = Math.min(midX, H) * 0.33;
+  const TYPES = [
+    {label:'Épithélium', col:'#38d890', angle:0,     d:0.55},
+    {label:'Muscle',     col:'#e8a030', angle:0.8,   d:0.6},
+    {label:'Neurone',    col:'#7090f0', angle:1.6,   d:0.65},
+    {label:'Os',         col:'#c8c890', angle:2.4,   d:0.55},
+    {label:'Sang',       col:'#e05050', angle:3.2,   d:0.62},
+    {label:'Foie',       col:'#a06840', angle:4.0,   d:0.58},
+    {label:'Peau',       col:'#c0a078', angle:4.8,   d:0.6},
+    {label:'Gras',       col:'#c8c040', angle:5.6,   d:0.55},
+  ];
+
+  let t = 0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H); t += 0.012;
+
+    // Fonds
+    ctx.fillStyle = 'rgba(20,38,14,0.2)'; ctx.fillRect(10,10,midX-20,H-20);
+    ctx.fillStyle = 'rgba(10,38,18,0.28)'; ctx.fillRect(midX+10,10,midX-20,H-20);
+
+    // Titres
+    ctx.font = "400 15px 'Cinzel', serif";
+    ctx.fillStyle = 'rgba(140,185,110,0.88)'; ctx.textAlign='center';
+    ctx.fillText('CELLULES AUTONOMES', midX*0.5, 36);
+    ctx.fillStyle = 'rgba(56,216,144,0.92)';
+    ctx.fillText('ORGANISME MULTICELLULAIRE', midX+midX*0.5, 36);
+    ctx.font = "300 12px 'Raleway', sans-serif";
+    ctx.fillStyle = 'rgba(130,175,105,0.65)'; ctx.textAlign='center';
+    ctx.fillText('Chacune pour soi', midX*0.5, 54);
+    ctx.fillStyle = 'rgba(80,210,145,0.72)';
+    ctx.fillText('Tout pour un · Un pour tous', midX+midX*0.5, 54);
+
+    // Cellules libres
+    free.forEach(c => {
+      c.x += c.vx; c.y += c.vy;
+      if(c.x < 40 || c.x > midX-40) c.vx *= -1;
+      if(c.y < 70 || c.y > H-40)    c.vy *= -1;
+      const pulse = 0.92 + 0.08*Math.sin(t*1.3+c.ph);
+      const g = ctx.createRadialGradient(c.x-c.r*0.3, c.y-c.r*0.3, 0, c.x, c.y, c.r*pulse);
+      g.addColorStop(0, '#80c870'); g.addColorStop(1, 'rgba(60,140,60,0.3)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, c.r*pulse, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(90,170,80,0.22)'; ctx.lineWidth=1; ctx.stroke();
+    });
+    // Connexions faibles libres
+    free.forEach((a,i) => free.slice(i+1).forEach(b => {
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<70){
+        ctx.strokeStyle=`rgba(80,160,80,${(1-d/70)*0.1})`; ctx.lineWidth=0.8;
+        ctx.setLineDash([2,5]); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }));
+
+    // Organisme — glow
+    const og = ctx.createRadialGradient(OCX, OCY, 0, OCX, OCY, orgR*1.2);
+    og.addColorStop(0, 'rgba(56,216,144,0.08)'); og.addColorStop(1, 'transparent');
+    ctx.fillStyle=og; ctx.beginPath(); ctx.arc(OCX,OCY,orgR*1.2,0,Math.PI*2); ctx.fill();
+    // Contour organisme
+    ctx.strokeStyle='rgba(56,216,144,0.28)'; ctx.lineWidth=1.5; ctx.setLineDash([4,5]);
+    ctx.beginPath(); ctx.arc(OCX,OCY,orgR*(0.97+0.03*Math.sin(t*0.8)),0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Positions des cellules spécialisées
+    const positions = TYPES.map(tp => ({
+      ...tp,
+      x: OCX + Math.cos(tp.angle + t*0.07) * orgR * tp.d,
+      y: OCY + Math.sin(tp.angle + t*0.07) * orgR * tp.d,
+      r: 12
+    }));
+
+    // Connexions internes
+    positions.forEach((a,i) => positions.slice(i+1).forEach(b => {
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d < orgR*1.1){
+        const alpha = (1-d/(orgR*1.1))*0.3*(0.6+0.4*Math.sin(t*1.5+i));
+        ctx.strokeStyle=`rgba(56,216,144,${alpha})`; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      }
+    }));
+
+    // Noyau central
+    const cg = ctx.createRadialGradient(OCX-5,OCY-5,0,OCX,OCY,18);
+    cg.addColorStop(0,'rgba(220,240,200,0.65)'); cg.addColorStop(1,'rgba(56,216,144,0.12)');
+    ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(OCX,OCY,18,0,Math.PI*2); ctx.fill();
+    ctx.font="300 11px 'Raleway',sans-serif"; ctx.fillStyle='rgba(200,240,200,0.85)';
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('ADN',OCX,OCY); ctx.textBaseline='alphabetic';
+
+    // Cellules spécialisées
+    positions.forEach(c => {
+      const pulse = 0.9 + 0.1*Math.sin(t*1.4+c.angle);
+      const g = ctx.createRadialGradient(c.x-c.r*0.3,c.y-c.r*0.3,0,c.x,c.y,c.r*pulse);
+      g.addColorStop(0, hexA(c.col,0.87)); g.addColorStop(1, hexA(c.col,0.13));
+      // Simplifier : juste fillStyle direct
+      ctx.fillStyle = hexA(c.col,0.80); ctx.beginPath(); ctx.arc(c.x,c.y,c.r*pulse,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = hexA(c.col,0.40); ctx.lineWidth=1; ctx.stroke();
+      // Label
+      const lx = c.x + (c.x-OCX)*0.4, ly = c.y + (c.y-OCY)*0.4;
+      ctx.font = "200 11px 'Raleway',sans-serif";
+      ctx.fillStyle = hexA(c.col,0.73); ctx.textAlign='center';
+      ctx.fillText(c.label, lx, ly + (c.y < OCY ? -14 : 14));
+    });
+
+    // Séparateur
+    ctx.strokeStyle='rgba(56,216,144,0.12)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(midX,10); ctx.lineTo(midX,H-10); ctx.stroke();
+
+    requestAnimationFrame(loop);
+  })();
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx2 = (e.clientX-rect.left)*(W/rect.width);
+    const my2 = (e.clientY-rect.top)*(H/rect.height);
+    const OCX2 = W/2 + W/4, OCY2 = H/2;
+    const orgR2 = Math.min(W/2,H)*0.33;
+    let hit = null;
+    TYPES.forEach(tp => {
+      const x = OCX2 + Math.cos(tp.angle)*orgR2*tp.d;
+      const y = OCY2 + Math.sin(tp.angle)*orgR2*tp.d;
+      if(Math.sqrt((mx2-x)**2+(my2-y)**2) < 20) hit = tp;
+    });
+    if(hit) showTip(e, hit.label, '<br>Cellule spécialisée de l\'organisme');
+    else hideTip();
+  });
+  canvas.addEventListener('mouseleave', hideTip);
+})();
+
+// ══ VIZ 4 : EXPLOSION CAMBRIENNE ══════════════════════
+(function(){
+  const canvas = document.getElementById('cambrian-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0;
+
+  const ML = {l:60, r:30, t:56, b:60};
+  const GROUPS = [
+    {label:'Éponges',       t:0.05, col:'#a09060', r:9,  sub:'−600 M'},
+    {label:'Cnidaires',     t:0.15, col:'#60c890', r:10, sub:'−580 M'},
+    {label:'Vers',          t:0.28, col:'#c0a050', r:11, sub:'−560 M'},
+    {label:'Mollusques',    t:0.42, col:'#7090e0', r:12, sub:'−545 M'},
+    {label:'Arthropodes',   t:0.54, col:'#38d890', r:16, sub:'−540 M', boom:true},
+    {label:'Échinodermes',  t:0.64, col:'#e0c040', r:13, sub:'−530 M'},
+    {label:'Vertébrés',     t:0.74, col:'#e08040', r:14, sub:'−520 M'},
+    {label:'Plantes terr.', t:0.86, col:'#60d060', r:12, sub:'−470 M'},
+    {label:'Insectes',      t:0.96, col:'#c8e040', r:13, sub:'−400 M'},
+  ];
+
+  let tt = 0;
+  (function loop(){
+    // Initialiser les dimensions au premier frame où le canvas est visible
+    if (W === 0) {
+      const cw = canvas.getBoundingClientRect().width;
+      if (cw === 0) { requestAnimationFrame(loop); return; }
+      W = cw;
+      H = 360;
+      canvas.width  = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    const iW = W - ML.l - ML.r;
+    const iH = H - ML.t - ML.b;
+    ctx.clearRect(0, 0, W, H);
+    tt += 0.01;
+
+    // Fond
+    const bg = ctx.createLinearGradient(ML.l,0,ML.l+iW,0);
+    bg.addColorStop(0,'rgba(10,28,14,0.35)');
+    bg.addColorStop(0.45,'rgba(20,55,25,0.45)');
+    bg.addColorStop(0.58,'rgba(40,100,50,0.55)');
+    bg.addColorStop(1,'rgba(10,38,18,0.35)');
+    ctx.fillStyle=bg; ctx.fillRect(ML.l,ML.t,iW,iH);
+
+    // Zone cambrienne
+    const boomX = ML.l + 0.46*iW;
+    ctx.fillStyle='rgba(56,216,144,0.07)';
+    ctx.fillRect(boomX, ML.t, iW*0.28, iH);
+
+    ctx.font = "500 14px 'Cinzel', serif";
+    ctx.fillStyle = `rgba(56,216,144,${0.85+0.1*Math.sin(tt*2)})`;
+    ctx.textAlign='center';
+    ctx.fillText('Explosion Cambrienne', boomX+iW*0.14, ML.t+22);
+    ctx.font = "300 12px 'Raleway', sans-serif";
+    ctx.fillStyle = 'rgba(80,200,140,0.72)';
+    ctx.fillText("−540 millions d'années", boomX+iW*0.14, ML.t+38);
+
+    // Axe temporel
+    ctx.strokeStyle='rgba(56,216,144,0.38)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ML.l,ML.t+iH); ctx.lineTo(ML.l+iW,ML.t+iH); ctx.stroke();
+    [[0,'−600 M'],[0.5,'−540 M'],[1,'−400 M']].forEach(([p,l]) => {
+      const x = ML.l+p*iW;
+      ctx.fillStyle='rgba(56,216,144,0.7)';
+      ctx.beginPath(); ctx.arc(x,ML.t+iH,3,0,Math.PI*2); ctx.fill();
+      ctx.font="200 11px 'Raleway',sans-serif";
+      ctx.fillStyle='rgba(120,190,150,0.75)'; ctx.textAlign='center';
+      ctx.fillText(l, x, ML.t+iH+18);
+    });
+
+    // Branches
+    GROUPS.forEach((g, i) => {
+      const x = ML.l + g.t*iW;
+      const maxH = iH*(0.28 + g.r/24);
+      const brH = maxH*(0.5+0.5*Math.sin(tt*0.4+i*0.5));
+      const y = ML.t+iH-brH;
+
+      ctx.strokeStyle = g.boom ? hexA(g.col,0.80) : hexA(g.col,0.47);
+      ctx.lineWidth = g.boom ? 2.5 : 1.5;
+      ctx.beginPath(); ctx.moveTo(x,ML.t+iH); ctx.lineTo(x,y); ctx.stroke();
+
+      if(g.boom){
+        const gw = ctx.createRadialGradient(x,y,0,x,y,28);
+        gw.addColorStop(0,hexA(g.col,0.27)); gw.addColorStop(1,'transparent');
+        ctx.fillStyle=gw; ctx.beginPath(); ctx.arc(x,y,28,0,Math.PI*2); ctx.fill();
+      }
+
+      const pulse = g.boom ? 1+0.15*Math.sin(tt*2.5) : 1+0.08*Math.sin(tt*1.5+i);
+      ctx.fillStyle = g.col;
+      ctx.beginPath(); ctx.arc(x,y,g.r*pulse,0,Math.PI*2); ctx.fill();
+
+      ctx.font = `${g.boom?'500':'300'} 13px 'Raleway', sans-serif`;
+      ctx.fillStyle = g.boom ? 'rgba(120,255,180,0.95)' : hexA(g.col,0.80);
+      ctx.textAlign='center';
+      ctx.fillText(g.label, x, y-g.r*pulse-8);
+      ctx.font = "200 11px 'Raleway', sans-serif";
+      ctx.fillStyle = 'rgba(140,200,160,0.65)';
+      ctx.fillText(g.sub, x, y-g.r*pulse-22);
+    });
+
+    // Axe Y
+    ctx.save(); ctx.translate(16,ML.t+iH/2); ctx.rotate(-Math.PI/2);
+    ctx.font="200 12px 'Raleway',sans-serif";
+    ctx.fillStyle='rgba(56,216,144,0.58)'; ctx.textAlign='center';
+    ctx.fillText('DIVERSITÉ DES FORMES DE VIE',0,0);
+    ctx.restore();
+
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>

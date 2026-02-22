@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 5 : Une première crise planétaire</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root{--void:#01050a;--text-main:#c8dcc0;--text-dim:#6a9070;--star-white:#e8f5e0;--gold:#c9a84c;--gold-dim:#8a6520;--cyan:#40d0b0;--cyan-mid:#20a888;--cyan-dim:#0a5038;--cyan-pale:#a0f0d8;--solar:#f0c040;--solar-pale:#f8e888;--oxygen:#e06040;--green:#50c860;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--text-main);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:6px;height:6px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 12px var(--cyan),0 0 28px rgba(64,208,176,0.5);}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(64,208,176,0.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#cover{position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;text-align:center;overflow:hidden;}
+#cover-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+.book-label{font-family:'Raleway',sans-serif;font-weight:200;letter-spacing:0.5em;font-size:0.72rem;color:var(--cyan-mid);text-transform:uppercase;margin-bottom:2.5rem;animation:fadeInDown 2s ease forwards;}
+.chapter-num{font-family:'Cinzel',serif;font-weight:400;font-size:0.78rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;animation:fadeInDown 2s 0.3s ease both;}
+h1.title{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(2rem,5vw,4.5rem);letter-spacing:0.04em;line-height:1.1;background:linear-gradient(155deg,#e8fff8 0%,#40d0b0 35%,#0a4030 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;animation:fadeInUp 2s 0.5s ease both;}
+.title-tag{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.74rem;letter-spacing:0.4em;color:var(--cyan-mid);text-transform:uppercase;margin-bottom:1rem;animation:fadeInUp 2s 0.7s ease both;}
+.title-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--text-dim);letter-spacing:0.1em;animation:fadeInUp 2s 0.8s ease both;margin-bottom:4rem;}
+.scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.6rem;animation:fadeIn 3s 2s ease both;}
+.scroll-hint span{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.35em;color:var(--text-dim);text-transform:uppercase;}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--cyan-dim),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+.epigraph-section{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:50vh;padding:5rem 2rem;}
+.epigraph-inner{max-width:680px;text-align:center;}
+blockquote{font-style:italic;font-size:clamp(1.1rem,2.2vw,1.5rem);font-weight:300;line-height:1.85;color:var(--star-white);position:relative;padding:2rem 3rem;}
+blockquote::before{content:'\201C';position:absolute;top:-0.5rem;left:0.5rem;font-size:5rem;line-height:1;color:var(--cyan-dim);font-family:Georgia,serif;}
+.quote-source{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.78rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-top:1.5rem;}
+.section{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:4rem 2rem;}
+.section-label{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.7rem;letter-spacing:0.4em;color:var(--cyan-mid);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:1.5rem;}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--cyan-dim),transparent);max-width:80px;}
+.section p{font-size:clamp(1rem,2vw,1.2rem);line-height:1.95;color:var(--text-main);font-weight:300;margin-bottom:1.8rem;}
+.section p:first-of-type::first-letter{font-family:'Cinzel',serif;font-size:4.5rem;line-height:0.75;float:left;margin-right:0.15em;margin-top:0.1em;color:var(--cyan);}
+.hl{color:var(--cyan-pale);font-style:italic;}.hl-solar{color:var(--solar-pale);font-style:italic;}.hl-danger{color:#f09070;font-style:italic;}.hl-gold{color:var(--gold);font-style:italic;}
+.pull-quote{border-left:2px solid var(--cyan-mid);padding:1.5rem 2rem;margin:3rem 0;font-size:clamp(1.1rem,2.3vw,1.45rem);font-style:italic;color:var(--star-white);background:linear-gradient(to right,rgba(64,208,176,0.06),transparent);line-height:1.7;}
+.viz-panel{position:relative;z-index:1;padding:3rem 2rem 5rem;text-align:center;}
+.viz-title{font-family:'Cinzel',serif;font-size:0.95rem;letter-spacing:0.3em;color:var(--cyan);text-transform:uppercase;margin-bottom:0.6rem;}
+.viz-subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:rgba(160,210,190,0.85);margin-bottom:2.5rem;}
+.viz-caption{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.78rem;letter-spacing:0.18em;color:rgba(160,210,190,0.8);max-width:620px;margin:2rem auto 0;line-height:1.8;text-transform:uppercase;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;max-width:900px;margin:3rem auto;padding:0 2rem;position:relative;z-index:1;}
+.stat-card{background:linear-gradient(135deg,rgba(4,16,12,0.9),rgba(1,5,10,0.95));border:1px solid rgba(32,168,136,0.2);border-radius:2px;padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--cyan-dim),transparent);}
+.stat-card:hover{border-color:rgba(64,208,176,0.4);}
+.stat-number{font-family:'Cinzel',serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;color:var(--cyan);line-height:1;margin-bottom:0.6rem;}
+.stat-label{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.72rem;letter-spacing:0.22em;color:rgba(160,210,190,0.8);text-transform:uppercase;line-height:1.5;}
+.cosmic-divider{display:flex;align-items:center;justify-content:center;padding:3rem 2rem;position:relative;z-index:1;gap:1.5rem;}
+.cosmic-divider::before,.cosmic-divider::after{content:'';flex:1;height:1px;max-width:200px;background:linear-gradient(to right,transparent,rgba(32,168,136,0.25));}
+.cosmic-divider::after{background:linear-gradient(to left,transparent,rgba(32,168,136,0.25));}
+.divider-star{color:var(--cyan-dim);font-size:0.6rem;letter-spacing:0.5em;}
+.parallele-box{position:relative;z-index:1;max-width:900px;margin:4rem auto;padding:4rem 3rem;border:1px solid rgba(64,208,176,0.12);background:linear-gradient(135deg,rgba(4,16,12,0.97),rgba(1,5,10,0.99));overflow:hidden;}
+.parallele-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--cyan-mid),transparent);}
+.parallele-title{font-family:'Cinzel',serif;font-size:0.82rem;letter-spacing:0.4em;color:var(--cyan-mid);text-transform:uppercase;text-align:center;margin-bottom:3rem;}
+.parallele-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.parallele-col h4{font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.25em;margin-bottom:1.2rem;}
+.col-cyano h4{color:var(--cyan);}.col-human h4{color:var(--solar-pale);}
+.parallele-col p{font-size:clamp(0.95rem,1.8vw,1.1rem);line-height:1.9;color:rgba(200,220,190,0.8);font-weight:300;}
+@media(max-width:600px){.parallele-grid{grid-template-columns:1fr;}}
+.finale-section{position:relative;z-index:1;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem;}
+.finale-text{max-width:700px;font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:2;color:var(--star-white);font-weight:300;}
+.finale-text em{color:var(--cyan-pale);}
+.tooltip{position:fixed;background:rgba(1,8,6,0.97);border:1px solid rgba(32,168,136,0.35);padding:0.8rem 1.2rem;font-family:'Raleway',sans-serif;font-weight:300;font-size:0.8rem;letter-spacing:0.06em;color:var(--text-main);pointer-events:none;z-index:1000;max-width:280px;line-height:1.7;opacity:0;transition:opacity 0.2s;}
+.tooltip.show{opacity:1;}
+.tooltip strong{display:block;color:var(--cyan);margin-bottom:0.3rem;font-weight:400;font-size:0.88rem;}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--void);}::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:2px;}
+footer.site-footer{position:relative;z-index:1;background:rgba(1,5,10,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,12,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 1.6rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:110px;max-width:190px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.fd-home::before,.fd-intro::before,.fd-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.fd-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.fd-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.fd-ch4::before{background:linear-gradient(to right,transparent,rgba(200,120,248,0.5),transparent);}
+.fd-ch5::before{background:linear-gradient(to right,transparent,rgba(64,208,176,0.5),transparent);}
+.footer-dalle:hover{background:rgba(4,16,12,0.9);}
+.fd-home:hover,.fd-intro:hover,.fd-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.fd-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.fd-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.fd-ch4:hover{border-color:rgba(200,120,248,0.2);}
+.fd-ch5:hover{border-color:rgba(64,208,176,0.2);}
+.footer-sphere{width:26px;height:26px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-blue{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 10px rgba(77,143,212,0.4);}
+.fsp-amber{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 10px rgba(201,168,76,0.4);}
+.fsp-green{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 10px rgba(60,190,120,0.4);}
+.fsp-violet{background:radial-gradient(circle at 38% 32%,#e0a0ff,#8840d0,#1a0440);box-shadow:0 0 10px rgba(200,120,248,0.4);}
+.fsp-cyan{background:radial-gradient(circle at 38% 32%,#80f0e0,#20a888,#041410);box-shadow:0 0 10px rgba(64,208,176,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.3em;}
+.fd-home .footer-num,.fd-intro .footer-num,.fd-ch1 .footer-num{color:#4d8fd4;}
+.fd-ch2 .footer-num{color:#c9a84c;}.fd-ch3 .footer-num{color:#3cbe78;}.fd-ch4 .footer-num{color:#c878f8;}.fd-ch5 .footer-num{color:#40d0b0;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.62rem;letter-spacing:0.18em;color:rgba(200,225,215,0.65);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(140,170,160,0.65);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.62rem;letter-spacing:0.22em;color:rgba(120,150,140,0.5);}
+
+/* ══════════════ CHAPTER NAV ══════════════ */
+.chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
+.chapter-nav-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:stretch;gap:1.5rem;}
+.chapter-nav-link{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem 2.2rem;text-decoration:none;background:rgba(4,8,20,0.5);border:1px solid rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;transition:background 0.4s,border-color 0.4s,transform 0.3s;}
+.chapter-nav-link:hover{background:rgba(8,14,32,0.85);transform:translateY(-2px);}
+.chapter-nav-link::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;transition:opacity 0.3s;}
+.chapter-nav-link:hover::before{opacity:1;}
+.chapter-nav-link--prev{text-align:left;padding-right:3rem;}
+.chapter-nav-link--next{text-align:right;padding-left:3rem;}
+.chapter-nav-label{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.6rem;letter-spacing:0.45em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem;}
+.chapter-nav-link--prev .chapter-nav-label{color:rgba(140,170,200,0.5);}
+.chapter-nav-link--next .chapter-nav-label{color:rgba(140,170,200,0.5);justify-content:flex-end;}
+.chapter-nav-arrow{font-size:0.75rem;transition:transform 0.3s;}
+.chapter-nav-link:hover .chapter-nav-arrow--prev{transform:translateX(-4px);}
+.chapter-nav-link:hover .chapter-nav-arrow--next{transform:translateX(4px);}
+.chapter-nav-title{font-family:'Cinzel',serif;font-size:clamp(1rem,2vw,1.35rem);letter-spacing:0.04em;line-height:1.25;margin-bottom:0.35rem;transition:text-shadow 0.4s;}
+.chapter-nav-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;line-height:1.4;opacity:0.6;transition:opacity 0.3s;}
+.chapter-nav-link:hover .chapter-nav-sub{opacity:0.85;}
+.chapter-nav-spacer{flex:1;}
+
+/* Separator line */
+.chapter-nav-sep{width:100%;max-width:960px;margin:0 auto 0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,0.06),transparent);}
+
+/* Footer bottom */
+.chapter-footer-bottom{text-align:center;padding:2rem 2rem 2.5rem;position:relative;z-index:1;}
+.chapter-footer-brand{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.25em;color:rgba(100,140,180,0.4);margin-bottom:0.3rem;}
+.chapter-footer-brand a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(100,140,180,0.15);transition:color 0.2s,border-color 0.2s;}
+.chapter-footer-brand a:hover{color:rgba(140,180,220,0.7);border-color:rgba(140,180,220,0.3);}
+.chapter-footer-copy{font-family:'Raleway',sans-serif;font-weight:200;font-size:0.58rem;letter-spacing:0.22em;color:rgba(120,150,170,0.35);}
+
+@media(max-width:600px){
+  .chapter-nav-inner{flex-direction:column;gap:1rem;}
+  .chapter-nav-link--prev,.chapter-nav-link--next{text-align:left;}
+  .chapter-nav-link--next .chapter-nav-label{justify-content:flex-start;}
+  .chapter-nav-link{padding:1.5rem 1.5rem;}
+}
+
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu · Partie I — La Biosphère</div>
+  <div class="chapter-num">Chapitre V</div>
+  <h1 class="title">Une première<br>crise planétaire</h1>
+  <div class="title-tag">La photosynthèse · La grande oxydation</div>
+  <p class="title-sub">Quand la vie faillit se tuer elle-même</p>
+  <div class="scroll-hint"><span>Défiler</span><div class="scroll-line"></div></div>
+</section>
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>Les Chinois utilisent deux traits de pinceau pour écrire le mot « crise ». Un trait représente le danger, l'autre l'opportunité.</blockquote>
+    <div class="quote-source">— John F. Kennedy</div>
+  </div>
+</section>
+<div class="section reveal">
+  <div class="section-label">Deux milliards d'années de règne bactérien</div>
+  <p>Après l'apparition de la première cellule et de l'ADN, il y a au moins 3,5 milliards d'années, la Terre est restée peuplée exclusivement d'êtres unicellulaires pendant près de <span class="hl">deux milliards d'années</span>. Bactéries et archées ont constitué l'intégralité du monde vivant durant cette période immense.</p>
+  <p>Les organismes unicellulaires n'en restent pas moins fascinants. Ils ont exploré, colonisé et transformé presque tous les milieux accessibles sur Terre : glaces polaires, déserts, sources hydrothermales, fonds océaniques. Ils représentent aujourd'hui encore <span class="hl">15% de la biomasse totale</span>.</p>
+  <p>Le corps humain abrite à peu près autant de bactéries que de cellules humaines. <span class="hl-gold">Nous ne sommes pas des individus, mais des écosystèmes collectifs ambulants.</span></p>
+</div>
+<div class="viz-panel reveal">
+  <div class="viz-title">Le règne invisible</div>
+  <div class="viz-subtitle">2 milliards d'années de domination bactérienne — leur monde, leur planète</div>
+  <canvas id="microbe-canvas" style="width:100%;max-width:960px;height:440px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Les bactéries ont colonisé tous les milieux de la Terre bien avant tout autre être vivant</div>
+</div>
+<div class="stats-grid">
+  <div class="stat-card reveal"><div class="stat-number">3,5 Mds</div><div class="stat-label">Années d'âge<br>des premières cellules</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.1s"><div class="stat-number">2 Mds</div><div class="stat-label">Années de règne<br>exclusif bactérien</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.2s"><div class="stat-number">15%</div><div class="stat-label">De la biomasse totale<br>encore bactérienne</div></div>
+  <div class="stat-card reveal" style="transition-delay:0.3s"><div class="stat-number">38 000 Mds</div><div class="stat-label">Bactéries<br>dans votre corps</div></div>
+</div>
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+<div class="section reveal">
+  <div class="section-label">L'invention qui a tout changé</div>
+  <p>Il y a environ 3 milliards d'années, certaines bactéries ont mis au point un mécanisme radicalement nouveau pour capter l'énergie — <span class="hl">la photosynthèse</span> — rendue possible par une molécule extraordinaire : la chlorophylle.</p>
+  <p>La chlorophylle est constituée d'un atome de <span class="hl-solar">magnésium (Mg)</span> entouré d'atomes de carbone, hydrogène, oxygène et azote. Ces quatre éléments constituent à eux seuls <span class="hl">96% de la biomasse</span>. La photosynthèse exploite des <span class="hl">effets quantiques</span> pour transférer l'énergie lumineuse avec une efficacité que nos technologies peinent encore à reproduire.</p>
+</div>
+<div class="viz-panel reveal">
+  <div class="viz-title">La chlorophylle · Structure et magie quantique</div>
+  <div class="viz-subtitle">Une molécule qui relie le vivant au Soleil</div>
+  <canvas id="chloro-canvas" style="width:100%;max-width:960px;height:460px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">L'atome de magnésium au centre capture les photons — C, H, O, N représentent 96% de toute la biomasse</div>
+</div>
+<div class="viz-panel reveal">
+  <div class="viz-title">La photosynthèse · Le flux d'énergie</div>
+  <div class="viz-subtitle">Lumière + CO₂ + eau → sucres + oxygène · La recette qui a nourri toute la vie</div>
+  <canvas id="photo-canvas" style="width:100%;max-width:960px;height:320px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Ce mécanisme a alimenté toutes les chaînes alimentaires pendant des milliards d'années</div>
+</div>
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+<div class="section reveal">
+  <div class="section-label">Quand la vie empoisonna la planète</div>
+  <p>Si la photosynthèse fut décisive pour la vie, elle faillit aussi lui être fatale. Les cyanobactéries, nourries par cette énergie illimitée, <span class="hl-danger">ont retiré la plupart du CO₂ de l'atmosphère et relâché des quantités gigantesques d'oxygène</span> — un élément chimique très oxydant.</p>
+  <p>L'oxygène massivement relâché a d'abord rouillé les métaux, puis a <span class="hl-danger">empoisonné l'atmosphère</span>, mettant en péril la vie. C'est le phénomène de <span class="hl">Grande Oxydation</span>, survenu il y a 2,4 milliards d'années.</p>
+  <div class="pull-quote">"Pour la première fois dans l'histoire de la Terre, une forme de vie avait modifié la planète entière au point de menacer les conditions mêmes de son existence."</div>
+</div>
+<div class="viz-panel reveal">
+  <div class="viz-title">La Grande Oxydation · −2,4 milliards d'années</div>
+  <div class="viz-subtitle">L'atmosphère terrestre transformée de l'intérieur par le vivant lui-même</div>
+  <canvas id="oxidation-canvas" style="width:100%;max-width:960px;height:400px;display:block;margin:0 auto;"></canvas>
+  <div class="viz-caption">Le taux d'oxygène est passé de quasi-nul à 21% — catastrophe pour les anaérobies, opportunité pour les aérobies</div>
+</div>
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+<div class="parallele-box reveal">
+  <div class="parallele-title">✦ &nbsp; Deux crises · Même logique &nbsp; ✦</div>
+  <div class="parallele-grid">
+    <div class="parallele-col col-cyano"><h4>Cyanobactéries · −3 milliards d'ans</h4><p>Accèdent à une source d'énergie nouvelle — le Soleil via la photosynthèse. Se multiplient à l'échelle planétaire. Modifient l'atmosphère entière. Provoquent une extinction massive. Ouvrent la voie à une vie plus complexe.</p></div>
+    <div class="parallele-col col-human"><h4>Humanité · depuis 1750</h4><p>Accède à une source d'énergie nouvelle — les énergies fossiles. Se multiplie à l'échelle planétaire. Modifie l'atmosphère entière. Provoque une extinction massive. Pourrait ouvrir la voie à une civilisation plus complexe.</p></div>
+  </div>
+</div>
+<div class="section reveal">
+  <div class="section-label">Le vivant, force de transformation globale</div>
+  <p>Cette crise révèle une propriété fondamentale de la biosphère : <span class="hl-gold">le vivant n'est pas un simple passager de la planète, mais une force de transformation globale.</span></p>
+  <p>Plus de deux milliards d'années plus tard, une autre espèce a provoqué un basculement de même nature, mais à une vitesse sans précédent. <span class="hl-danger">Jamais encore une seule espèce n'avait concentré un tel pouvoir de transformation, ni agi à une telle vitesse, tout en ayant conscience de ce qu'elle faisait.</span></p>
+</div>
+<section class="finale-section">
+  <p class="finale-text reveal">La vie a failli se détruire elle-même.<br>Et de cette catastrophe<br>est née une planète plus complexe.<br><br><em>Danger et opportunité.<br>Toujours les deux traits du même pinceau.</em></p>
+  <div style="margin-top:5rem;font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.5em;color:var(--text-dim);text-transform:uppercase;" class="reveal">↓ &nbsp; Chapitre VI</div>
+</section>
+
+<!-- ══ CHAPTER NAV ══ -->
+<nav class="chapter-nav">
+  <div class="chapter-nav-inner">
+    <a href="petit-livre-bleu-chapitre4.html" class="chapter-nav-link chapter-nav-link--prev" style="--nav-accent:#c878f8;">
+      <div class="chapter-nav-label"><span class="chapter-nav-arrow chapter-nav-arrow--prev">←</span> Chapitre précédent</div>
+      <div class="chapter-nav-title" style="color:#c878f8;text-shadow:0 0 30px rgba(200,120,248,0.4);">L'ADN</div>
+      <div class="chapter-nav-sub">Quatre lettres pour écrire la totalité du vivant</div>
+    </a>
+    <a href="petit-livre-bleu-chapitre6.html" class="chapter-nav-link chapter-nav-link--next" style="--nav-accent:#38d890;">
+      <div class="chapter-nav-label">Chapitre suivant <span class="chapter-nav-arrow chapter-nav-arrow--next">→</span></div>
+      <div class="chapter-nav-title" style="color:#38d890;text-shadow:0 0 30px rgba(56,216,144,0.4);">La multicellularité</div>
+      <div class="chapter-nav-sub">Quand les cellules ont appris à faire corps ensemble</div>
+    </a>
+  </div>
+</nav>
+<div class="chapter-nav-sep"></div>
+<div class="chapter-footer-bottom">
+  <div class="chapter-footer-brand"><a href="index.html">Le Petit Livre Bleu</a> · Jean-Pierre Goux</div>
+  <div class="chapter-footer-copy">Une autre histoire de l'humanité</div>
+</div>
+<script>
+// ── CANVAS RETINA HELPER ──
+// Règle stricte : police minimum 12px dans tous les canvas
+function resizeCanvas(canvas, maxW, fixedH) {
+  const dpr = window.devicePixelRatio || 1;
+  const parentW = canvas.parentElement.getBoundingClientRect().width;
+  const W = Math.min(parentW || maxW, maxW);
+  const H = fixedH;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, W, H };
+}
+
+// CURSOR
+const cursor=document.getElementById('cursor'),cRing=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function ar(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;cRing.style.left=rx+'px';cRing.style.top=ry+'px';requestAnimationFrame(ar);})();
+
+// STARFIELD
+const sfC=document.getElementById('starfield'),sfX=sfC.getContext('2d');
+let sfW,sfH;
+function rsf(){
+  const dpr=window.devicePixelRatio||1;
+  sfW=window.innerWidth; sfH=window.innerHeight;
+  sfC.style.width=sfW+'px'; sfC.style.height=sfH+'px';
+  sfC.width=Math.round(sfW*dpr); sfC.height=Math.round(sfH*dpr);
+  sfX.scale(dpr,dpr);
+}
+rsf(); window.addEventListener('resize',rsf);
+const stars=Array.from({length:260},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.2+0.2,a:Math.random()*0.4+0.08,ph:Math.random()*Math.PI*2,hue:Math.random()<0.4?170:Math.random()<0.5?50:200}));
+let sft=0;
+(function ds(){sfX.clearRect(0,0,sfW,sfH);sft+=0.01;
+stars.forEach(s=>{const a=s.a*(0.5+0.5*Math.sin(sft*0.3+s.ph));sfX.beginPath();sfX.arc(s.x*sfW,s.y*sfH,s.r,0,Math.PI*2);sfX.fillStyle=`hsla(${s.hue},60%,72%,${a})`;sfX.fill();});
+requestAnimationFrame(ds);})();
+
+// COVER CANVAS
+const cc=document.getElementById('cover-canvas'),cx0=cc.getContext('2d');
+let ccW,ccH;
+function rcc(){
+  const dpr=window.devicePixelRatio||1;
+  ccW=cc.offsetWidth||window.innerWidth; ccH=cc.offsetHeight||window.innerHeight;
+  cc.style.width=ccW+'px'; cc.style.height=ccH+'px';
+  cc.width=Math.round(ccW*dpr); cc.height=Math.round(ccH*dpr);
+  cx0.scale(dpr,dpr);
+}
+rcc(); window.addEventListener('resize',rcc);
+const bubbles=Array.from({length:26},()=>({x:Math.random()*1400,y:Math.random()*900,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:2+Math.random()*4,a:Math.random()*0.22+0.04,ph:Math.random()*Math.PI*2,col:`hsl(${160+Math.random()*40},${60+Math.random()*30}%,${38+Math.random()*22}%)`}));
+let cct=0;
+(function dcc(){cx0.clearRect(0,0,ccW,ccH);cct+=0.01;
+bubbles.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;
+if(p.x<0)p.x=ccW;if(p.x>ccW)p.x=0;if(p.y<0)p.y=ccH;if(p.y>ccH)p.y=0;
+bubbles.slice(i+1).forEach(q=>{const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
+if(d<110){cx0.strokeStyle=`rgba(32,168,136,${(1-d/110)*0.06})`;cx0.lineWidth=0.6;cx0.beginPath();cx0.moveTo(p.x,p.y);cx0.lineTo(q.x,q.y);cx0.stroke();}});
+cx0.globalAlpha=p.a*(0.5+0.5*Math.sin(cct*1.4+p.ph));cx0.fillStyle=p.col;cx0.beginPath();cx0.arc(p.x,p.y,p.r,0,Math.PI*2);cx0.fill();cx0.globalAlpha=1;});
+requestAnimationFrame(dcc);})();
+
+// SCROLL REVEAL
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.07});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// TOOLTIP
+const tooltip=document.getElementById('tooltip');
+function showTip(e,t,txt){tooltip.innerHTML=`<strong>${t}</strong>${txt}`;tooltip.classList.add('show');moveTip(e);}
+function moveTip(e){tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-10)+'px';}
+function hideTip(){tooltip.classList.remove('show');}
+document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))moveTip(e);});
+
+// ══════════════════════════════════════════════════════
+// VIZ 1 : LE MONDE MICROBIEN
+// ══════════════════════════════════════════════════════
+(function buildMicrobe(){
+  const canvas=document.getElementById('microbe-canvas');
+  let W,H,ctx;
+  function resize(){const r=resizeCanvas(canvas,960,440);ctx=r.ctx;W=r.W;H=r.H;}
+  resize();window.addEventListener('resize',resize);
+  const HABITATS=[
+    {name:'Océans',          x:0.10,y:0.42,col:'#2898d8',r:52,sub:'Règnent sur les mers depuis 3,5 Mds d\'ans'},
+    {name:'Sols',            x:0.27,y:0.46,col:'#b08038',r:46,sub:'1 gramme de sol contient 1 milliard de bactéries'},
+    {name:'Sources hydro',   x:0.45,y:0.52,col:'#d85030',r:36,sub:'Survivent à 120°C sans lumière'},
+    {name:'Glaces polaires', x:0.60,y:0.38,col:'#60b8e0',r:33,sub:'Actives à −20°C dans les cristaux de glace'},
+    {name:'Atmosphère',      x:0.75,y:0.32,col:'#88c860',r:29,sub:'Circulent jusqu\'à 10 km d\'altitude'},
+    {name:'Corps humain',    x:0.90,y:0.50,col:'#d07878',r:40,sub:'38 000 Mds de bactéries en symbiose'},
+  ];
+  const particles=[];
+  HABITATS.forEach(h=>{for(let i=0;i<18;i++){const a=Math.random()*Math.PI*2,r=Math.random()*h.r*0.75;particles.push({hx:h.x,hy:h.y,ox:Math.cos(a)*r,oy:Math.sin(a)*r,ph:Math.random()*Math.PI*2,sp:0.5+Math.random(),col:h.col,r:1.5+Math.random()*2.5});}});
+  const TL=[{p:0,label:'−3,5 Mds',sub:'Première cellule'},{p:0.43,label:'−2 Mds',sub:'Grande Oxydation'},{p:0.71,label:'−1 Md',sub:'Eucaryotes'},{p:1,label:'Aujourd\'hui',sub:''}];
+  let t=0;
+  (function loop(){
+    if(!ctx){requestAnimationFrame(loop);return;}
+    ctx.clearRect(0,0,W,H);t+=0.012;
+    HABITATS.forEach(h=>{
+      const hx=h.x*W,hy=h.y*H;
+      const g=ctx.createRadialGradient(hx,hy,0,hx,hy,h.r*1.9);
+      g.addColorStop(0,h.col+'22');g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(hx,hy,h.r*1.9,0,Math.PI*2);ctx.fill();
+    });
+    particles.forEach(p=>{
+      const hx=p.hx*W,hy=p.hy*H;
+      const px=hx+p.ox+Math.sin(t*p.sp+p.ph)*4,py=hy+p.oy+Math.cos(t*p.sp*0.7+p.ph)*3;
+      ctx.globalAlpha=0.55+0.3*Math.sin(t*2+p.ph);ctx.fillStyle=p.col;
+      ctx.beginPath();ctx.arc(px,py,p.r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+    });
+    HABITATS.forEach((h,i)=>{
+      const hx=h.x*W,hy=h.y*H,pulse=0.88+0.12*Math.sin(t*1.1+i*0.9);
+      ctx.strokeStyle=h.col+'99';ctx.lineWidth=1.8;
+      ctx.beginPath();ctx.arc(hx,hy,h.r*pulse,0,Math.PI*2);ctx.stroke();
+      // NOM — 13px net
+      ctx.font="300 13px 'Raleway', sans-serif";
+      ctx.fillStyle=h.col;ctx.textAlign='center';
+      ctx.fillText(h.name,hx,hy+h.r*pulse+20);
+      h._x=hx;h._y=hy;h._r=h.r;
+    });
+    // Timeline
+    const bx=50,by=H-32,bw=W-100;
+    ctx.strokeStyle='rgba(64,208,176,0.55)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bw,by);ctx.stroke();
+    TL.forEach(ev=>{
+      const x=bx+ev.p*bw;
+      ctx.fillStyle='rgba(64,208,176,0.9)';ctx.beginPath();ctx.arc(x,by,4,0,Math.PI*2);ctx.fill();
+      ctx.font="300 12px 'Raleway', sans-serif";
+      ctx.fillStyle='rgba(140,220,200,0.92)';ctx.textAlign='center';
+      ctx.fillText(ev.label,x,by-18);
+      if(ev.sub){ctx.font="200 11px 'Raleway', sans-serif";ctx.fillStyle='rgba(100,190,170,0.8)';ctx.fillText(ev.sub,x,by-4);}
+    });
+    requestAnimationFrame(loop);
+  })();
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect(),sx=W/rect.width,sy=H/rect.height;
+    const mx2=(e.clientX-rect.left)*sx,my2=(e.clientY-rect.top)*sy;
+    let hit=null;
+    HABITATS.forEach(h=>{if(!h._x)return;const dx=mx2-h._x,dy=my2-h._y;if(Math.sqrt(dx*dx+dy*dy)<h._r+12)hit=h;});
+    if(hit)showTip(e,hit.name,`<br><em>${hit.sub}</em>`);else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+
+// ══════════════════════════════════════════════════════
+// VIZ 2 : CHLOROPHYLLE
+// ══════════════════════════════════════════════════════
+(function buildChloro(){
+  const canvas=document.getElementById('chloro-canvas');
+  let W,H,ctx;
+  function resize(){const r=resizeCanvas(canvas,960,460);ctx=r.ctx;W=r.W;H=r.H;}
+  resize();window.addEventListener('resize',resize);
+  const ATOMS=[
+    {el:'Mg',col:'#f0c040',r:20,x:0.5, y:0.5, note:'Atome central — capte les photons solaires',key:true},
+    {el:'N', col:'#4888f0',r:11,x:0.5, y:0.36,note:'Azote — pont électronique'},
+    {el:'N', col:'#4888f0',r:11,x:0.63,y:0.5, note:'Azote — pont électronique'},
+    {el:'N', col:'#4888f0',r:11,x:0.5, y:0.64,note:'Azote — pont électronique'},
+    {el:'N', col:'#4888f0',r:11,x:0.37,y:0.5, note:'Azote — pont électronique'},
+    {el:'C', col:'#70c870',r:8, x:0.5, y:0.27,note:'Carbone — squelette organique'},
+    {el:'C', col:'#70c870',r:8, x:0.60,y:0.30,note:'Carbone'},{el:'C',col:'#70c870',r:8,x:0.69,y:0.41,note:'Carbone'},
+    {el:'C', col:'#70c870',r:8, x:0.69,y:0.59,note:'Carbone'},{el:'C',col:'#70c870',r:8,x:0.60,y:0.70,note:'Carbone'},
+    {el:'C', col:'#70c870',r:8, x:0.5, y:0.73,note:'Carbone'},{el:'C',col:'#70c870',r:8,x:0.40,y:0.70,note:'Carbone'},
+    {el:'C', col:'#70c870',r:8, x:0.31,y:0.59,note:'Carbone'},{el:'C',col:'#70c870',r:8,x:0.31,y:0.41,note:'Carbone'},
+    {el:'C', col:'#70c870',r:8, x:0.40,y:0.30,note:'Carbone'},
+    {el:'O', col:'#e84040',r:10,x:0.73,y:0.26,note:'Oxygène — groupe carbonyle'},
+    {el:'O', col:'#e84040',r:10,x:0.27,y:0.26,note:'Oxygène'},
+    {el:'H', col:'#b0b8c8',r:6, x:0.5, y:0.18,note:'Hydrogène'},{el:'H',col:'#b0b8c8',r:6,x:0.80,y:0.5,note:'Hydrogène'},
+    {el:'H', col:'#b0b8c8',r:6, x:0.5, y:0.84,note:'Hydrogène'},{el:'H',col:'#b0b8c8',r:6,x:0.20,y:0.5,note:'Hydrogène'},
+  ];
+  const BONDS=[[0,1],[0,2],[0,3],[0,4],[1,5],[2,7],[3,10],[4,13],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,5],[7,15],[5,16],[5,17],[7,17],[10,18],[12,18],[14,19]];
+  const photons=Array.from({length:10},(_,i)=>({angle:i*(Math.PI*2/10),col:`hsl(${48+Math.random()*16},100%,${72+Math.random()*18}%)`,r:3.5+Math.random()*2,ph:Math.random()*Math.PI*2,sp:0.007+Math.random()*0.005}));
+  const LEGEND=[{el:'C',col:'#70c870',pct:'~45%'},{el:'O',col:'#e84040',pct:'~30%'},{el:'H',col:'#b0b8c8',pct:'~11%'},{el:'N',col:'#4888f0',pct:'~10%'}];
+  let t=0;
+  (function loop(){
+    if(!ctx){requestAnimationFrame(loop);return;}
+    ctx.clearRect(0,0,W,H);t+=0.012;
+    const sg=ctx.createRadialGradient(W*0.08,H*0.08,0,W*0.08,H*0.08,W*0.45);
+    sg.addColorStop(0,'rgba(240,200,64,0.1)');sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
+    const cx=W*0.46,cy=H*0.5,scale=Math.min(H*0.88,W*0.5);
+    const pg=ctx.createRadialGradient(cx,cy,0,cx,cy,scale*0.3);
+    pg.addColorStop(0,'rgba(240,200,64,0.15)');pg.addColorStop(0.6,'rgba(64,208,176,0.07)');pg.addColorStop(1,'transparent');
+    ctx.fillStyle=pg;ctx.beginPath();ctx.arc(cx,cy,scale*0.3,0,Math.PI*2);ctx.fill();
+    BONDS.forEach(([a,b])=>{
+      if(a>=ATOMS.length||b>=ATOMS.length)return;
+      const pa=ATOMS[a],pb=ATOMS[b];
+      ctx.strokeStyle='rgba(140,200,140,0.3)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx+(pa.x-0.5)*scale,cy+(pa.y-0.5)*scale);ctx.lineTo(cx+(pb.x-0.5)*scale,cy+(pb.y-0.5)*scale);ctx.stroke();
+    });
+    photons.forEach(p=>{
+      const prog=(Math.sin(t*p.sp*30+p.ph)+1)/2;
+      const dist=W*0.52*(1-prog*0.88);
+      const px2=cx+Math.cos(p.angle+t*0.08)*dist,py2=cy+Math.sin(p.angle+t*0.08)*dist;
+      ctx.globalAlpha=0.35+prog*0.55;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(px2,py2,p.r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+    });
+    ATOMS.forEach((a,i)=>{
+      const ax=cx+(a.x-0.5)*scale,ay=cy+(a.y-0.5)*scale+(a.key?Math.sin(t*2)*2:Math.sin(t*1.4+i)*1.5);
+      const g=ctx.createRadialGradient(ax-a.r*0.3,ay-a.r*0.3,0,ax,ay,a.r*(a.key?1.5:1));
+      g.addColorStop(0,a.col);g.addColorStop(1,a.col+'44');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(ax,ay,a.r*(a.key?1.5:1),0,Math.PI*2);ctx.fill();
+      if(a.key){ctx.strokeStyle='rgba(240,200,64,0.65)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(ax,ay,a.r*2.2+3*Math.sin(t*3),0,Math.PI*2);ctx.stroke();}
+      // Lettre dans l'atome — taille proportionnelle à l'atome, min 10px
+      ctx.font=`${a.key?'600':'500'} ${Math.max(10,Math.round(a.r*0.85))}px 'Cinzel', serif`;
+      ctx.fillStyle='rgba(255,255,255,0.93)';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(a.el,ax,ay);ctx.textBaseline='alphabetic';
+      a._ax=ax;a._ay=ay;
+    });
+    // Légende — 13px
+    const lx=W*0.80,ly=H*0.18;
+    ctx.font="300 13px 'Raleway', sans-serif";ctx.fillStyle='rgba(64,208,176,0.88)';ctx.textAlign='left';
+    ctx.fillText('BIOMASSE TERRESTRE',lx,ly);
+    LEGEND.forEach((it,i)=>{
+      const bx=lx+(i%2)*90,by2=ly+22+(Math.floor(i/2))*44;
+      const bg=ctx.createRadialGradient(bx+13,by2,0,bx+13,by2,14);
+      bg.addColorStop(0,it.col);bg.addColorStop(1,it.col+'44');
+      ctx.fillStyle=bg;ctx.beginPath();ctx.arc(bx+13,by2,14,0,Math.PI*2);ctx.fill();
+      ctx.font="600 11px 'Cinzel',serif";ctx.fillStyle='rgba(255,255,255,0.93)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it.el,bx+13,by2);ctx.textBaseline='alphabetic';
+      ctx.font="300 13px 'Raleway',sans-serif";ctx.fillStyle='rgba(180,225,195,0.9)';ctx.textAlign='left';ctx.fillText(it.pct,bx+31,by2+5);
+    });
+    ctx.font="200 12px 'Raleway',sans-serif";ctx.fillStyle='rgba(64,208,176,0.75)';ctx.textAlign='left';
+    ctx.fillText('= 96% de toute la biomasse',lx,ly+118);
+    requestAnimationFrame(loop);
+  })();
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect(),sx=W/rect.width,sy=H/rect.height;
+    const mx2=(e.clientX-rect.left)*sx,my2=(e.clientY-rect.top)*sy;
+    let hit=null;
+    ATOMS.forEach(a=>{if(!a._ax)return;const dx=mx2-a._ax,dy=my2-a._ay;if(Math.sqrt(dx*dx+dy*dy)<a.r+10)hit=a;});
+    if(hit)showTip(e,`Atome : ${hit.el}`,`<br>${hit.note}`);else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+
+// ══════════════════════════════════════════════════════
+// VIZ 3 : PHOTOSYNTHÈSE FLOW
+// ══════════════════════════════════════════════════════
+(function buildPhoto(){
+  const canvas=document.getElementById('photo-canvas');
+  let W,H,ctx;
+  function resize(){const r=resizeCanvas(canvas,960,320);ctx=r.ctx;W=r.W;H=r.H;}
+  resize();window.addEventListener('resize',resize);
+  const inputs=[{label:'☀ Lumière',col:'#f0c040'},{label:'CO₂',col:'#88c870'},{label:'H₂O',col:'#40a8e8'}];
+  const outputs=[{label:'Sucres',col:'#e0a040'},{label:'O₂',col:'#e84060'}];
+  let t=0;
+  (function loop(){
+    if(!ctx){requestAnimationFrame(loop);return;}
+    ctx.clearRect(0,0,W,H);t+=0.012;
+    const cx=W/2,cy=H/2,cellR=52;
+    inputs.forEach((inp,i)=>{
+      const angle=-Math.PI/2+(i-1)*0.85;
+      const sx=cx+Math.cos(angle)*W*0.28,sy=cy+Math.sin(angle)*H*0.52;
+      const ex=cx+Math.cos(angle)*cellR,ey=cy+Math.sin(angle)*cellR;
+      for(let p=0;p<4;p++){const prog=(t*0.4+p*0.25)%1;ctx.fillStyle=inp.col;ctx.globalAlpha=0.65*Math.sin(prog*Math.PI);ctx.beginPath();ctx.arc(sx+(ex-sx)*prog,sy+(ey-sy)*prog,4,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+      ctx.strokeStyle=inp.col+'70';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+      ctx.font="300 14px 'Raleway',sans-serif";ctx.fillStyle=inp.col;ctx.textAlign='center';
+      ctx.fillText(inp.label,sx,sy+(i===0?-22:22));
+    });
+    outputs.forEach((out,i)=>{
+      const angle=i===0?Math.PI*0.18:Math.PI*0.82;
+      const sx=cx+Math.cos(angle)*cellR,sy=cy+Math.sin(angle)*cellR;
+      const ex=cx+Math.cos(angle)*W*0.26,ey=cy+Math.sin(angle)*H*0.46;
+      for(let p=0;p<4;p++){const prog=(t*0.4+p*0.25)%1;ctx.fillStyle=out.col;ctx.globalAlpha=0.7*Math.sin(prog*Math.PI);ctx.beginPath();ctx.arc(sx+(ex-sx)*prog,sy+(ey-sy)*prog,4,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+      ctx.strokeStyle=out.col+'70';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+      ctx.font="300 14px 'Raleway',sans-serif";ctx.fillStyle=out.col;ctx.textAlign='center';ctx.fillText(out.label,ex,ey+22);
+    });
+    const pulse=0.93+0.07*Math.sin(t*1.5);
+    const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,cellR*pulse);
+    cg.addColorStop(0,'rgba(64,208,176,0.28)');cg.addColorStop(0.7,'rgba(32,168,136,0.1)');cg.addColorStop(1,'rgba(32,168,136,0.03)');
+    ctx.fillStyle=cg;ctx.beginPath();ctx.arc(cx,cy,cellR*pulse,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(64,208,176,0.5)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,cellR*pulse,0,Math.PI*2);ctx.stroke();
+    ctx.font="500 13px 'Cinzel',serif";ctx.fillStyle='rgba(160,240,210,0.92)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Chlorophylle',cx,cy-5);
+    ctx.font="200 11px 'Raleway',sans-serif";ctx.fillStyle='rgba(100,200,160,0.75)';ctx.textBaseline='top';ctx.fillText('Photosynthèse',cx,cy+10);ctx.textBaseline='alphabetic';
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══════════════════════════════════════════════════════
+// VIZ 4 : GRANDE OXYDATION — timeline O2
+// ══════════════════════════════════════════════════════
+(function buildOxidation(){
+  const canvas=document.getElementById('oxidation-canvas');
+  let W,H,ctx;
+  function resize(){const r=resizeCanvas(canvas,960,400);ctx=r.ctx;W=r.W;H=r.H;}
+  resize();window.addEventListener('resize',resize);
+  const EVENTS=[
+    {t:0,    label:'−3,5 Mds',sub:'Premières cellules',        col:'#40d0b0',o2:0.0005,crisis:false},
+    {t:0.21, label:'−3 Mds',  sub:'Photosynthèse apparaît',    col:'#60c840',o2:0.003, crisis:false},
+    {t:0.40, label:'−2,7 Mds',sub:'Cyanobactéries prolifèrent',col:'#90c020',o2:0.008, crisis:false},
+    {t:0.57, label:'−2,4 Mds',sub:'Grande Oxydation',           col:'#e07820',o2:0.018, crisis:true},
+    {t:0.64, label:'−2 Mds',  sub:'Roches rouges (fer)',         col:'#c04020',o2:0.04,  crisis:false},
+    {t:0.74, label:'−1 Md',   sub:'Eucaryotes aérobies',         col:'#80c060',o2:0.10,  crisis:false},
+    {t:0.87, label:'−600 M',  sub:'Explosion cambrienne',        col:'#50d080',o2:0.15,  crisis:false},
+    {t:1,    label:'Aujourd\'hui',sub:'Atmosphère actuelle',     col:'#40d0b0',o2:0.21,  crisis:false},
+  ];
+  const ML={l:68,r:28,t:56,b:58};
+  let t=0;
+  (function loop(){
+    if(!ctx){requestAnimationFrame(loop);return;}
+    ctx.clearRect(0,0,W,H);t+=0.01;
+    const iW=W-ML.l-ML.r,iH=H-ML.t-ML.b;
+    const xS=tt=>ML.l+tt*iW, yS=o2=>ML.t+iH*(1-o2/0.22);
+    // Area fill
+    ctx.beginPath();ctx.moveTo(ML.l,ML.t+iH);
+    EVENTS.forEach(e=>ctx.lineTo(xS(e.t),yS(e.o2)));
+    ctx.lineTo(ML.l+iW,ML.t+iH);ctx.closePath();
+    const og=ctx.createLinearGradient(0,ML.t,0,ML.t+iH);
+    og.addColorStop(0,'rgba(232,64,64,0.32)');og.addColorStop(0.55,'rgba(64,208,176,0.14)');og.addColorStop(1,'rgba(64,208,176,0.02)');
+    ctx.fillStyle=og;ctx.fill();
+    // Line
+    ctx.strokeStyle='rgba(220,80,60,0.85)';ctx.lineWidth=2.5;
+    ctx.beginPath();EVENTS.forEach((e,i)=>i===0?ctx.moveTo(xS(e.t),yS(e.o2)):ctx.lineTo(xS(e.t),yS(e.o2)));ctx.stroke();
+    // Crisis zone
+    const crisisX=xS(EVENTS[3].t);
+    ctx.fillStyle='rgba(224,120,32,0.1)';ctx.fillRect(crisisX-18,ML.t,36,iH);
+    ctx.strokeStyle='rgba(224,120,32,0.45)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(crisisX,ML.t);ctx.lineTo(crisisX,ML.t+iH);ctx.stroke();ctx.setLineDash([]);
+    // Crisis label — 14px bien visible
+    ctx.font="500 14px 'Cinzel',serif";
+    ctx.fillStyle=`rgba(240,160,60,${0.9+0.08*Math.sin(t*2)})`;
+    ctx.textAlign='center';ctx.fillText('Grande Oxydation',crisisX,ML.t+20);
+    ctx.font="300 12px 'Raleway',sans-serif";
+    ctx.fillStyle=`rgba(210,120,60,${0.75+0.1*Math.sin(t*2)})`;
+    ctx.fillText('La vie empoisonne la planète',crisisX,ML.t+36);
+    // Event dots + labels
+    EVENTS.forEach((ev,i)=>{
+      const x=xS(ev.t),y=yS(ev.o2),pulse=ev.crisis?1+0.12*Math.sin(t*3):1;
+      const cg=ctx.createRadialGradient(x,y,0,x,y,9*pulse);
+      cg.addColorStop(0,ev.col);cg.addColorStop(1,ev.col+'44');
+      ctx.fillStyle=cg;ctx.beginPath();ctx.arc(x,y,9*pulse,0,Math.PI*2);ctx.fill();
+      const above=i%2===0;
+      // Label date — 13px
+      ctx.font=`${ev.crisis?'500':'300'} 13px 'Raleway',sans-serif`;
+      ctx.fillStyle=ev.crisis?'rgba(245,165,70,0.97)':'rgba(160,225,205,0.92)';
+      ctx.textAlign=x<W*0.08?'left':x>W*0.94?'right':'center';
+      ctx.fillText(ev.label,x,above?y-20:y+28);
+      // Sous-label — 11px
+      ctx.font="200 11px 'Raleway',sans-serif";
+      ctx.fillStyle='rgba(120,195,175,0.78)';
+      ctx.fillText(ev.sub,x,above?y-5:y+42);
+    });
+    // Axe Y
+    ctx.save();ctx.translate(16,ML.t+iH/2);ctx.rotate(-Math.PI/2);
+    ctx.font="200 12px 'Raleway',sans-serif";ctx.fillStyle='rgba(220,80,60,0.65)';ctx.textAlign='center';
+    ctx.fillText("TAUX D'OXYGÈNE ATMOSPHÉRIQUE",0,0);ctx.restore();
+    requestAnimationFrame(loop);
+  })();
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect(),sx=W/rect.width,sy=H/rect.height;
+    const mx2=(e.clientX-rect.left)*sx,my2=(e.clientY-rect.top)*sy;
+    let hit=null;
+    EVENTS.forEach(ev=>{
+      const x=ML.l+ev.t*(W-ML.l-ML.r),y=ML.t+(H-ML.t-ML.b)*(1-ev.o2/0.22);
+      if(Math.sqrt((mx2-x)**2+(my2-y)**2)<16)hit=ev;
+    });
+    if(hit)showTip(e,hit.label,`<br>O₂ : ${(hit.o2*100).toFixed(1)}%<br><em>${hit.sub}</em>`);else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+</script>
+</body>
+</html>
