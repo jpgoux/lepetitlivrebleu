@@ -316,33 +316,6 @@ blockquote::before {
 ::-webkit-scrollbar-thumb { background:var(--life-dim); border-radius:2px; }
 
 /* ══ SITE FOOTER ══ */
-footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
-.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
-.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
-.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
-.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
-.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
-.footer-dalle:hover{background:rgba(8,14,32,0.9);}
-.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
-.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
-.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
-.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
-.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
-.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
-.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
-.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
-.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
-.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
-.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
-.footer-dalle-ch2 .footer-num{color:#c9a84c;}
-.footer-dalle-ch3 .footer-num{color:#3cbe78;}
-.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
-.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
-.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
-
 
 /* ══════════════ CHAPTER NAV ══════════════ */
 .chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
@@ -535,13 +508,13 @@ document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cursor.st
 // ══════════════════════
 const sfC=document.getElementById('starfield');
 const sfX=sfC.getContext('2d');
-function rsf(){ sfC.width=window.innerWidth; sfC.height=window.innerHeight; }
+function rsf(){ const dpr=window.devicePixelRatio||1;sfC.width=Math.round(window.innerWidth*dpr);sfC.height=Math.round(window.innerHeight*dpr);sfC.style.width=window.innerWidth+"px";sfC.style.height=window.innerHeight+"px";sfX.setTransform(dpr,0,0,dpr,0,0);sfC._lw=window.innerWidth;sfC._lh=window.innerHeight; }
 rsf(); window.addEventListener('resize',rsf);
 const stars=Array.from({length:260},()=>({ x:Math.random(),y:Math.random(),r:Math.random()*1.3+0.2,alpha:Math.random()*0.5+0.1,phase:Math.random()*Math.PI*2,speed:Math.random()*0.001+0.0003 }));
 let sft=0;
-(function ds(){ sfX.clearRect(0,0,sfC.width,sfC.height); sft+=0.01;
+(function ds(){ sfX.clearRect(0,0,sfC._lw||sfC.width,sfC._lh||sfC.height); sft+=0.01;
   stars.forEach(s=>{ const a=s.alpha*(0.5+0.5*Math.sin(sft*s.speed*300+s.phase));
-    sfX.beginPath(); sfX.arc(s.x*sfC.width,s.y*sfC.height,s.r,0,Math.PI*2);
+    sfX.beginPath(); sfX.arc(s.x*(sfC._lw||sfC.width),s.y*(sfC._lh||sfC.height),s.r,0,Math.PI*2);
     sfX.fillStyle=`rgba(160,220,170,${a})`; sfX.fill(); }); requestAnimationFrame(ds); })();
 
 // ══════════════════════
@@ -549,7 +522,7 @@ let sft=0;
 // ══════════════════════
 const cc=document.getElementById('cover-canvas');
 const cx2=cc.getContext('2d');
-function rcc(){ cc.width=cc.offsetWidth; cc.height=cc.offsetHeight; }
+function rcc(){ const dpr=window.devicePixelRatio||1;const w=cc.offsetWidth,h=cc.offsetHeight;cc.width=Math.round(w*dpr);cc.height=Math.round(h*dpr);cc.style.width=w+"px";cc.style.height=h+"px";cx2.setTransform(dpr,0,0,dpr,0,0);cc._lw=w;cc._lh=h; }
 rcc(); window.addEventListener('resize',rcc);
 const cparts=Array.from({length:50},()=>({
   x:Math.random()*cc.width, y:Math.random()*cc.height,
@@ -558,7 +531,7 @@ const cparts=Array.from({length:50},()=>({
   color:`hsl(${120+Math.random()*60},${60+Math.random()*30}%,${40+Math.random()*35}%)`
 }));
 (function dcc(){
-  cx2.clearRect(0,0,cc.width,cc.height);
+  cx2.clearRect(0,0,cc._lw||cc.width,cc._lh||cc.height);
   // Connections
   cparts.forEach((p,i)=>{ cparts.slice(i+1).forEach(q=>{
     const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
@@ -597,7 +570,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   const canvas=document.getElementById('assembly-canvas');
   const ctx=canvas.getContext('2d');
   let W,H;
-  function resize(){ const r=canvas.parentElement.getBoundingClientRect(); W=canvas.width=r.width; H=canvas.height=520; }
+  function resize(){ const r=canvas.parentElement.getBoundingClientRect();const vdpr=window.devicePixelRatio||1;W=r.width;H=520;canvas.width=Math.round(W*vdpr);canvas.height=Math.round(H*vdpr);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(vdpr,0,0,vdpr,0,0); }
   resize(); window.addEventListener('resize',()=>{ resize(); });
 
   let stage=0;
@@ -847,7 +820,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     // Center arrow
     ctx.save();
     ctx.textAlign='center';
-    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.font=`300 ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
     ctx.fillStyle=info.arrowColor;
     ctx.fillText(info.arrow, W/2, H/2+4);
     if(stage<3){
@@ -934,17 +907,17 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     if(stage<3){
       const labelY=H*0.12;
       [[W*0.27,info.left,info.leftSub],[W*0.73,info.right,info.rightSub]].forEach(([px,lbl,sub],li)=>{
-        ctx.font=`600 ${Math.min(12,W*0.015)}px 'Raleway', sans-serif`;
+        ctx.font=`600 ${Math.max(13,W*0.015)}px 'Raleway', sans-serif`;
         ctx.fillStyle=li===0?'rgba(80,200,100,0.9)':'rgba(160,215,170,0.7)';
         ctx.fillText(lbl, px, labelY);
-        ctx.font=`300 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+        ctx.font=`300 ${Math.max(13,W*0.011)}px 'Raleway', sans-serif`;
         ctx.fillStyle='rgba(120,160,130,0.5)';
         sub.split('\n').forEach((ln,si)=>ctx.fillText(ln,px,labelY+14+si*13));
       });
     } else {
-      ctx.font=`600 ${Math.min(12,W*0.015)}px 'Raleway', sans-serif`;
+      ctx.font=`600 ${Math.max(13,W*0.015)}px 'Raleway', sans-serif`;
       ctx.fillStyle='rgba(80,200,100,0.9)'; ctx.fillText('Cellule vivante', W/2, H*0.08);
-      ctx.font=`300 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+      ctx.font=`300 ${Math.max(13,W*0.011)}px 'Raleway', sans-serif`;
       ctx.fillStyle='rgba(120,160,130,0.5)';
       ctx.fillText('Membrane · Noyau · Ribosomes · Mitochondries', W/2, H*0.08+14);
       // Legend
@@ -954,7 +927,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
           ctx.fillStyle=it.c; ctx.globalAlpha=0.8;
           ctx.beginPath(); ctx.arc(lx,ly,5,0,Math.PI*2); ctx.fill();
           ctx.globalAlpha=0.5; ctx.fillStyle='rgba(160,215,170,0.7)';
-          ctx.font=`300 ${Math.min(8,W*0.01)}px 'Raleway', sans-serif`;
+          ctx.font=`300 ${Math.max(13,W*0.01)}px 'Raleway', sans-serif`;
           ctx.fillText(it.l,lx,ly+14);
         });
       ctx.globalAlpha=1;
@@ -962,7 +935,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     // Stage dots
     for(let i=0;i<4;i++){
       ctx.beginPath(); ctx.arc(W/2+(i-1.5)*18,H-14,i===stage?4:2.5,0,Math.PI*2);
-      ctx.fillStyle=i===stage?'rgba(80,200,100,0.9)':'rgba(80,200,100,0.2)'; ctx.fill();
+      ctx.fillStyle=i===stage?'rgba(80,200,100,0.9)':'rgba(80,200,100,0.45)'; ctx.fill();
     }
     ctx.restore();
     requestAnimationFrame(loop);
@@ -1003,7 +976,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   // Life area
   const lGrad=defs.append('linearGradient').attr('id','lGrad').attr('x1','0%').attr('x2','100%');
   lGrad.append('stop').attr('offset','0%').attr('stop-color','rgba(80,200,100,0.05)');
-  lGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(80,200,100,0.2)');
+  lGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(80,200,100,0.45)');
 
   const areaLife=d3.area().x(d=>x(d.x)).y0(iH).y1(d=>y(d.y)).curve(d3.curveCatmullRom);
   g.append('path').datum(lifeData).attr('d',areaLife).attr('fill','url(#lGrad)');
@@ -1013,24 +986,24 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
 
   // Labels
   g.append('text').attr('x',x(9.5)).attr('y',y(0.96)).attr('fill','rgba(200,100,80,0.7)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('letter-spacing','1').text('ENTROPIE ↑');
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','1').text('ENTROPIE ↑');
   g.append('text').attr('x',x(9.2)).attr('y',y(lifeData[10].y)-10).attr('fill','rgba(80,200,100,0.8)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('letter-spacing','1').text('VIE');
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','1').text('VIE');
 
   // Axis
   g.append('g').attr('transform',`translate(0,${iH})`).call(d3.axisBottom(x).ticks(0))
     .call(ax=>ax.select('.domain').attr('stroke','rgba(80,200,100,0.15)'));
   g.append('text').attr('x',iW/2).attr('y',iH+36).attr('text-anchor','middle')
     .attr('fill','rgba(120,160,130,0.4)').attr('font-family',"'Raleway',sans-serif")
-    .attr('font-size','8').attr('letter-spacing','2').text('TEMPS →');
+    .attr('font-size','12').attr('letter-spacing','2').text('TEMPS →');
 
   // Annotations
   g.append('text').attr('x',x(1)).attr('y',y(0.5)).attr('text-anchor','middle')
     .attr('fill','rgba(120,160,130,0.35)').attr('font-family',"'Cormorant Garamond',serif")
-    .attr('font-size','10').attr('font-style','italic').text('Matière inerte');
+    .attr('font-size','13').attr('font-style','italic').text('Matière inerte');
   g.append('text').attr('x',x(5)).attr('y',y(0.82)).attr('text-anchor','middle')
     .attr('fill','rgba(80,200,100,0.4)').attr('font-family',"'Cormorant Garamond',serif")
-    .attr('font-size','10').attr('font-style','italic').text('Matière vivante');
+    .attr('font-size','13').attr('font-style','italic').text('Matière vivante');
 })();
 
 // ══════════════════════════════════════════════
@@ -1059,7 +1032,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     .attr('fill','#1e6eb0').attr('stroke','rgba(80,200,100,0.5)').attr('stroke-width',1.5);
   svg.append('text').attr('x',220).attr('y',cy-20+26)
     .attr('text-anchor','middle').attr('fill','rgba(80,200,100,0.6)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','1').text('TERRE');
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','1').text('TERRE');
 
   // Bennu orbit
   svg.append('ellipse').attr('cx',80).attr('cy',cy).attr('rx',W2*0.43).attr('ry',90)
@@ -1070,7 +1043,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     .attr('fill','rgba(120,80,40,0.6)').attr('stroke','rgba(200,140,60,0.5)').attr('stroke-width',1.5);
   svg.append('text').attr('x',bx).attr('y',by+30).attr('text-anchor','middle')
     .attr('fill','rgba(200,140,60,0.7)').attr('font-family',"'Raleway',sans-serif")
-    .attr('font-size','8').attr('letter-spacing','1').text('BÉNOU');
+    .attr('font-size','12').attr('letter-spacing','1').text('BÉNOU');
 
   // OSIRIS spacecraft path
   svg.append('path').attr('d',`M ${220} ${cy-20} Q ${cx+80} ${cy-120} ${bx} ${by}`)
@@ -1080,7 +1053,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   svg.append('circle').attr('cx',cx+50).attr('cy',cy-70).attr('r',4)
     .attr('fill','rgba(240,240,255,0.8)').attr('stroke','rgba(240,240,255,0.4)').attr('stroke-width',2);
   svg.append('text').attr('x',cx+50).attr('y',cy-80).attr('text-anchor','middle')
-    .attr('fill','rgba(240,240,255,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','7').attr('letter-spacing','1').text('OSIRIS-REx');
+    .attr('fill','rgba(240,240,255,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','1').text('OSIRIS-REx');
 
   // Findings
   const bases=['Adénine','Guanine','Cytosine','Thymine','Uracile'];
@@ -1093,13 +1066,13 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
       .on('mouseenter',e=>showTip(e,b,'<br><em>Base nucléique de l\'ADN — trouvée sur Bénou en 2025</em>'))
       .on('mouseleave',hideTip);
     svg.append('line').attr('x1',bx).attr('y1',by).attr('x2',bx2).attr('y2',by2)
-      .attr('stroke','rgba(80,200,100,0.2)').attr('stroke-width',0.8);
+      .attr('stroke','rgba(80,200,100,0.45)').attr('stroke-width',0.8);
   });
 
   // Distance label
   svg.append('text').attr('x',cx).attr('y',H2-8)
     .attr('text-anchor','middle').attr('fill','rgba(120,160,130,0.4)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','2')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','2')
     .text('300 MILLIONS DE KILOMÈTRES — LES BRIQUES DU VIVANT VOYAGENT DANS L\'ESPACE');
 })();
 
@@ -1155,9 +1128,9 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
       .attr('stroke',ev.color).attr('stroke-width',0.5).attr('stroke-opacity',0.4);
 
     svg.append('text').attr('x',ex).attr('y',yLabel).attr('text-anchor','middle')
-      .attr('fill',ev.color).attr('font-family',"'Cinzel',serif").attr('font-size','8').attr('letter-spacing','0.5').text(ev.label);
+      .attr('fill',ev.color).attr('font-family',"'Cinzel',serif").attr('font-size','12').attr('letter-spacing','0.5').text(ev.label);
     svg.append('text').attr('x',ex).attr('y',yLabel+(above?12:-12)).attr('text-anchor','middle')
-      .attr('fill','rgba(140,180,150,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','7').text(ev.sub);
+      .attr('fill','rgba(140,180,150,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','12').text(ev.sub);
   });
 
   // "Human" highlight
@@ -1167,7 +1140,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
 
   svg.append('text').attr('x',W2/2).attr('y',H2-6)
     .attr('text-anchor','middle').attr('fill','rgba(80,160,100,0.3)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','7').attr('letter-spacing','2')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','2')
     .text('L\'HUMAIN N\'OCCUPE QU\'UNE FRACTION IMPERCEPTIBLE DE CETTE HISTOIRE');
 })();
 
@@ -1178,7 +1151,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   const canvas=document.getElementById('mystery-canvas');
   const ctx=canvas.getContext('2d');
   let W,H;
-  function resize(){ W=canvas.width=canvas.offsetWidth; H=canvas.height=260; }
+  function resize(){ const mdpr=window.devicePixelRatio||1;W=canvas.offsetWidth;H=260;canvas.width=Math.round(W*mdpr);canvas.height=Math.round(H*mdpr);canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(mdpr,0,0,mdpr,0,0); }
   resize(); window.addEventListener('resize',resize);
 
   const N=28;
@@ -1248,8 +1221,8 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     ctx.fillText('?', cx2(), cy2());
 
     // "Jamais reproduit" text
-    ctx.font=`200 ${Math.min(9,W*0.012)}px 'Raleway', sans-serif`;
-    ctx.fillStyle=`rgba(80,200,100,${0.2+0.1*Math.sin(t*0.5)})`;
+    ctx.font=`200 ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.fillStyle=`rgba(80,200,100,${0.5+0.15*Math.sin(t*0.5)})`;
     ctx.letterSpacing='3px';
     ctx.fillText('JAMAIS REPRODUIT EN LABORATOIRE', cx2(), H-16);
     ctx.restore();
@@ -1258,7 +1231,6 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   })();
 })();
 </script>
-
 
 <!-- ══ CHAPTER NAV ══ -->
 <nav class="chapter-nav">

@@ -329,33 +329,6 @@ body {
 ::-webkit-scrollbar-thumb { background:rgba(224,184,76,0.3); border-radius:2px; }
 
 /* ══ SITE FOOTER ══ */
-footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
-.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
-.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
-.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
-.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
-.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
-.footer-dalle:hover{background:rgba(8,14,32,0.9);}
-.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
-.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
-.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
-.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
-.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
-.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
-.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
-.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
-.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
-.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
-.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
-.footer-dalle-ch2 .footer-num{color:#c9a84c;}
-.footer-dalle-ch3 .footer-num{color:#3cbe78;}
-.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
-.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
-.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
-
 
 /* ══════════════ CHAPTER NAV ══════════════ */
 .chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
@@ -564,7 +537,7 @@ document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style
 // ══════════════════════════
 const sfC=document.getElementById('starfield');
 const sfX=sfC.getContext('2d');
-function rsf(){sfC.width=window.innerWidth;sfC.height=window.innerHeight;}
+function rsf(){const dpr=window.devicePixelRatio||1;sfC.width=Math.round(window.innerWidth*dpr);sfC.height=Math.round(window.innerHeight*dpr);sfC.style.width=window.innerWidth+"px";sfC.style.height=window.innerHeight+"px";sfX.setTransform(dpr,0,0,dpr,0,0);sfC._lw=window.innerWidth;sfC._lh=window.innerHeight;}
 rsf(); window.addEventListener('resize',rsf);
 const stars=Array.from({length:300},()=>({
   x:Math.random(),y:Math.random(),
@@ -576,11 +549,11 @@ const stars=Array.from({length:300},()=>({
 }));
 let sft=0;
 (function ds(){
-  sfX.clearRect(0,0,sfC.width,sfC.height);
+  sfX.clearRect(0,0,sfC._lw||sfC.width,sfC._lh||sfC.height);
   sft+=0.01;
   stars.forEach(s=>{
     const a=s.alpha*(0.5+0.5*Math.sin(sft*s.speed*300+s.phase));
-    sfX.beginPath();sfX.arc(s.x*sfC.width,s.y*sfC.height,s.r,0,Math.PI*2);
+    sfX.beginPath();sfX.arc(s.x*(sfC._lw||sfC.width),s.y*(sfC._lh||sfC.height),s.r,0,Math.PI*2);
     sfX.fillStyle=`hsla(${s.hue},60%,80%,${a})`;sfX.fill();
   });
   requestAnimationFrame(ds);
@@ -592,7 +565,7 @@ let sft=0;
 (function heroCanvas(){
   const c=document.getElementById('hero-canvas');
   const ctx=c.getContext('2d');
-  function resize(){c.width=c.offsetWidth;c.height=c.offsetHeight;}
+  function resize(){const dpr=window.devicePixelRatio||1;const w=c.offsetWidth,h=c.offsetHeight;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+"px";c.style.height=h+"px";ctx.setTransform(dpr,0,0,dpr,0,0);c._lw=w;c._lh=h;}
   resize();window.addEventListener('resize',resize);
   let t=0;
   const N=80;
@@ -658,8 +631,8 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
   const container=document.getElementById('perils-canvas');
   const W=container.offsetWidth||840;
   const H=380;
-  container.width=W; container.height=H;
-  const ctx=container.getContext('2d');
+  const dpr2=window.devicePixelRatio||1;container.width=Math.round(W*dpr2); container.height=Math.round(H*dpr2);container.style.width=W+'px';container.style.height=H+'px';
+  const ctx=container.getContext('2d');ctx.setTransform(dpr2,0,0,dpr2,0,0);
 
   const perils=[
     {id:0, label:'Nucléaire',    x:0,y:0, r:22, color:'#c03838', sub:'Tensions entre\npuissances nucléarisées'},
@@ -724,7 +697,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
       ctx.globalAlpha=1;
 
       // Label
-      ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+      ctx.font=`300 ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
       ctx.fillStyle='rgba(220,200,180,0.8)'; ctx.textAlign='center';
       ctx.fillText(p.label, px, py+p.r+13);
 
@@ -759,7 +732,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
   let W,H;
   function resize(){
     const r=canvas.parentElement.getBoundingClientRect();
-    W=canvas.width=Math.min(r.width,900); H=canvas.height=420;
+    const dpr3=window.devicePixelRatio||1;W=Math.min(r.width,900);H=420;canvas.width=Math.round(W*dpr3);canvas.height=Math.round(H*dpr3);canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(dpr3,0,0,dpr3,0,0);
   }
   resize(); window.addEventListener('resize',resize);
 
@@ -833,7 +806,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
       }
 
       // Circle
-      ctx.fillStyle=s.future?'rgba(122,200,232,0.15)':s.color;
+      ctx.fillStyle=s.future?'rgba(122,200,232,0.45)':s.color;
       ctx.globalAlpha=s.future?0.9:0.8;
       ctx.beginPath(); ctx.arc(x,py,s.r,0,Math.PI*2); ctx.fill();
       if(s.future){
@@ -852,11 +825,11 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
       const subY=above?labelY-14:labelY+14;
 
       ctx.textAlign='center';
-      ctx.font=`${s.future?'600':'400'} ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+      ctx.font=`${s.future?'600':'400'} ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
       ctx.fillStyle=s.future?'rgba(122,200,232,0.95)':s.color;
       ctx.fillText(s.label, x, labelY);
 
-      ctx.font=`200 ${Math.min(8,W*0.010)}px 'Raleway', sans-serif`;
+      ctx.font=`200 ${Math.max(13,W*0.010)}px 'Raleway', sans-serif`;
       ctx.fillStyle='rgba(160,180,160,0.45)';
       ctx.fillText(s.sub, x, above?labelY+12:labelY-12);
 
@@ -866,7 +839,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
 
     // "Homo biospheris" glowing label
     const hs=steps[N-1];
-    ctx.font=`100 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+    ctx.font=`100 ${Math.max(13,W*0.011)}px 'Raleway', sans-serif`;
     ctx.fillStyle=`rgba(122,200,232,${0.4+0.2*Math.sin(t)})`;
     ctx.textAlign='center';
     ctx.fillText('— le prochain saut —', hs._x, hs._y+hs.r+42);
@@ -898,7 +871,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
   const canvas=document.getElementById('homo-canvas');
   const ctx=canvas.getContext('2d');
   let W,H;
-  function resize(){W=canvas.width=canvas.offsetWidth; H=canvas.height=300;}
+  function resize(){const dpr4=window.devicePixelRatio||1;W=canvas.offsetWidth;H=300;canvas.width=Math.round(W*dpr4);canvas.height=Math.round(H*dpr4);canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(dpr4,0,0,dpr4,0,0);}
   resize(); window.addEventListener('resize',resize);
 
   const cx=()=>W/2, cy=()=>H/2;
@@ -973,7 +946,7 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
     });
 
     // Labels
-    ctx.textAlign='center'; ctx.font=`200 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+    ctx.textAlign='center'; ctx.font=`200 ${Math.max(13,W*0.011)}px 'Raleway', sans-serif`;
     ctx.fillStyle='rgba(122,200,232,0.4)'; ctx.letterSpacing='2px';
     ctx.fillText('8 500 000 000 SAPIENS', ccx, ccy+earthR*2.5+20);
 
@@ -981,7 +954,6 @@ document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))
   })();
 })();
 </script>
-
 
 <!-- ══ CHAPTER NAV ══ -->
 <nav class="chapter-nav">

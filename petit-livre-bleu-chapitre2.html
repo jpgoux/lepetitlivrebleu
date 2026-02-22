@@ -324,33 +324,6 @@ blockquote::before {
 ::-webkit-scrollbar-thumb { background:var(--matter-dim); border-radius:2px; }
 
 /* ══ SITE FOOTER ══ */
-footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
-.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
-.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
-.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
-.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
-.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
-.footer-dalle:hover{background:rgba(8,14,32,0.9);}
-.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
-.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
-.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
-.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
-.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
-.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
-.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
-.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
-.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
-.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
-.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
-.footer-dalle-ch2 .footer-num{color:#c9a84c;}
-.footer-dalle-ch3 .footer-num{color:#3cbe78;}
-.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
-.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
-.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
-
 
 /* ══════════════ CHAPTER NAV ══════════════ */
 .chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
@@ -545,7 +518,7 @@ document.addEventListener('mousemove', e=>{
 // ══════════════════════════════════════════════════
 const sfCanvas=document.getElementById('starfield');
 const sfCtx=sfCanvas.getContext('2d');
-function resizeSF(){ sfCanvas.width=window.innerWidth; sfCanvas.height=window.innerHeight; }
+function resizeSF(){ const dpr=window.devicePixelRatio||1;sfCanvas.width=Math.round(window.innerWidth*dpr);sfCanvas.height=Math.round(window.innerHeight*dpr);sfCanvas.style.width=window.innerWidth+"px";sfCanvas.style.height=window.innerHeight+"px";sfCtx.setTransform(dpr,0,0,dpr,0,0);sfCanvas._lw=window.innerWidth;sfCanvas._lh=window.innerHeight; }
 resizeSF(); window.addEventListener('resize',resizeSF);
 const stars=Array.from({length:280},()=>({
   x:Math.random(), y:Math.random(),
@@ -556,7 +529,7 @@ const stars=Array.from({length:280},()=>({
 }));
 let sfTime=0;
 (function drawSF(){
-  sfCtx.clearRect(0,0,sfCanvas.width,sfCanvas.height);
+  sfCtx.clearRect(0,0,sfCanvas._lw||sfCanvas.width,sfCanvas._lh||sfCanvas.height);
   sfTime+=0.01;
   stars.forEach(s=>{
     const a=s.alpha*(0.5+0.5*Math.sin(sfTime*s.speed*300+s.phase));
@@ -574,8 +547,11 @@ let sfTime=0;
 const coverCanvas=document.getElementById('cover-canvas');
 const cCtx=coverCanvas.getContext('2d');
 function resizeCover(){
-  coverCanvas.width=coverCanvas.offsetWidth;
-  coverCanvas.height=coverCanvas.offsetHeight;
+  const cdpr=window.devicePixelRatio||1;
+  const cw=coverCanvas.offsetWidth,ch2=coverCanvas.offsetHeight;
+  coverCanvas.width=Math.round(cw*cdpr);coverCanvas.height=Math.round(ch2*cdpr);
+  coverCanvas.style.width=cw+"px";coverCanvas.style.height=ch2+"px";
+  cCtx.setTransform(cdpr,0,0,cdpr,0,0);coverCanvas._lw=cw;coverCanvas._lh=ch2;
 }
 resizeCover(); window.addEventListener('resize',resizeCover);
 
@@ -639,8 +615,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
 
   function resize(){
     const rect=canvas.parentElement.getBoundingClientRect();
-    W=canvas.width=rect.width;
-    H=canvas.height=500;
+    const vdpr=window.devicePixelRatio||1;W=rect.width;H=500;canvas.width=Math.round(W*vdpr);canvas.height=Math.round(H*vdpr);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(vdpr,0,0,vdpr,0,0);
   }
   resize(); window.addEventListener('resize',()=>{ resize(); drawAll(); });
 
@@ -921,13 +896,13 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
 
     // ── Center divider arrow
     ctx.save();
-    ctx.font=`300 ${Math.min(11,W*0.013)}px 'Raleway', sans-serif`;
+    ctx.font=`300 ${Math.max(13,W*0.013)}px 'Raleway', sans-serif`;
     ctx.letterSpacing='2px';
     ctx.fillStyle='rgba(201,168,76,0.6)';
     ctx.textAlign='center';
     ctx.fillText(info.arrow, W/2, H/2+4);
     // arrow line
-    ctx.strokeStyle='rgba(201,168,76,0.25)';
+    ctx.strokeStyle='rgba(201,168,76,0.5)';
     ctx.lineWidth=1;
     ctx.setLineDash([4,4]);
     ctx.beginPath(); ctx.moveTo(W*0.4,H/2-16); ctx.lineTo(W*0.6,H/2-16); ctx.stroke();
@@ -1068,7 +1043,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     ctx.font=`600 ${Math.min(13,W*0.016)}px 'Raleway', sans-serif`;
     ctx.fillStyle='rgba(232,160,80,0.9)';
     ctx.fillText(info.left.title, W*0.28, H*0.1);
-    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.font=`300 ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
     ctx.fillStyle='rgba(170,150,130,0.6)';
     info.left.desc.split('\n').forEach((line,i)=>{
       ctx.fillText(line, W*0.28, H*0.1+16+i*14);
@@ -1077,7 +1052,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     ctx.font=`600 ${Math.min(13,W*0.016)}px 'Raleway', sans-serif`;
     ctx.fillStyle='rgba(201,168,76,0.9)';
     ctx.fillText(info.right.title, W*0.72, H*0.1);
-    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.font=`300 ${Math.max(13,W*0.012)}px 'Raleway', sans-serif`;
     ctx.fillStyle='rgba(170,150,130,0.6)';
     info.right.desc.split('\n').forEach((line,i)=>{
       ctx.fillText(line, W*0.72, H*0.1+16+i*14);
@@ -1086,7 +1061,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     for(let i=0;i<4;i++){
       ctx.beginPath();
       ctx.arc(W/2+(i-1.5)*18, H-20, i===currentStage?4:2.5, 0, Math.PI*2);
-      ctx.fillStyle=i===currentStage?'rgba(232,160,80,0.9)':'rgba(201,168,76,0.25)';
+      ctx.fillStyle=i===currentStage?'rgba(232,160,80,0.9)':'rgba(201,168,76,0.5)';
       ctx.fill();
     }
     ctx.restore();
@@ -1156,13 +1131,13 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     // Label
     svg.append('text').attr('x',x).attr('y',yLabel)
       .attr('text-anchor','middle').attr('fill',ev.color)
-      .attr('font-family',"'Cinzel',serif").attr('font-size','9').attr('font-weight','400')
+      .attr('font-family',"'Cinzel',serif").attr('font-size','12').attr('font-weight','400')
       .attr('letter-spacing','0.5')
       .text(ev.label);
 
     svg.append('text').attr('x',x).attr('y',yLabel+(above?14:-14))
       .attr('text-anchor','middle').attr('fill','rgba(170,150,130,0.6)')
-      .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('font-weight','300')
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('font-weight','300')
       .attr('letter-spacing','0.5')
       .text(ev.sub);
   });
@@ -1179,7 +1154,7 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
   // Caption bottom
   svg.append('text').attr('x',W/2).attr('y',H-8)
     .attr('text-anchor','middle').attr('fill','rgba(201,168,76,0.4)')
-    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','2')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('letter-spacing','2')
     .text('VOS ATOMES ONT TRAVERSÉ TOUTE CETTE HISTOIRE SANS JAMAIS ÊTRE DÉTRUITS');
 })();
 
@@ -1221,13 +1196,13 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     // Column header
     svg.append('text').attr('x',cx).attr('y',margin.top)
       .attr('text-anchor','middle').attr('fill',orig.textColor)
-      .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('font-weight','400')
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','12').attr('font-weight','400')
       .attr('letter-spacing','1')
       .text(orig.label.toUpperCase());
 
     svg.append('text').attr('x',cx).attr('y',margin.top+13)
       .attr('text-anchor','middle').attr('fill','rgba(170,150,130,0.4)')
-      .attr('font-family',"'Raleway',sans-serif").attr('font-size','7')
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','12')
       .text(orig.desc);
 
     // Elements
@@ -1268,11 +1243,10 @@ document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')
     .attr('fill','rgba(232,160,80,0.15)').attr('stroke','rgba(232,160,80,0.6)').attr('stroke-width',1.5).attr('rx',1);
   svg.append('text').attr('x',W-162).attr('y',H-margin.bottom+9)
     .attr('fill','rgba(170,150,130,0.6)').attr('font-family',"'Raleway',sans-serif")
-    .attr('font-size','8').attr('letter-spacing','1')
+    .attr('font-size','12').attr('letter-spacing','1')
     .text('PRÉSENT DANS VOTRE CORPS');
 })();
 </script>
-
 
 <!-- ══ CHAPTER NAV ══ -->
 <nav class="chapter-nav">

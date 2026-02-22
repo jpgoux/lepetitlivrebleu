@@ -593,33 +593,6 @@
   ::-webkit-scrollbar-thumb { background: var(--blue-dim); border-radius: 2px; }
 
 /* ══ SITE FOOTER ══ */
-footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
-.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
-.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
-.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
-.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
-.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
-.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
-.footer-dalle:hover{background:rgba(8,14,32,0.9);}
-.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
-.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
-.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
-.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
-.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
-.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
-.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
-.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
-.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
-.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
-.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
-.footer-dalle-ch2 .footer-num{color:#c9a84c;}
-.footer-dalle-ch3 .footer-num{color:#3cbe78;}
-.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
-.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
-.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
-
 
 /* ══════════════ CHAPTER NAV ══════════════ */
 .chapter-nav{position:relative;z-index:1;padding:0 2rem 3rem;background:transparent;}
@@ -886,7 +859,7 @@ footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);bord
         <circle cx="150" cy="150" r="47" fill="none" stroke="rgba(100,180,255,0.12)" stroke-width="6"/>
       </g>
       <!-- Label -->
-      <text x="150" y="218" text-anchor="middle" fill="rgba(122,184,245,0.7)" font-family="'Cinzel', serif" font-size="8" letter-spacing="3">NOTRE OASIS</text>
+      <text x="150" y="218" text-anchor="middle" fill="rgba(122,184,245,0.7)" font-family="'Cinzel', serif" font-size="12" letter-spacing="3">NOTRE OASIS</text>
     </svg>
   </div>
 
@@ -928,8 +901,13 @@ const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width = Math.round(window.innerWidth*dpr);
+  canvas.height = Math.round(window.innerHeight*dpr);
+  canvas.style.width=window.innerWidth+"px";
+  canvas.style.height=window.innerHeight+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  canvas._lw=window.innerWidth;canvas._lh=window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
@@ -945,12 +923,12 @@ const stars = Array.from({length: 320}, () => ({
 
 let time = 0;
 function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas._lw||canvas.width, canvas._lh||canvas.height);
   time += 0.01;
   stars.forEach(s => {
     const a = s.alpha * (0.5 + 0.5 * Math.sin(time * s.speed * 300 + s.phase));
     ctx.beginPath();
-    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+    ctx.arc(s.x * (canvas._lw||canvas.width), s.y * (canvas._lh||canvas.height), s.r, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(200, 220, 255, ${a})`;
     ctx.fill();
   });
@@ -1095,7 +1073,7 @@ document.addEventListener('mousemove', e => {
       .attr('text-anchor', 'middle')
       .attr('fill', p.highlight ? '#7ab8f5' : 'rgba(170,190,220,0.65)')
       .attr('font-family', "'Raleway', sans-serif")
-      .attr('font-size', '9')
+      .attr('font-size', '12')
       .attr('letter-spacing', '1')
       .text(p.name.toUpperCase());
 
@@ -1138,12 +1116,12 @@ document.addEventListener('mousemove', e => {
   g.append('g').call(d3.axisLeft(yScale).ticks(5).tickFormat(d => d + '× Terre'))
     .call(ax => ax.select('.domain').remove())
     .call(ax => ax.selectAll('.tick line').attr('stroke','rgba(42,95,168,0.2)').attr('x2', iW))
-    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif"));
+    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.75)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif"));
 
   g.append('g').attr('transform', `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => d + ' a.l.'))
     .call(ax => ax.select('.domain').attr('stroke','rgba(42,95,168,0.2)'))
-    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif"))
+    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.75)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif"))
     .call(ax => ax.selectAll('.tick line').attr('stroke','rgba(42,95,168,0.2)'));
 
   // Habitable zone band
@@ -1158,7 +1136,7 @@ document.addEventListener('mousemove', e => {
 
   g.append('text')
     .attr('x', iW - 4).attr('y', yScale(1.7)).attr('text-anchor','end')
-    .attr('fill','rgba(77,143,212,0.4)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .attr('fill','rgba(77,143,212,0.7)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif")
     .attr('letter-spacing','2')
     .text('ZONE HABITABLE POTENTIELLE');
 
@@ -1199,7 +1177,7 @@ document.addEventListener('mousemove', e => {
   g.append('circle').attr('cx', earthX).attr('cy', earthY).attr('r', 7)
     .attr('fill', '#2a5fa8').attr('stroke', '#7ab8f5').attr('stroke-width', 2);
   g.append('text').attr('x', earthX + 12).attr('y', earthY + 4)
-    .attr('fill', '#7ab8f5').attr('font-family',"'Raleway',sans-serif").attr('font-size','10').attr('letter-spacing','1')
+    .attr('fill', '#7ab8f5').attr('font-family',"'Raleway',sans-serif").attr('font-size','13').attr('letter-spacing','1')
     .text('TERRE');
 
   // Legend
@@ -1212,18 +1190,18 @@ document.addEventListener('mousemove', e => {
     leg.append('circle').attr('cx',6).attr('cy', i*18).attr('r',5)
       .attr('fill', item.c).attr('stroke', item.border || 'none').attr('stroke-width', 1);
     leg.append('text').attr('x',16).attr('y', i*18+4)
-      .attr('fill','rgba(122,184,245,0.6)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+      .attr('fill','rgba(122,184,245,0.6)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif")
       .text(item.l);
   });
 
   // Axis labels
   g.append('text').attr('x', iW/2).attr('y', iH+50)
     .attr('text-anchor','middle').attr('fill','rgba(122,184,245,0.4)')
-    .attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .attr('font-size','12').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
     .text('DISTANCE EN ANNÉES-LUMIÈRE');
   g.append('text').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-50)
     .attr('text-anchor','middle').attr('fill','rgba(122,184,245,0.4)')
-    .attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .attr('font-size','12').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
     .text('TAILLE (× TERRE)');
 })();
 
@@ -1250,7 +1228,7 @@ document.addEventListener('mousemove', e => {
 
   // Labels
   svg.append('text').attr('x', startX).attr('y', 18)
-    .attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .attr('fill','rgba(122,184,245,0.75)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
     .text('10 000 GÉNÉRATIONS — CHAQUE POINT = 100 GÉNÉRATIONS');
 
   // Reference : agriculture = 500 gen = 5 points
@@ -1260,7 +1238,7 @@ document.addEventListener('mousemove', e => {
     .attr('y1', startY + cellH + 28).attr('y2', startY + cellH + 28)
     .attr('stroke','rgba(201,168,76,0.4)').attr('stroke-width',1).attr('stroke-dasharray','3 2');
   agriRef.append('text').attr('x', startX + 2.5*cellW).attr('y', startY + cellH + 42)
-    .attr('text-anchor','middle').attr('fill','rgba(201,168,76,0.5)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .attr('text-anchor','middle').attr('fill','rgba(201,168,76,0.5)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif")
     .text('← Toute l\'agriculture humaine (500 gen)');
 
   // Draw dots
@@ -1274,7 +1252,7 @@ document.addEventListener('mousemove', e => {
     svg.append('circle')
       .attr('cx', x).attr('cy', y)
       .attr('r', 4)
-      .attr('fill', isNear ? 'rgba(201,168,76,0.7)' : 'rgba(42,95,168,0.35)')
+      .attr('fill', isNear ? 'rgba(201,168,76,0.7)' : 'rgba(42,95,168,0.55)')
       .attr('stroke', isNear ? 'rgba(201,168,76,0.9)' : 'rgba(42,95,168,0.5)')
       .attr('stroke-width', 0.5);
   }
@@ -1282,7 +1260,7 @@ document.addEventListener('mousemove', e => {
   // Destination label
   const lastX = startX + 49 * cellW + cellW / 2;
   svg.append('text').attr('x', lastX + 8).attr('y', startY + 4)
-    .attr('fill','rgba(122,184,245,0.7)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .attr('fill','rgba(122,184,245,0.7)').attr('font-size','12').attr('font-family',"'Raleway',sans-serif")
     .text('Ross 128 b');
 })();
 
@@ -1340,7 +1318,7 @@ document.addEventListener('mousemove', e => {
         .attr('x', lx).attr('y', ly)
         .attr('fill', lv.textColor)
         .attr('font-family', "'Raleway', sans-serif")
-        .attr('font-size', '9')
+        .attr('font-size', '12')
         .attr('letter-spacing', '1.5')
         .attr('text-anchor', lx > cx ? 'start' : 'end')
         .text(lv.label.toUpperCase());
@@ -1350,7 +1328,7 @@ document.addEventListener('mousemove', e => {
   // Earth center label
   svg.append('text').attr('x', cx).attr('y', cy + 3)
     .attr('text-anchor','middle').attr('fill','white')
-    .attr('font-family',"'Cinzel',serif").attr('font-size','9').attr('letter-spacing','1')
+    .attr('font-family',"'Cinzel',serif").attr('font-size','12').attr('letter-spacing','1')
     .text('TERRE');
 
   // Pointer lines connecting labels to rings
@@ -1376,7 +1354,6 @@ document.addEventListener('mousemove', e => {
   }
 })();
 </script>
-
 
 <!-- ══ CHAPTER NAV ══ -->
 <nav class="chapter-nav">
