@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 2 : La Matière</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #02040a;
+  --deep: #060d1f;
+  --cosmos: #0a1628;
+  --nebula: #0d2145;
+  --blue-dim: #1a3a6e;
+  --blue-mid: #2a5fa8;
+  --blue-bright: #4d8fd4;
+  --blue-glow: #7ab8f5;
+  --star-white: #e8f0ff;
+  --gold: #c9a84c;
+  --gold-dim: #7a6030;
+  --text-primary: #ccd8f0;
+  --text-dim: #7a90b8;
+  /* Chapitre 2 accent: warm amber/gold for matter */
+  --matter-warm: #e8a050;
+  --matter-hot: #f0c070;
+  --matter-dim: #7a4820;
+  --quark-r: #e05050;
+  --quark-g: #50c060;
+  --quark-b: #5080e0;
+  --proton-col: #c8a0f0;
+  --neutron-col: #80a8e0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text-primary);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+.cursor {
+  position:fixed; width:6px; height:6px;
+  background:var(--matter-warm);
+  border-radius:50%; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 12px var(--matter-warm), 0 0 24px rgba(232,160,80,0.4);
+}
+.cursor-ring {
+  position:fixed; width:32px; height:32px;
+  border:1px solid rgba(232,160,80,0.35);
+  border-radius:50%; pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+}
+
+#starfield { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+/* ── COVER ── */
+#cover {
+  position:relative; height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:1; text-align:center;
+  overflow:hidden;
+}
+
+.book-label {
+  font-family:'Raleway',sans-serif; font-weight:200;
+  letter-spacing:0.5em; font-size:0.7rem;
+  color:var(--blue-dim); text-transform:uppercase;
+  margin-bottom:2.5rem;
+  animation:fadeInDown 2s ease forwards;
+}
+.chapter-num {
+  font-family:'Cinzel',serif; font-weight:400;
+  font-size:0.75rem; letter-spacing:0.4em;
+  color:var(--gold-dim); text-transform:uppercase;
+  margin-bottom:1.5rem;
+  animation:fadeInDown 2s 0.3s ease both;
+}
+h1.title {
+  font-family:'Cinzel',serif; font-weight:600;
+  font-size:clamp(3.5rem,9vw,8rem); letter-spacing:0.06em; line-height:1;
+  background:linear-gradient(155deg,#f0e8d0 0%,#e8a050 35%,#c06820 80%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:1.8rem;
+  animation:fadeInUp 2s 0.5s ease both;
+}
+.title-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:1.1rem; color:var(--text-dim); letter-spacing:0.15em;
+  animation:fadeInUp 2s 0.8s ease both; margin-bottom:4rem;
+}
+
+/* Cover particle animation canvas */
+#cover-canvas {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:-1; pointer-events:none;
+}
+
+.scroll-hint {
+  position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:0.6rem;
+  animation:fadeIn 3s 2s ease both;
+}
+.scroll-hint span {
+  font-family:'Raleway',sans-serif; font-weight:200;
+  font-size:0.65rem; letter-spacing:0.35em; color:var(--text-dim); text-transform:uppercase;
+}
+.scroll-line {
+  width:1px; height:50px;
+  background:linear-gradient(to bottom,var(--matter-dim),transparent);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── EPIGRAPH ── */
+.epigraph-section {
+  position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+  min-height:55vh; padding:5rem 2rem;
+}
+.epigraph-inner { max-width:620px; text-align:center; }
+blockquote {
+  font-style:italic; font-size:clamp(1.2rem,2.5vw,1.7rem); font-weight:300;
+  line-height:1.8; color:var(--star-white);
+  position:relative; padding:2rem 3rem;
+}
+blockquote::before {
+  content:'\201C'; position:absolute; top:-0.5rem; left:0.5rem;
+  font-size:5rem; line-height:1; color:var(--matter-dim); font-family:Georgia,serif;
+}
+.quote-source {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.75rem;
+  letter-spacing:0.3em; color:var(--gold-dim); text-transform:uppercase; margin-top:1.5rem;
+}
+
+/* ── SECTIONS ── */
+.section {
+  position:relative; z-index:1;
+  max-width:780px; margin:0 auto; padding:4rem 2rem;
+}
+.section-label {
+  font-family:'Raleway',sans-serif; font-weight:200; font-size:0.65rem;
+  letter-spacing:0.5em; color:var(--matter-dim); text-transform:uppercase;
+  margin-bottom:2.5rem; display:flex; align-items:center; gap:1.5rem;
+}
+.section-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right,var(--matter-dim),transparent); max-width:80px;
+}
+.section p {
+  font-size:clamp(1rem,2vw,1.2rem); line-height:1.95;
+  color:var(--text-primary); font-weight:300; margin-bottom:1.8rem;
+}
+.section p:first-of-type::first-letter {
+  font-family:'Cinzel',serif; font-size:4.5rem; line-height:0.75;
+  float:left; margin-right:0.15em; margin-top:0.1em;
+  color:var(--matter-warm);
+  filter:drop-shadow(0 0 12px rgba(232,160,80,0.5));
+}
+.highlight { color:var(--matter-hot); font-style:italic; }
+.highlight-blue { color:var(--blue-glow); font-style:italic; }
+.pull-quote {
+  border-left:2px solid var(--matter-warm);
+  padding:1.5rem 2rem; margin:3rem 0;
+  font-size:clamp(1.2rem,2.5vw,1.55rem); font-style:italic;
+  color:var(--star-white);
+  background:linear-gradient(to right,rgba(232,160,80,0.08),transparent);
+  line-height:1.6;
+}
+.imanishi-quote {
+  border:1px solid rgba(201,168,76,0.2);
+  background:linear-gradient(135deg,rgba(10,22,40,0.8),rgba(6,13,31,0.95));
+  padding:2.5rem 3rem; margin:3rem 0; position:relative;
+  font-style:italic; font-size:clamp(1rem,2vw,1.15rem); line-height:1.95;
+  color:var(--text-primary);
+}
+.imanishi-quote::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,transparent,var(--gold-dim),transparent);
+}
+.imanishi-attr {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.25em; color:var(--gold-dim); text-transform:uppercase;
+  margin-top:1.2rem; display:block;
+}
+
+/* ── VIZ PANELS ── */
+.viz-panel {
+  position:relative; z-index:1; padding:3rem 2rem 5rem; text-align:center;
+}
+.viz-title {
+  font-family:'Cinzel',serif; font-size:clamp(0.8rem,1.8vw,0.95rem);
+  letter-spacing:0.3em; color:var(--matter-warm); text-transform:uppercase; margin-bottom:0.6rem;
+}
+.viz-subtitle {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:0.95rem; color:var(--text-dim); margin-bottom:3rem;
+}
+.viz-caption {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.2em; color:var(--text-dim); max-width:540px;
+  margin:2rem auto 0; line-height:1.8; text-transform:uppercase;
+}
+
+/* ── THE MAIN ANIMATION VIZ ── */
+#assembly-viz {
+  width:100%; max-width:960px; margin:0 auto;
+  position:relative;
+}
+#assembly-canvas {
+  width:100%; height:500px; display:block;
+  cursor:pointer;
+}
+.assembly-controls {
+  display:flex; justify-content:center; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;
+}
+.assembly-btn {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.3em; text-transform:uppercase;
+  padding:0.6rem 1.8rem; border:1px solid rgba(232,160,80,0.35);
+  background:transparent; color:var(--text-dim); cursor:pointer;
+  transition:all 0.3s; position:relative; overflow:hidden;
+}
+.assembly-btn:hover, .assembly-btn.active {
+  border-color:var(--matter-warm); color:var(--matter-warm);
+  background:rgba(232,160,80,0.06);
+}
+.assembly-btn::after {
+  content:attr(data-label);
+  position:absolute; bottom:0.2rem; left:50%; transform:translateX(-50%);
+  font-size:0.5rem; letter-spacing:0.15em; color:var(--matter-dim); white-space:nowrap;
+}
+
+/* ── TIMELINE / AGES VIZ ── */
+#timeline-viz { width:100%; max-width:900px; margin:0 auto; height:260px; }
+
+/* ── ELEMENTS TABLE ── */
+#elements-viz { width:100%; max-width:900px; margin:0 auto; height:320px; }
+
+/* ── STAT CARDS ── */
+.stats-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1.5rem; max-width:900px; margin:3rem auto; padding:0 2rem;
+  position:relative; z-index:1;
+}
+.stat-card {
+  background:linear-gradient(135deg,rgba(10,22,40,0.9),rgba(6,13,31,0.95));
+  border:1px solid rgba(201,168,76,0.15); border-radius:2px;
+  padding:2rem 1.5rem; text-align:center; position:relative; overflow:hidden;
+  transition:border-color 0.3s;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,transparent,var(--matter-dim),transparent);
+}
+.stat-card:hover { border-color:rgba(232,160,80,0.4); }
+.stat-number {
+  font-family:'Cinzel',serif; font-size:clamp(1.6rem,3.5vw,2.5rem);
+  font-weight:600; color:var(--matter-warm); line-height:1; margin-bottom:0.6rem;
+  filter:drop-shadow(0 0 10px rgba(232,160,80,0.35));
+}
+.stat-label {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.68rem;
+  letter-spacing:0.3em; color:var(--text-dim); text-transform:uppercase; line-height:1.5;
+}
+
+/* ── DIVIDERS ── */
+.cosmic-divider {
+  display:flex; align-items:center; justify-content:center;
+  padding:3rem 2rem; position:relative; z-index:1; gap:1.5rem;
+}
+.cosmic-divider::before,.cosmic-divider::after {
+  content:''; flex:1; height:1px; max-width:200px;
+  background:linear-gradient(to right,transparent,rgba(201,168,76,0.25));
+}
+.cosmic-divider::after { background:linear-gradient(to left,transparent,rgba(201,168,76,0.25)); }
+.divider-star { color:var(--gold-dim); font-size:0.6rem; letter-spacing:0.5em; }
+
+/* ── FINALE ── */
+.finale-section {
+  position:relative; z-index:1; min-height:75vh;
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; padding:6rem 2rem;
+}
+.finale-text {
+  max-width:680px; font-size:clamp(1.1rem,2.5vw,1.4rem);
+  line-height:1.95; color:var(--star-white); font-weight:300;
+}
+.finale-text em { color:var(--matter-hot); }
+.finale-cta {
+  margin-top:5rem; font-family:'Raleway',sans-serif; font-weight:200;
+  font-size:0.65rem; letter-spacing:0.5em; color:var(--text-dim); text-transform:uppercase;
+}
+
+/* ── REVEAL ── */
+.reveal { opacity:0; transform:translateY(40px); transition:opacity 0.9s ease,transform 0.9s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ── TOOLTIP ── */
+.tooltip {
+  position:fixed; background:rgba(6,13,31,0.97);
+  border:1px solid rgba(201,168,76,0.3);
+  padding:0.8rem 1.2rem; font-family:'Raleway',sans-serif; font-weight:300;
+  font-size:0.75rem; letter-spacing:0.1em; color:var(--text-primary);
+  pointer-events:none; z-index:1000; max-width:240px; line-height:1.6; opacity:0; transition:opacity 0.2s;
+}
+.tooltip.show { opacity:1; }
+.tooltip strong { display:block; color:var(--matter-warm); margin-bottom:0.3rem; font-weight:400; }
+
+/* ── KEYFRAMES ── */
+@keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn     { from{opacity:0} to{opacity:1} }
+@keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:var(--void); }
+::-webkit-scrollbar-thumb { background:var(--matter-dim); border-radius:2px; }
+
+/* ══ SITE FOOTER ══ */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.footer-dalle:hover{background:rgba(8,14,32,0.9);}
+.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
+.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
+.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
+.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
+.footer-dalle-ch2 .footer-num{color:#c9a84c;}
+.footer-dalle-ch3 .footer-num{color:#3cbe78;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+
+<!-- ══════ COVER ══════ -->
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu</div>
+  <div class="chapter-num">Chapitre II</div>
+  <h1 class="title">La Matière</h1>
+  <p class="title-sub">Des quarks aux noyaux — le miracle de la complexité</p>
+  <div class="scroll-hint">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══════ ÉPIGRAPHE ══════ -->
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>Nous sommes solitaires, emportés par la même planète, équipage d'un même navire.</blockquote>
+    <div class="quote-source">— Antoine de Saint-Exupéry · Terre des hommes</div>
+  </div>
+</section>
+
+<!-- ══════ SECTION 1 ══════ -->
+<div class="section reveal">
+  <div class="section-label">L'illusion de la séparation</div>
+  <p>La biosphère et l'humanité sont-elles deux entités distinctes ? Une grande partie de l'humanité vit aujourd'hui dans l'illusion de cette séparation entre le navire et l'équipage. Que peuvent bien avoir en commun un vélo, une falaise, une glace à la pistache, un rosier, les yeux d'un enfant ou l'air que vous respirez ? <span class="highlight">A priori pas grand-chose.</span></p>
+  <p>Pourtant, l'ensemble du système solaire est né à partir d'un même nuage de gaz et de poussières enrichi par des explosions d'étoiles plus anciennes. Les atomes qui composent la Terre, comme ceux de nos corps, ont donc tous été <span class="highlight">forgés au cœur de supernovæ</span>. Mais les liens qui nous unissent sont encore bien plus profonds.</p>
+  <div class="pull-quote">"Remontons à l'origine, au Big Bang."</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ SECTION 2 — PROTON ══════ -->
+<div class="section reveal">
+  <div class="section-label">Le chaos qui s'organise</div>
+  <p>Aux premiers instants, l'univers était un plasma bouillonnant de particules élémentaires. Une <span class="highlight">microseconde</span> après le Big Bang, en se refroidissant, quarks et gluons se sont assemblés pour donner naissance aux protons et neutrons.</p>
+  <p>Sous son apparente simplicité, le proton cache un tumulte invisible — un monde foisonnant où quarks, gluons et surgissements éphémères de paires quarks-antiquarks s'entrelacent sans cesse. Ce minuscule fragment de matière est sans doute <span class="highlight">l'un des objets les plus complexes</span> que l'esprit humain ait jamais cherché à comprendre.</p>
+</div>
+
+<!-- ══════ VIZ CENTRALE : ANIMATION PARTICULES → TOUT ══════ -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Le saut évolutif</div>
+  <div class="viz-subtitle">Du chaos des parties à l'émergence du Tout</div>
+  <div id="assembly-viz">
+    <canvas id="assembly-canvas"></canvas>
+    <div class="assembly-controls">
+      <button class="assembly-btn active" data-stage="0" data-label="Étape 1">Particules libres</button>
+      <button class="assembly-btn" data-stage="1" data-label="Étape 2">Formation du proton</button>
+      <button class="assembly-btn" data-stage="2" data-label="Étape 3">Noyau atomique</button>
+      <button class="assembly-btn" data-stage="3" data-label="Étape 4">Atome complet</button>
+    </div>
+  </div>
+  <div class="viz-caption">Observez comment des parties identiques peuvent s'auto-organiser en structures stables et radicalement nouvelles — chaque saut crée un Tout dont les propriétés dépassent la somme des parties</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ SECTION 3 — ÂGE ══════ -->
+<div class="section reveal">
+  <div class="section-label">13,8 milliards d'années</div>
+  <p>L'ensemble des protons et neutrons qui composent l'univers a été créé en un même instant — à cette microseconde-là. La matière qui constitue un vélo, une glace à la pistache, votre corps ou l'air que vous respirez a donc <span class="highlight">la même origine et le même âge : 13,8 milliards d'années</span>.</p>
+  <p>Prenez un moment. Regardez autour de vous. Les particules élémentaires qui constituent les molécules de votre corps et les objets qui vous entourent ont toutes <span class="highlight">13,8 milliards d'années</span>. Ces protons ont voyagé depuis le Big Bang jusqu'à vous, se sont recombinés dans les étoiles — mais ils n'ont jamais été détruits.</p>
+</div>
+
+<!-- ══════ VIZ TIMELINE ══════ -->
+<div class="viz-panel reveal">
+  <div class="viz-title">La même matière depuis le début</div>
+  <div class="viz-subtitle">13,8 milliards d'années d'un seul et même voyage</div>
+  <div id="timeline-viz"></div>
+  <div class="viz-caption">Les protons qui composent votre corps existaient avant la formation du Soleil, avant la Terre, avant la vie</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card reveal">
+    <div class="stat-number">13,8</div>
+    <div class="stat-label">Milliards d'années<br>— l'âge de vos atomes</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.15s">
+    <div class="stat-number">10⁻⁶</div>
+    <div class="stat-label">Secondes après le Big Bang<br>— naissance des protons</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.3s">
+    <div class="stat-number">∞</div>
+    <div class="stat-label">Les protons ne<br>se désintègrent pas</div>
+  </div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ SECTION 4 — ÉLÉMENTS ══════ -->
+<div class="section reveal">
+  <div class="section-label">La violence cosmique créatrice</div>
+  <p>L'assemblage des protons et des neutrons obéit à un processus spectaculaire. Des forces antagonistes colossales s'y affrontent — de leur équilibre instable naissent des structures durables et de plus en plus complexes : <span class="highlight">les noyaux atomiques</span>.</p>
+  <p>Les plus légers, hydrogène et hélium, sont nés juste après le Big Bang. Le carbone, l'oxygène, le magnésium se sont formés au cœur des étoiles. Les plus lourds — fer, cuivre, or, uranium, platine — ne voient le jour que lors d'événements extrêmes : <span class="highlight">explosions de supernovæ ou collisions d'étoiles à neutrons</span>. La diversité de la matière est issue de cette violence cosmique.</p>
+</div>
+
+<!-- ══════ VIZ ÉLÉMENTS ══════ -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Les origines des éléments</div>
+  <div class="viz-subtitle">Où est né chaque atome qui vous constitue</div>
+  <div id="elements-viz"></div>
+  <div class="viz-caption">Survolez chaque élément pour découvrir son origine cosmique — votre corps est un musée de l'histoire de l'univers</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ IMANISHI ══════ -->
+<div class="section reveal">
+  <div class="section-label">Kinji Imanishi · 1940</div>
+  <div class="imanishi-quote">
+    <p>Notre monde est constitué d'une grande variété de choses. Au cours du développement et de la croissance de la Terre, une partie de cette Terre en est venue à constituer les matériaux nécessaires au bateau, et a pris finalement une forme de bateau. Les parties prenantes sont devenues les passagers. Ainsi, le bateau n'a pas précédé les passagers et les passagers n'ont pas précédé le bateau. Le bateau et les passagers se sont originellement différenciés à partir d'un seul élément.</p>
+    <span class="imanishi-attr">— Kinji Imanishi · Le Monde des êtres vivants · 1940</span>
+  </div>
+</div>
+
+<!-- ══════ FINALE ══════ -->
+<section class="finale-section">
+  <p class="finale-text reveal">
+    La biosphère et l'humanité ne sont pas distinctes.<br>
+    L'équipage et le vaisseau ne sont pas différents.<br><br>
+    Nous sommes entremêlés. Nous appartenons à un monde profondément uni et interdépendant, à toutes les échelles — des atomes aux galaxies.<br><br>
+    <em>Il est temps de renouer avec ces liens invisibles et de nous en émerveiller.</em>
+  </p>
+  <div class="finale-cta reveal" style="transition-delay:0.5s">↓ &nbsp; Chapitre III</div>
+</section>
+
+<script>
+// ══════════════════════════════════════════════════
+// CURSOR
+// ══════════════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  cursorRing.style.left=rx+'px'; cursorRing.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+
+// ══════════════════════════════════════════════════
+// STARFIELD
+// ══════════════════════════════════════════════════
+const sfCanvas=document.getElementById('starfield');
+const sfCtx=sfCanvas.getContext('2d');
+function resizeSF(){ sfCanvas.width=window.innerWidth; sfCanvas.height=window.innerHeight; }
+resizeSF(); window.addEventListener('resize',resizeSF);
+const stars=Array.from({length:280},()=>({
+  x:Math.random(), y:Math.random(),
+  r:Math.random()*1.3+0.2,
+  alpha:Math.random()*0.6+0.1,
+  phase:Math.random()*Math.PI*2,
+  speed:Math.random()*0.001+0.0003
+}));
+let sfTime=0;
+(function drawSF(){
+  sfCtx.clearRect(0,0,sfCanvas.width,sfCanvas.height);
+  sfTime+=0.01;
+  stars.forEach(s=>{
+    const a=s.alpha*(0.5+0.5*Math.sin(sfTime*s.speed*300+s.phase));
+    sfCtx.beginPath();
+    sfCtx.arc(s.x*sfCanvas.width, s.y*sfCanvas.height, s.r, 0, Math.PI*2);
+    sfCtx.fillStyle=`rgba(210,200,180,${a})`; // warm tint for matter chapter
+    sfCtx.fill();
+  });
+  requestAnimationFrame(drawSF);
+})();
+
+// ══════════════════════════════════════════════════
+// COVER CANVAS — ambient warm particle drift
+// ══════════════════════════════════════════════════
+const coverCanvas=document.getElementById('cover-canvas');
+const cCtx=coverCanvas.getContext('2d');
+function resizeCover(){
+  coverCanvas.width=coverCanvas.offsetWidth;
+  coverCanvas.height=coverCanvas.offsetHeight;
+}
+resizeCover(); window.addEventListener('resize',resizeCover);
+
+const coverParticles=Array.from({length:60},()=>({
+  x:Math.random()*coverCanvas.width,
+  y:Math.random()*coverCanvas.height,
+  vx:(Math.random()-0.5)*0.4,
+  vy:(Math.random()-0.5)*0.4,
+  r:Math.random()*3+1,
+  alpha:Math.random()*0.35+0.05,
+  color:`hsl(${20+Math.random()*30},80%,${50+Math.random()*30}%)`
+}));
+
+(function drawCover(){
+  cCtx.clearRect(0,0,coverCanvas.width,coverCanvas.height);
+  coverParticles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=coverCanvas.width; if(p.x>coverCanvas.width)p.x=0;
+    if(p.y<0)p.y=coverCanvas.height; if(p.y>coverCanvas.height)p.y=0;
+    cCtx.beginPath();
+    cCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    cCtx.fillStyle=p.color;
+    cCtx.globalAlpha=p.alpha;
+    cCtx.fill();
+    cCtx.globalAlpha=1;
+  });
+  requestAnimationFrame(drawCover);
+})();
+
+// ══════════════════════════════════════════════════
+// SCROLL REVEAL
+// ══════════════════════════════════════════════════
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+// ══════════════════════════════════════════════════
+// TOOLTIP
+// ══════════════════════════════════════════════════
+const tooltip=document.getElementById('tooltip');
+function showTip(e,title,text){
+  tooltip.innerHTML=`<strong>${title}</strong>${text}`;
+  tooltip.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e){
+  tooltip.style.left=(e.clientX+16)+'px';
+  tooltip.style.top=(e.clientY-10)+'px';
+}
+function hideTip(){ tooltip.classList.remove('show'); }
+document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')) moveTip(e); });
+
+// ══════════════════════════════════════════════════
+// ██████  ANIMATION CENTRALE : SAUT ÉVOLUTIF  ██████
+// ══════════════════════════════════════════════════
+(function buildAssembly(){
+  const canvas=document.getElementById('assembly-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+
+  function resize(){
+    const rect=canvas.parentElement.getBoundingClientRect();
+    W=canvas.width=rect.width;
+    H=canvas.height=500;
+  }
+  resize(); window.addEventListener('resize',()=>{ resize(); drawAll(); });
+
+  // ── STAGES ──
+  // 0: free quarks/particles scattered
+  // 1: 3 quarks assembled into proton + remaining free particles
+  // 2: protons+neutrons assemble into nucleus
+  // 3: nucleus + electron cloud = atom
+
+  let currentStage=0;
+  let animT=0;
+  let animating=false;
+  let particles=[];
+  let targetPositions=[];
+
+  // Color palette
+  const COLORS={
+    quarkR:'#e05050', quarkG:'#50c878', quarkB:'#5080e8',
+    gluon:'rgba(255,200,100,0.6)',
+    proton:'#c8a0f0', neutron:'#80b0e8',
+    electron:'#50d0f0', nucleus:'#e8a050',
+    free:'rgba(200,180,160,0.7)'
+  };
+
+  // Stage labels
+  const STAGE_INFO=[
+    {
+      left:{title:'Particules élémentaires', desc:'Quarks et gluons libres\ndans le plasma primordial'},
+      right:{title:'Chaos', desc:'Aucune structure stable\nne peut exister'},
+      arrow:'→ 10⁻⁶ seconde après le Big Bang'
+    },
+    {
+      left:{title:'3 quarks liés', desc:'Force nucléaire forte\nassemble les quarks'},
+      right:{title:'Proton', desc:'Une structure stable\nmais d\'une complexité abyssale'},
+      arrow:'→ Le premier saut évolutif'
+    },
+    {
+      left:{title:'Protons + Neutrons', desc:'Forces antagonistes\ncolossales s\'affrontent'},
+      right:{title:'Noyau atomique', desc:'Structures durables\nde plus en plus complexes'},
+      arrow:'→ En 3 minutes après le Big Bang'
+    },
+    {
+      left:{title:'Noyau + Électrons', desc:'La force électromagnétique\nenveloppe le noyau'},
+      right:{title:'Atome', desc:'La brique fondamentale\nde toute la matière'},
+      arrow:'→ 380 000 ans après le Big Bang'
+    }
+  ];
+
+  // Particle system
+  function makeParticles(stage){
+    const pts=[];
+    const cx=W/2, cy=H/2;
+    const leftCx=W*0.28, rightCx=W*0.72;
+
+    if(stage===0){
+      // Scattered quarks — left side
+      for(let i=0;i<12;i++){
+        const angle=Math.random()*Math.PI*2;
+        const dist=40+Math.random()*80;
+        pts.push({
+          x:leftCx+Math.cos(angle)*dist,
+          y:cy+Math.sin(angle)*dist,
+          tx:leftCx+Math.cos(angle)*dist,
+          ty:cy+Math.sin(angle)*dist,
+          r:6+Math.random()*4,
+          color:i%3===0?COLORS.quarkR:i%3===1?COLORS.quarkG:COLORS.quarkB,
+          alpha:0.85, label:`quark`,
+          vx:(Math.random()-0.5)*0.6, vy:(Math.random()-0.5)*0.6,
+          wobble:Math.random()*100
+        });
+      }
+      // Right: chaos visual — same scattered
+      for(let i=0;i<12;i++){
+        const angle=Math.random()*Math.PI*2;
+        const dist=50+Math.random()*85;
+        pts.push({
+          x:rightCx+Math.cos(angle)*dist,
+          y:cy+Math.sin(angle)*dist,
+          tx:rightCx+Math.cos(angle)*dist,
+          ty:cy+Math.sin(angle)*dist,
+          r:6+Math.random()*4,
+          color:i%3===0?COLORS.quarkR:i%3===1?COLORS.quarkG:COLORS.quarkB,
+          alpha:0.4, label:'chaos',
+          vx:(Math.random()-0.5)*1.2, vy:(Math.random()-0.5)*1.2,
+          wobble:Math.random()*100
+        });
+      }
+    }
+
+    else if(stage===1){
+      // Left: 3 quarks converging toward proton formation
+      const angles=[0, Math.PI*2/3, Math.PI*4/3];
+      angles.forEach((a,i)=>{
+        pts.push({
+          x:leftCx+Math.cos(a)*55,
+          y:cy+Math.sin(a)*55,
+          tx:leftCx+Math.cos(a)*35,
+          ty:cy+Math.sin(a)*35,
+          r:8, color:[COLORS.quarkR,COLORS.quarkG,COLORS.quarkB][i],
+          alpha:0.9, label:['quark up','quark up','quark down'][i],
+          vx:0, vy:0, wobble:i*40
+        });
+      });
+      // Other free quarks
+      for(let i=0;i<8;i++){
+        const angle=Math.random()*Math.PI*2;
+        pts.push({
+          x:leftCx+Math.cos(angle)*(90+Math.random()*40),
+          y:cy+Math.sin(angle)*(90+Math.random()*40),
+          tx:leftCx+Math.cos(angle)*(90+Math.random()*40),
+          ty:cy+Math.sin(angle)*(90+Math.random()*40),
+          r:5, color:COLORS.free, alpha:0.35,
+          label:'quark libre', vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5,
+          wobble:Math.random()*100
+        });
+      }
+      // Right: formed proton
+      pts.push({
+        x:rightCx, y:cy, tx:rightCx, ty:cy,
+        r:40, color:COLORS.proton, alpha:0.25, label:'proton',
+        isProton:true, vx:0, vy:0, wobble:0
+      });
+      // Inner quarks of proton
+      angles.forEach((a,i)=>{
+        pts.push({
+          x:rightCx+Math.cos(a)*18,
+          y:cy+Math.sin(a)*18,
+          tx:rightCx+Math.cos(a)*18,
+          ty:cy+Math.sin(a)*18,
+          r:7, color:[COLORS.quarkR,COLORS.quarkG,COLORS.quarkB][i],
+          alpha:0.9, label:['quark up','quark up','quark down'][i],
+          isInner:true, vx:0, vy:0, wobble:i*30
+        });
+      });
+    }
+
+    else if(stage===2){
+      // Left: protons and neutrons
+      const nucleons=[
+        {x:-60,y:-30,c:COLORS.proton,l:'proton'},
+        {x:-20,y:-55,c:COLORS.neutron,l:'neutron'},
+        {x:30,y:-40,c:COLORS.proton,l:'proton'},
+        {x:55,y:10,c:COLORS.neutron,l:'neutron'},
+        {x:20,y:50,c:COLORS.proton,l:'proton'},
+        {x:-35,y:45,c:COLORS.neutron,l:'neutron'},
+      ];
+      nucleons.forEach(n=>{
+        pts.push({
+          x:leftCx+n.x, y:cy+n.y,
+          tx:leftCx+n.x, ty:cy+n.y,
+          r:16, color:n.c, alpha:0.6, label:n.l,
+          vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, wobble:Math.random()*80
+        });
+      });
+      // Right: assembled nucleus
+      const nNucleons=[
+        {x:-22,y:-18,c:COLORS.proton,l:'proton'},
+        {x:8,y:-28,c:COLORS.neutron,l:'neutron'},
+        {x:28,y:-5,c:COLORS.proton,l:'proton'},
+        {x:18,y:22,c:COLORS.neutron,l:'neutron'},
+        {x:-12,y:25,c:COLORS.proton,l:'proton'},
+        {x:-28,y:8,c:COLORS.neutron,l:'neutron'},
+      ];
+      nNucleons.forEach(n=>{
+        pts.push({
+          x:rightCx+n.x, y:cy+n.y,
+          tx:rightCx+n.x, ty:cy+n.y,
+          r:16, color:n.c, alpha:0.8, label:n.l,
+          vx:0, vy:0, wobble:Math.random()*60,
+          isNucleus:true
+        });
+      });
+      // Nucleus border
+      pts.push({
+        x:rightCx, y:cy, tx:rightCx, ty:cy,
+        r:58, color:'rgba(232,160,80,0.1)', alpha:1, label:'noyau atomique',
+        isRing:true, vx:0, vy:0, wobble:0
+      });
+    }
+
+    else if(stage===3){
+      // Nucleus center
+      const cNucleons=[
+        {x:-12,y:-10,c:COLORS.proton},{x:10,y:-15,c:COLORS.neutron},
+        {x:18,y:5,c:COLORS.proton},{x:5,y:18,c:COLORS.neutron},
+        {x:-15,y:12,c:COLORS.proton},{x:-18,y:-5,c:COLORS.neutron},
+      ];
+      cNucleons.forEach((n,i)=>{
+        pts.push({
+          x:cx+n.x, y:cy+n.y, tx:cx+n.x, ty:cy+n.y,
+          r:13, color:n.c, alpha:0.85, label:'noyau',
+          vx:0, vy:0, wobble:i*25, isNucleusAtom:true
+        });
+      });
+      // Electron orbits
+      const eAngles=[0, Math.PI*2/3, Math.PI*4/3, Math.PI/3, Math.PI, Math.PI*5/3];
+      const orbits=[90,90,90,130,130,130];
+      eAngles.forEach((a,i)=>{
+        pts.push({
+          x:cx+Math.cos(a)*orbits[i], y:cy+Math.sin(a)*orbits[i],
+          tx:cx+Math.cos(a)*orbits[i], ty:cy+Math.sin(a)*orbits[i],
+          r:5, color:COLORS.electron, alpha:0.85, label:'électron',
+          vx:0, vy:0, wobble:a*30, orbitR:orbits[i], orbitAngle:a, orbitSpeed:0.008*(i%2?1:-1),
+          isElectron:true
+        });
+      });
+      // Orbit rings
+      [90,130].forEach(r=>{
+        pts.push({
+          x:cx, y:cy, tx:cx, ty:cy,
+          r:r, color:'rgba(80,208,240,0.1)', alpha:1,
+          isRing:true, vx:0, vy:0, wobble:0, ringOnly:true
+        });
+      });
+      // Atom outer glow
+      pts.push({
+        x:cx, y:cy, tx:cx, ty:cy,
+        r:160, color:'rgba(80,208,240,0.04)', alpha:1,
+        isRing:true, vx:0, vy:0, wobble:0, ringOnly:true
+      });
+    }
+
+    return pts;
+  }
+
+  let anim=null;
+  let phase=0; // 0=show, 1=dissolve, 2=reform
+
+  function setStage(s){
+    if(s===currentStage) return;
+    // Mark active button
+    document.querySelectorAll('.assembly-btn').forEach((b,i)=>{
+      b.classList.toggle('active',i===s);
+    });
+    currentStage=s;
+    particles=makeParticles(s);
+  }
+
+  // Init
+  particles=makeParticles(0);
+
+  // Button controls
+  document.querySelectorAll('.assembly-btn').forEach((btn,i)=>{
+    btn.addEventListener('click',()=>setStage(i));
+  });
+
+  // Auto-cycle
+  let autoCycle=setInterval(()=>{
+    setStage((currentStage+1)%4);
+  }, 3200);
+  canvas.addEventListener('click',()=>{ clearInterval(autoCycle); });
+
+  // Draw loop
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.016;
+
+    const info=STAGE_INFO[currentStage];
+
+    // ── Left panel bg
+    ctx.save();
+    const lgGrad=ctx.createRadialGradient(W*0.28,H/2,0,W*0.28,H/2,130);
+    lgGrad.addColorStop(0,'rgba(232,160,80,0.05)');
+    lgGrad.addColorStop(1,'transparent');
+    ctx.fillStyle=lgGrad; ctx.beginPath();
+    ctx.arc(W*0.28,H/2,130,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // ── Right panel bg
+    ctx.save();
+    const rgGrad=ctx.createRadialGradient(W*0.72,H/2,0,W*0.72,H/2,130);
+    rgGrad.addColorStop(0,'rgba(201,168,76,0.07)');
+    rgGrad.addColorStop(1,'transparent');
+    ctx.fillStyle=rgGrad; ctx.beginPath();
+    ctx.arc(W*0.72,H/2,130,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // ── Center divider arrow
+    ctx.save();
+    ctx.font=`300 ${Math.min(11,W*0.013)}px 'Raleway', sans-serif`;
+    ctx.letterSpacing='2px';
+    ctx.fillStyle='rgba(201,168,76,0.6)';
+    ctx.textAlign='center';
+    ctx.fillText(info.arrow, W/2, H/2+4);
+    // arrow line
+    ctx.strokeStyle='rgba(201,168,76,0.25)';
+    ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(W*0.4,H/2-16); ctx.lineTo(W*0.6,H/2-16); ctx.stroke();
+    ctx.setLineDash([]);
+    // arrow head
+    ctx.fillStyle='rgba(201,168,76,0.5)';
+    ctx.beginPath(); ctx.moveTo(W*0.6,H/2-16);
+    ctx.lineTo(W*0.6-8,H/2-21); ctx.lineTo(W*0.6-8,H/2-11); ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    // ── Draw gluon lines (stage 1 right, stage 2)
+    if(currentStage===1){
+      const innerPts=particles.filter(p=>p.isInner);
+      if(innerPts.length>=3){
+        ctx.save();
+        ctx.strokeStyle='rgba(255,200,80,0.4)';
+        ctx.lineWidth=1.5;
+        for(let i=0;i<innerPts.length;i++){
+          for(let j=i+1;j<innerPts.length;j++){
+            const wave=Math.sin(t*3+i*2)*4;
+            ctx.beginPath();
+            ctx.moveTo(innerPts[i].x,innerPts[i].y);
+            const mx2=(innerPts[i].x+innerPts[j].x)/2+wave;
+            const my2=(innerPts[i].y+innerPts[j].y)/2+wave;
+            ctx.quadraticCurveTo(mx2,my2,innerPts[j].x,innerPts[j].y);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+    }
+
+    if(currentStage===2){
+      const npts=particles.filter(p=>p.isNucleus);
+      if(npts.length>=2){
+        ctx.save();
+        ctx.strokeStyle='rgba(232,160,80,0.3)';
+        ctx.lineWidth=2;
+        for(let i=0;i<npts.length;i++){
+          for(let j=i+1;j<npts.length;j++){
+            const dx=npts[j].x-npts[i].x, dy=npts[j].y-npts[i].y;
+            const d=Math.sqrt(dx*dx+dy*dy);
+            if(d<50){
+              ctx.globalAlpha=(1-d/50)*0.5;
+              ctx.beginPath(); ctx.moveTo(npts[i].x,npts[i].y); ctx.lineTo(npts[j].x,npts[j].y); ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha=1; ctx.restore();
+      }
+    }
+
+    if(currentStage===3){
+      // Draw nucleus connections
+      const npts=particles.filter(p=>p.isNucleusAtom);
+      ctx.save();
+      ctx.strokeStyle='rgba(232,160,80,0.4)'; ctx.lineWidth=2;
+      for(let i=0;i<npts.length;i++){
+        for(let j=i+1;j<npts.length;j++){
+          const dx=npts[j].x-npts[i].x,dy=npts[j].y-npts[i].y;
+          const d=Math.sqrt(dx*dx+dy*dy);
+          if(d<35){
+            ctx.globalAlpha=(1-d/35)*0.6;
+            ctx.beginPath(); ctx.moveTo(npts[i].x,npts[i].y); ctx.lineTo(npts[j].x,npts[j].y); ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha=1;
+      // Orbit rings
+      [90,130].forEach((r,ri)=>{
+        ctx.strokeStyle=`rgba(80,208,240,${0.08+ri*0.04})`;
+        ctx.lineWidth=1; ctx.setLineDash([3,4]);
+        ctx.beginPath(); ctx.arc(W/2,H/2,r,0,Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      ctx.restore();
+    }
+
+    // ── Draw particles
+    particles.forEach(p=>{
+      // Update electrons orbit
+      if(p.isElectron){
+        p.orbitAngle+=p.orbitSpeed;
+        p.x=W/2+Math.cos(p.orbitAngle)*p.orbitR;
+        p.y=H/2+Math.sin(p.orbitAngle)*p.orbitR;
+        // trail
+        ctx.save();
+        ctx.strokeStyle='rgba(80,208,240,0.15)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        for(let a=p.orbitAngle-0.5;a<p.orbitAngle;a+=0.05){
+          const ex=W/2+Math.cos(a)*p.orbitR, ey=H/2+Math.sin(a)*p.orbitR;
+          if(a===p.orbitAngle-0.5) ctx.moveTo(ex,ey); else ctx.lineTo(ex,ey);
+        }
+        ctx.stroke(); ctx.restore();
+      }
+
+      // Wobble for free particles
+      if(p.vx!==0||p.vy!==0){
+        p.x+=p.vx+Math.sin(t*2+p.wobble)*0.4;
+        p.y+=p.vy+Math.cos(t*2+p.wobble)*0.4;
+      } else if(!p.isElectron && !p.isRing && !p.isInner && !p.isNucleus && !p.isNucleusAtom){
+        p.x=p.tx+Math.sin(t*1.5+p.wobble)*2;
+        p.y=p.ty+Math.cos(t*1.8+p.wobble)*2;
+      }
+
+      if(p.isRing){
+        ctx.save();
+        ctx.strokeStyle=p.color; ctx.lineWidth=p.r>100?1:1.5;
+        ctx.setLineDash(p.r>50?[5,5]:[]); 
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]); ctx.restore();
+        return;
+      }
+
+      ctx.save();
+      // Glow
+      const gGrad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*1.8);
+      gGrad.addColorStop(0,p.color); gGrad.addColorStop(1,'transparent');
+      ctx.globalAlpha=p.alpha*0.3;
+      ctx.fillStyle=gGrad; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*1.8,0,Math.PI*2); ctx.fill();
+
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+
+      // Inner shimmer
+      if(p.r>6){
+        const sGrad=ctx.createRadialGradient(p.x-p.r*0.3,p.y-p.r*0.3,0,p.x,p.y,p.r);
+        sGrad.addColorStop(0,'rgba(255,255,255,0.3)'); sGrad.addColorStop(1,'transparent');
+        ctx.fillStyle=sGrad; ctx.fill();
+      }
+      ctx.restore();
+    });
+
+    // ── Labels
+    ctx.save();
+    ctx.textAlign='center';
+    // Left label
+    ctx.font=`600 ${Math.min(13,W*0.016)}px 'Raleway', sans-serif`;
+    ctx.fillStyle='rgba(232,160,80,0.9)';
+    ctx.fillText(info.left.title, W*0.28, H*0.1);
+    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.fillStyle='rgba(170,150,130,0.6)';
+    info.left.desc.split('\n').forEach((line,i)=>{
+      ctx.fillText(line, W*0.28, H*0.1+16+i*14);
+    });
+    // Right label
+    ctx.font=`600 ${Math.min(13,W*0.016)}px 'Raleway', sans-serif`;
+    ctx.fillStyle='rgba(201,168,76,0.9)';
+    ctx.fillText(info.right.title, W*0.72, H*0.1);
+    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.fillStyle='rgba(170,150,130,0.6)';
+    info.right.desc.split('\n').forEach((line,i)=>{
+      ctx.fillText(line, W*0.72, H*0.1+16+i*14);
+    });
+    // Stage dots
+    for(let i=0;i<4;i++){
+      ctx.beginPath();
+      ctx.arc(W/2+(i-1.5)*18, H-20, i===currentStage?4:2.5, 0, Math.PI*2);
+      ctx.fillStyle=i===currentStage?'rgba(232,160,80,0.9)':'rgba(201,168,76,0.25)';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══════════════════════════════════════════════════
+// VIZ TIMELINE — âge de la matière
+// ══════════════════════════════════════════════════
+(function buildTimeline(){
+  const container=document.getElementById('timeline-viz');
+  const W=Math.min(container.offsetWidth||880,880);
+  const H=260;
+
+  const svg=d3.select('#timeline-viz').append('svg')
+    .attr('width','100%').attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);
+
+  const defs=svg.append('defs');
+
+  const events=[
+    {t:0,   label:'Big Bang', sub:'Plasma primordial', color:'#f0c070'},
+    {t:0.001, label:'10⁻⁶ s', sub:'Naissance des protons', color:'#c8a0f0'},
+    {t:0.005, label:'3 min', sub:'Nucléosynthèse primordiale', color:'#c8a0f0'},
+    {t:0.027, label:'380 000 ans', sub:'Premiers atomes', color:'#80b0e8'},
+    {t:0.2,  label:'1 milliard d\'ans', sub:'Premières étoiles', color:'#f0a050'},
+    {t:0.52, label:'5 milliards d\'ans', sub:'Formation du Soleil', color:'#f5c842'},
+    {t:0.67, label:'9 milliards d\'ans', sub:'Formation de la Terre', color:'#4d8fd4'},
+    {t:0.72, label:'10 milliards d\'ans', sub:'Premières bactéries', color:'#50c878'},
+    {t:1.0,  label:'Aujourd\'hui', sub:'Vous lisez ceci', color:'#7ab8f5'},
+  ];
+
+  const margin={left:30,right:30,top:40,bottom:60};
+  const iW=W-margin.left-margin.right;
+  const cy=(H-margin.top-margin.bottom)/2+margin.top;
+
+  const xScale=d3.scaleLinear().domain([0,1]).range([margin.left,W-margin.right]);
+
+  // Timeline base line
+  const lineGrad=defs.append('linearGradient').attr('id','tlGrad').attr('x1','0%').attr('x2','100%');
+  lineGrad.append('stop').attr('offset','0%').attr('stop-color','#f0c070').attr('stop-opacity',0.8);
+  lineGrad.append('stop').attr('offset','50%').attr('stop-color','#c8a0f0').attr('stop-opacity',0.6);
+  lineGrad.append('stop').attr('offset','100%').attr('stop-color','#7ab8f5').attr('stop-opacity',0.9);
+
+  svg.append('line')
+    .attr('x1',xScale(0)).attr('x2',xScale(1))
+    .attr('y1',cy).attr('y2',cy)
+    .attr('stroke','url(#tlGrad)').attr('stroke-width',2);
+
+  // Events
+  events.forEach((ev,i)=>{
+    const x=xScale(ev.t);
+    const above=i%2===0;
+    const yLabel=above?cy-45:cy+45;
+    const yDot=cy;
+
+    // Dot
+    svg.append('circle').attr('cx',x).attr('cy',yDot).attr('r',i===0||i===events.length-1?7:5)
+      .attr('fill',ev.color).attr('stroke','var(--void)').attr('stroke-width',2);
+
+    // Connector
+    svg.append('line').attr('x1',x).attr('x2',x)
+      .attr('y1',yDot+(above?-6:6)).attr('y2',yLabel+(above?12:-12))
+      .attr('stroke',ev.color).attr('stroke-width',0.5).attr('stroke-opacity',0.4);
+
+    // Label
+    svg.append('text').attr('x',x).attr('y',yLabel)
+      .attr('text-anchor','middle').attr('fill',ev.color)
+      .attr('font-family',"'Cinzel',serif").attr('font-size','9').attr('font-weight','400')
+      .attr('letter-spacing','0.5')
+      .text(ev.label);
+
+    svg.append('text').attr('x',x).attr('y',yLabel+(above?14:-14))
+      .attr('text-anchor','middle').attr('fill','rgba(170,150,130,0.6)')
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('font-weight','300')
+      .attr('letter-spacing','0.5')
+      .text(ev.sub);
+  });
+
+  // "Your atoms" highlight bar
+  const atomBar=defs.append('linearGradient').attr('id','atomBar').attr('x1','0%').attr('x2','100%');
+  atomBar.append('stop').attr('offset','0%').attr('stop-color','rgba(201,168,76,0.12)');
+  atomBar.append('stop').attr('offset','100%').attr('stop-color','rgba(201,168,76,0.02)');
+
+  svg.append('rect')
+    .attr('x',xScale(0)).attr('y',cy-4).attr('width',xScale(1)-xScale(0)).attr('height',8)
+    .attr('fill','url(#atomBar)');
+
+  // Caption bottom
+  svg.append('text').attr('x',W/2).attr('y',H-8)
+    .attr('text-anchor','middle').attr('fill','rgba(201,168,76,0.4)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','2')
+    .text('VOS ATOMES ONT TRAVERSÉ TOUTE CETTE HISTOIRE SANS JAMAIS ÊTRE DÉTRUITS');
+})();
+
+// ══════════════════════════════════════════════════
+// VIZ ÉLÉMENTS — origines cosmiques
+// ══════════════════════════════════════════════════
+(function buildElements(){
+  const container=document.getElementById('elements-viz');
+  const W=Math.min(container.offsetWidth||880,880);
+  const H=320;
+
+  const svg=d3.select('#elements-viz').append('svg')
+    .attr('width','100%').attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);
+
+  const defs=svg.append('defs');
+
+  const origins=[
+    {label:'Big Bang', color:'#f0c070', textColor:'#f0c070', desc:'Né dans les 3 premières minutes',
+     elements:['H','He','Li']},
+    {label:'Étoiles de faible masse', color:'#f0a878', textColor:'#f0a878', desc:'Fusion dans les étoiles comme notre Soleil',
+     elements:['C','N','O','Ne','Mg','Si','S']},
+    {label:'Supernovæ', color:'#e05050', textColor:'#e05050', desc:'Explosions d\'étoiles massives',
+     elements:['Na','Al','P','Cl','K','Ca','Ti','Cr','Fe','Co','Ni','Cu','Zn']},
+    {label:'Collisions d\'étoiles à neutrons', color:'#c8a0f0', textColor:'#c8a0f0', desc:'Fusions d\'étoiles mortes ultra-denses',
+     elements:['Au','Pt','Ag','Pb','U','Th','W','Ir','Os','Pd','Rh']},
+    {label:'Rayonnement cosmique', color:'#80b0e8', textColor:'#80b0e8', desc:'Bombardement de particules à haute énergie',
+     elements:['Be','B','F']},
+  ];
+
+  // Body elements — what's in you
+  const inBody={H:true,C:true,N:true,O:true,Na:true,Mg:true,P:true,S:true,Cl:true,K:true,Ca:true,Fe:true,Zn:true,Cu:true};
+
+  const margin={left:10,right:10,top:20,bottom:30};
+  const colW=(W-margin.left-margin.right)/origins.length;
+
+  origins.forEach((orig,ci)=>{
+    const cx=margin.left+ci*colW+colW/2;
+
+    // Column header
+    svg.append('text').attr('x',cx).attr('y',margin.top)
+      .attr('text-anchor','middle').attr('fill',orig.textColor)
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('font-weight','400')
+      .attr('letter-spacing','1')
+      .text(orig.label.toUpperCase());
+
+    svg.append('text').attr('x',cx).attr('y',margin.top+13)
+      .attr('text-anchor','middle').attr('fill','rgba(170,150,130,0.4)')
+      .attr('font-family',"'Raleway',sans-serif").attr('font-size','7')
+      .text(orig.desc);
+
+    // Elements
+    const cols2=Math.min(4, Math.ceil(orig.elements.length/2));
+    orig.elements.forEach((el,ei)=>{
+      const row=Math.floor(ei/cols2);
+      const col=ei%cols2;
+      const ex=cx-(cols2-1)*16+col*32;
+      const ey=margin.top+38+row*40;
+      const isBody=inBody[el];
+
+      svg.append('rect').attr('x',ex-14).attr('y',ey-14).attr('width',28).attr('height',28)
+        .attr('fill',isBody?`${orig.color}22`:'rgba(10,22,40,0.6)')
+        .attr('stroke',orig.color).attr('stroke-opacity',isBody?0.8:0.25)
+        .attr('stroke-width',isBody?1.5:0.5).attr('rx',2)
+        .style('cursor','pointer')
+        .on('mouseenter',(e)=>{
+          showTip(e,el,`<br><em>${orig.label}</em>${isBody?'<br>🫀 Présent dans votre corps':''}`);
+        })
+        .on('mouseleave',hideTip);
+
+      svg.append('text').attr('x',ex).attr('y',ey+5)
+        .attr('text-anchor','middle').attr('fill',isBody?orig.textColor:'rgba(170,150,130,0.5)')
+        .attr('font-family',"'Cinzel',serif").attr('font-size','11')
+        .attr('font-weight',isBody?'600':'400')
+        .text(el);
+    });
+
+    // Column bottom line
+    svg.append('line')
+      .attr('x1',margin.left+ci*colW).attr('x2',margin.left+ci*colW)
+      .attr('y1',margin.top+30).attr('y2',H-margin.bottom)
+      .attr('stroke',orig.color).attr('stroke-opacity',0.12).attr('stroke-width',1);
+  });
+
+  // Legend body
+  svg.append('rect').attr('x',W-180).attr('y',H-margin.bottom-2).attr('width',12).attr('height',12)
+    .attr('fill','rgba(232,160,80,0.15)').attr('stroke','rgba(232,160,80,0.6)').attr('stroke-width',1.5).attr('rx',1);
+  svg.append('text').attr('x',W-162).attr('y',H-margin.bottom+9)
+    .attr('fill','rgba(170,150,130,0.6)').attr('font-family',"'Raleway',sans-serif")
+    .attr('font-size','8').attr('letter-spacing','1')
+    .text('PRÉSENT DANS VOTRE CORPS');
+})();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav">
+      <a href="index.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Accueil</div>
+          <div class="footer-name">Le Petit Livre Bleu</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-intro.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Introduction</div>
+          <div class="footer-name">Homo biospheris</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre1.html" class="footer-dalle footer-dalle-ch1">
+        <div class="footer-sphere fsp-ch1"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">I</div>
+          <div class="footer-name">La Terre</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre2.html" class="footer-dalle footer-dalle-ch2">
+        <div class="footer-sphere fsp-ch2"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">II</div>
+          <div class="footer-name">La Matière</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre3.html" class="footer-dalle footer-dalle-ch3">
+        <div class="footer-sphere fsp-ch3"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">III</div>
+          <div class="footer-name">La Vie</div>
+        </div>
+      </a>
+    </nav>
+    <div class="footer-bottom">
+      <div class="footer-brand">Le Petit Livre Bleu · Jean-Pierre Goux</div>
+      <div class="footer-copy">Une autre histoire de l'humanité</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

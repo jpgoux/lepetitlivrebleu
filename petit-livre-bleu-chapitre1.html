@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 1 : La Terre</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #02040a;
+    --deep: #060d1f;
+    --cosmos: #0a1628;
+    --nebula: #0d2145;
+    --blue-dim: #1a3a6e;
+    --blue-mid: #2a5fa8;
+    --blue-bright: #4d8fd4;
+    --blue-glow: #7ab8f5;
+    --star-white: #e8f0ff;
+    --gold: #c9a84c;
+    --gold-dim: #7a6030;
+    --text-primary: #ccd8f0;
+    --text-dim: #7a90b8;
+    --earth-blue: #1e6eb0;
+    --earth-green: #2d7a45;
+    --earth-brown: #8b5e3c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text-primary);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 6px; height: 6px;
+    background: var(--blue-glow);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px var(--blue-glow), 0 0 24px rgba(122,184,245,0.4);
+    transition: width 0.2s, height 0.2s, opacity 0.2s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(122,184,245,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.12s ease-out, width 0.2s, height 0.2s;
+  }
+
+  /* Star canvas background */
+  #starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════
+     COVER / HERO
+  ═══════════════════════════════════ */
+  #cover {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .book-label {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.5em;
+    font-size: 0.7rem;
+    color: var(--blue-dim);
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    animation: fadeInDown 2s ease forwards;
+  }
+
+  .chapter-num {
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeInDown 2s 0.3s ease both;
+  }
+
+  h1.title {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: clamp(4rem, 10vw, 9rem);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    background: linear-gradient(160deg, #e8f0ff 0%, #7ab8f5 40%, #2a5fa8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 2rem;
+    animation: fadeInUp 2s 0.5s ease both;
+    text-shadow: none;
+  }
+
+  .title-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    animation: fadeInUp 2s 0.8s ease both;
+    margin-bottom: 4rem;
+  }
+
+  .earth-visual {
+    position: relative;
+    width: 160px; height: 160px;
+    margin: 0 auto 3rem;
+    animation: fadeIn 3s 1s ease both;
+  }
+
+  #earth-svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 30px rgba(30,110,176,0.7)) drop-shadow(0 0 80px rgba(30,110,176,0.3));
+  }
+
+  .earth-orbit {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 220px; height: 220px;
+    border: 1px solid rgba(122,184,245,0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: orbit-spin 20s linear infinite;
+  }
+
+  .orbit-dot {
+    position: absolute;
+    top: -3px; left: 50%;
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    animation: fadeIn 3s 2s ease both;
+  }
+  .scroll-hint span {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--blue-dim), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ═══════════════════════════════════
+     EPIGRAPH
+  ═══════════════════════════════════ */
+  .epigraph-section {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 6rem 2rem;
+  }
+
+  .epigraph-inner {
+    max-width: 600px;
+    text-align: center;
+  }
+
+  blockquote {
+    font-style: italic;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--star-white);
+    position: relative;
+    padding: 2rem 3rem;
+  }
+
+  blockquote::before {
+    content: '\201C';
+    position: absolute;
+    top: -0.5rem; left: 0.5rem;
+    font-size: 5rem;
+    line-height: 1;
+    color: var(--blue-dim);
+    font-family: Georgia, serif;
+  }
+
+  .quote-source {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+
+  /* ═══════════════════════════════════
+     NARRATIVE SECTIONS
+  ═══════════════════════════════════ */
+  .section {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .section-label {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold-dim), transparent);
+    max-width: 80px;
+  }
+
+  .section p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.95;
+    color: var(--text-primary);
+    font-weight: 300;
+    margin-bottom: 1.8rem;
+  }
+
+  .section p:first-of-type::first-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 4.5rem;
+    line-height: 0.75;
+    float: left;
+    margin-right: 0.15em;
+    margin-top: 0.1em;
+    color: var(--blue-glow);
+    filter: drop-shadow(0 0 12px rgba(122,184,245,0.5));
+  }
+
+  .highlight {
+    color: var(--blue-glow);
+    font-style: italic;
+  }
+
+  .pull-quote {
+    border-left: 2px solid var(--blue-mid);
+    padding: 1.5rem 2rem;
+    margin: 3rem 0;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    color: var(--star-white);
+    background: linear-gradient(to right, rgba(42,95,168,0.1), transparent);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════
+     VISUALIZATION PANELS
+  ═══════════════════════════════════ */
+  .viz-panel {
+    position: relative;
+    z-index: 1;
+    padding: 4rem 2rem 6rem;
+    text-align: center;
+  }
+
+  .viz-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    letter-spacing: 0.3em;
+    color: var(--blue-glow);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .viz-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    margin-bottom: 3rem;
+  }
+
+  .viz-caption {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 2rem auto 0;
+    line-height: 1.8;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════
+     VIZ 1 : Système solaire
+  ═══════════════════════════════════ */
+  #solar-system-viz {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    height: 340px;
+    position: relative;
+  }
+
+  /* ═══════════════════════════════════
+     VIZ 2 : Zoom cosmique
+  ═══════════════════════════════════ */
+  #zoom-viz {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    height: 460px;
+  }
+
+  /* ═══════════════════════════════════
+     VIZ 3 : Exoplanètes
+  ═══════════════════════════════════ */
+  #exoplanets-viz {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    height: 420px;
+  }
+
+  /* ═══════════════════════════════════
+     VIZ 4 : Distance Ross 128b
+  ═══════════════════════════════════ */
+  #distance-viz {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    height: 180px;
+  }
+
+  /* ═══════════════════════════════════
+     STAT CARDS
+  ═══════════════════════════════════ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, rgba(10,22,40,0.9), rgba(6,13,31,0.95));
+    border: 1px solid rgba(42,95,168,0.25);
+    border-radius: 2px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--blue-mid), transparent);
+  }
+
+  .stat-card:hover { border-color: rgba(122,184,245,0.4); }
+
+  .stat-number {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 600;
+    color: var(--blue-glow);
+    line-height: 1;
+    margin-bottom: 0.6rem;
+    filter: drop-shadow(0 0 10px rgba(122,184,245,0.4));
+  }
+
+  .stat-label {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════
+     DIVIDERS
+  ═══════════════════════════════════ */
+  .cosmic-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    position: relative;
+    z-index: 1;
+    gap: 1.5rem;
+  }
+
+  .cosmic-divider::before,
+  .cosmic-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(42,95,168,0.3));
+    max-width: 200px;
+  }
+  .cosmic-divider::after {
+    background: linear-gradient(to left, transparent, rgba(42,95,168,0.3));
+  }
+
+  .divider-star {
+    color: var(--gold-dim);
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* ═══════════════════════════════════
+     FINALE / OASIS
+  ═══════════════════════════════════ */
+  .finale-section {
+    position: relative;
+    z-index: 1;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem;
+  }
+
+  .oasis-visual {
+    width: 260px; height: 260px;
+    margin: 0 auto 4rem;
+    position: relative;
+  }
+
+  #oasis-svg { width: 100%; height: 100%; }
+
+  .finale-text {
+    max-width: 680px;
+    font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+    line-height: 1.9;
+    color: var(--star-white);
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .finale-cta {
+    margin-top: 5rem;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════
+     SCROLL ANIMATIONS
+  ═══════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes orbit-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(30,110,176,0.6)); }
+    50% { filter: drop-shadow(0 0 50px rgba(30,110,176,0.9)) drop-shadow(0 0 100px rgba(30,110,176,0.3)); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* ═══════════════════════════════════
+     TOOLTIP
+  ═══════════════════════════════════ */
+  .tooltip {
+    position: fixed;
+    background: rgba(6,13,31,0.95);
+    border: 1px solid rgba(42,95,168,0.4);
+    padding: 0.8rem 1.2rem;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 220px;
+    line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip strong {
+    display: block;
+    color: var(--blue-glow);
+    margin-bottom: 0.3rem;
+    font-weight: 400;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: var(--blue-dim); border-radius: 2px; }
+
+/* ══ SITE FOOTER ══ */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.footer-dalle:hover{background:rgba(8,14,32,0.9);}
+.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
+.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
+.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
+.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
+.footer-dalle-ch2 .footer-num{color:#c9a84c;}
+.footer-dalle-ch3 .footer-num{color:#3cbe78;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
+
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- ═══════ COVER ═══════ -->
+<section id="cover">
+  <div class="book-label">Le Petit Livre Bleu</div>
+  <div class="chapter-num">Chapitre I</div>
+  <h1 class="title">La Terre</h1>
+  <p class="title-sub">L'histoire d'un miracle ordinaire</p>
+  <div class="earth-visual" style="animation: float 6s ease-in-out infinite, fadeIn 3s 1s ease both;">
+    <div class="earth-orbit"><div class="orbit-dot"></div></div>
+    <svg id="earth-svg" viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="earthGrad" cx="38%" cy="35%">
+          <stop offset="0%" stop-color="#4a9dd4"/>
+          <stop offset="30%" stop-color="#1e6eb0"/>
+          <stop offset="70%" stop-color="#0e4a80"/>
+          <stop offset="100%" stop-color="#062040"/>
+        </radialGradient>
+        <radialGradient id="atmosphereGrad" cx="50%" cy="50%">
+          <stop offset="70%" stop-color="transparent"/>
+          <stop offset="100%" stop-color="rgba(100,180,255,0.25)"/>
+        </radialGradient>
+        <clipPath id="earthClip">
+          <circle cx="100" cy="100" r="75"/>
+        </clipPath>
+      </defs>
+      <!-- Atmosphere glow -->
+      <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(100,180,255,0.15)" stroke-width="10"/>
+      <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(100,180,255,0.08)" stroke-width="6"/>
+      <!-- Earth body -->
+      <circle cx="100" cy="100" r="75" fill="url(#earthGrad)"/>
+      <!-- Continents -->
+      <g clip-path="url(#earthClip)" fill="rgba(45,122,69,0.75)">
+        <!-- Americas-like -->
+        <ellipse cx="68" cy="85" rx="18" ry="28" transform="rotate(-15,68,85)"/>
+        <ellipse cx="72" cy="120" rx="12" ry="20" transform="rotate(-20,72,120)"/>
+        <!-- Europe/Africa-like -->
+        <ellipse cx="108" cy="78" rx="14" ry="18" transform="rotate(10,108,78)"/>
+        <ellipse cx="112" cy="108" rx="11" ry="22" transform="rotate(5,112,108)"/>
+        <!-- Asia-like -->
+        <ellipse cx="138" cy="72" rx="22" ry="16" transform="rotate(-5,138,72)"/>
+        <ellipse cx="145" cy="95" rx="16" ry="12"/>
+      </g>
+      <!-- Ice caps -->
+      <g clip-path="url(#earthClip)">
+        <ellipse cx="100" cy="30" rx="35" ry="12" fill="rgba(220,235,255,0.5)"/>
+        <ellipse cx="100" cy="168" rx="28" ry="10" fill="rgba(220,235,255,0.4)"/>
+      </g>
+      <!-- Atmosphere overlay -->
+      <circle cx="100" cy="100" r="75" fill="url(#atmosphereGrad)"/>
+      <!-- Specular highlight -->
+      <ellipse cx="75" cy="65" rx="20" ry="14" fill="rgba(200,230,255,0.12)" transform="rotate(-20,75,65)"/>
+    </svg>
+  </div>
+  <div class="scroll-hint">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════ ÉPIGRAPHE ═══════ -->
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>La Terre n'est pas une planète quelconque !</blockquote>
+    <div class="quote-source">— Le Petit Prince · Antoine de Saint-Exupéry</div>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 1 ═══════ -->
+<div class="section reveal">
+  <div class="section-label">Notre étoile</div>
+  <p>Nous avons pris l'habitude de vivre sur notre planète comme si elle était ordinaire. Et pourtant, comme nous le rappelle le Petit Prince, elle ne l'est pas. Nous avons banalisé l'extraordinaire — celui-ci se cache derrière le fait le plus banal : <span class="highlight">exister. Vivre. Ici.</span></p>
+  <p>La Terre orbite autour du Soleil, une naine jaune de petite taille, depuis <span class="highlight">4,6 milliards d'années</span>. Dans notre imaginaire collectif, les planètes voisines devaient nécessairement héberger leurs propres espèces. Il a fallu attendre les années 1960 pour se rendre à l'évidence que nos voisines n'étaient pas habitées.</p>
+</div>
+
+<!-- VIZ 1 : Système Solaire -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Notre système solaire</div>
+  <div class="viz-subtitle">4,6 milliards d'années de compagnonnage</div>
+  <div id="solar-system-viz"></div>
+  <div class="viz-caption">Passez la souris sur chaque planète pour en savoir plus sur son statut biologique connu à ce jour</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ═══════ STATS ═══════ -->
+<div class="stats-grid">
+  <div class="stat-card reveal">
+    <div class="stat-number">4,6</div>
+    <div class="stat-label">Milliards d'années<br>d'âge de notre système</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.15s">
+    <div class="stat-number">1</div>
+    <div class="stat-label">Seule planète<br>à biosphère confirmée</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.3s">
+    <div class="stat-number">8</div>
+    <div class="stat-label">Planètes dans<br>notre système solaire</div>
+  </div>
+</div>
+
+<!-- ═══════ SECTION 2 ═══════ -->
+<div class="section reveal">
+  <div class="section-label">L'horizon des exoplanètes</div>
+  <p>Pour saisir le caractère remarquable de la Terre, éloignons-nous encore, vers d'autres étoiles. La Voie lactée en compte des <span class="highlight">centaines de milliards</span>. Longtemps, nous avons ignoré si elles possédaient des planètes. Cette inconnue fondamentale a été levée en <span class="highlight">1995</span> avec la découverte de la première exoplanète.</p>
+  <div class="pull-quote">"Nous savons désormais que les planètes sont la règle, non l'exception."</div>
+  <p>Depuis, plus de <span class="highlight">6 000 exoplanètes</span> ont été détectées. Et pourtant, parmi ces mondes connus, seule une poignée est aujourd'hui considérée comme potentiellement habitable.</p>
+</div>
+
+<!-- VIZ 2 : Exoplanètes -->
+<div class="viz-panel reveal">
+  <div class="viz-title">6 000+ mondes détectés</div>
+  <div class="viz-subtitle">Une infime fraction pourrait être habitable</div>
+  <div id="exoplanets-viz"></div>
+  <div class="viz-caption">Chaque point représente une exoplanète connue. En bleu, celles potentiellement dans la zone habitable.</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ═══════ SECTION 3 ═══════ -->
+<div class="section reveal">
+  <div class="section-label">La distance infranchissable</div>
+  <p>La planète candidate la plus proche, <span class="highlight">Ross 128 b</span>, se situe à 11 années-lumière. Avec nos technologies de propulsion actuelles, il faudrait près de <span class="highlight">200 000 ans</span> — soit 10 000 générations — pour l'atteindre.</p>
+</div>
+
+<!-- VIZ 3 : Distance / Générations -->
+<div class="viz-panel reveal">
+  <div class="viz-title">200 000 ans de voyage</div>
+  <div class="viz-subtitle">De la Terre à Ross 128 b : 10 000 générations humaines</div>
+  <div id="distance-viz"></div>
+  <div class="viz-caption">Chaque icône représente 100 générations. L'humanité agricole entière ne représente que 500 générations.</div>
+</div>
+
+<!-- ═══════ SECTION 4 ═══════ -->
+<div class="section reveal">
+  <div class="section-label">La galaxie, l'univers</div>
+  <p>Si nous dézoomons encore, nous réalisons que notre destin se joue dans un des bras spiralés de la Voie lactée. Et que notre galaxie ne représente qu'une infime partie de l'Univers — qui en abrite des <span class="highlight">centaines de milliards</span>.</p>
+</div>
+
+<!-- VIZ 4 : Zoom cosmique -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Du système solaire à l'univers observable</div>
+  <div class="viz-subtitle">Chaque cercle contient le précédent — multiplié par des milliards</div>
+  <div id="zoom-viz"></div>
+  <div class="viz-caption">Il y aurait davantage de planètes dans l'univers que de grains de sable sur Terre</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ═══════ STATS FINALES ═══════ -->
+<div class="stats-grid">
+  <div class="stat-card reveal">
+    <div class="stat-number">6 000+</div>
+    <div class="stat-label">Exoplanètes<br>détectées à ce jour</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.15s">
+    <div class="stat-number">11</div>
+    <div class="stat-label">Années-lumière jusqu'à<br>Ross 128 b</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.3s">
+    <div class="stat-number">100 Mds</div>
+    <div class="stat-label">Galaxies dans<br>l'univers observable</div>
+  </div>
+</div>
+
+<!-- ═══════ FINALE ═══════ -->
+<section class="finale-section">
+  <div class="oasis-visual reveal">
+    <svg id="oasis-svg" viewBox="0 0 300 300">
+      <defs>
+        <radialGradient id="voidGrad" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="rgba(42,95,168,0.05)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="oasisEarth" cx="38%" cy="35%">
+          <stop offset="0%" stop-color="#6ab8e8"/>
+          <stop offset="40%" stop-color="#1e6eb0"/>
+          <stop offset="100%" stop-color="#062040"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Void rings -->
+      <circle cx="150" cy="150" r="130" fill="none" stroke="rgba(42,95,168,0.06)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="110" fill="none" stroke="rgba(42,95,168,0.08)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="90" fill="none" stroke="rgba(42,95,168,0.1)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="70" fill="none" stroke="rgba(42,95,168,0.15)" stroke-width="1"/>
+      <!-- Scattered small stars -->
+      <g fill="rgba(200,220,255,0.6)">
+        <circle cx="40" cy="60" r="1"/>
+        <circle cx="90" cy="30" r="0.8"/>
+        <circle cx="200" cy="45" r="1.2"/>
+        <circle cx="255" cy="80" r="0.9"/>
+        <circle cx="270" cy="160" r="1"/>
+        <circle cx="240" cy="240" r="0.8"/>
+        <circle cx="60" cy="220" r="1.1"/>
+        <circle cx="30" cy="150" r="0.7"/>
+        <circle cx="170" cy="20" r="1"/>
+        <circle cx="120" cy="270" r="0.9"/>
+      </g>
+      <!-- The Earth — alone -->
+      <g filter="url(#glow)" style="animation: pulse-glow 4s ease-in-out infinite">
+        <circle cx="150" cy="150" r="45" fill="url(#oasisEarth)"/>
+        <g clip-path="none">
+          <ellipse cx="138" cy="140" rx="10" ry="16" fill="rgba(45,122,69,0.7)" transform="rotate(-10,138,140)"/>
+          <ellipse cx="158" cy="135" rx="14" ry="10" fill="rgba(45,122,69,0.65)"/>
+          <ellipse cx="162" cy="155" rx="9" ry="13" fill="rgba(45,122,69,0.6)"/>
+        </g>
+        <ellipse cx="150" cy="110" rx="22" ry="7" fill="rgba(220,235,255,0.45)"/>
+        <ellipse cx="150" cy="190" rx="17" ry="6" fill="rgba(220,235,255,0.35)"/>
+        <circle cx="150" cy="150" r="45" fill="none" stroke="rgba(100,180,255,0.3)" stroke-width="4"/>
+        <circle cx="150" cy="150" r="47" fill="none" stroke="rgba(100,180,255,0.12)" stroke-width="6"/>
+      </g>
+      <!-- Label -->
+      <text x="150" y="218" text-anchor="middle" fill="rgba(122,184,245,0.7)" font-family="'Cinzel', serif" font-size="8" letter-spacing="3">NOTRE OASIS</text>
+    </svg>
+  </div>
+
+  <p class="finale-text reveal">
+    Il n'existe ni planète B ni plan B dans notre voisinage accessible.<br><br>
+    La Terre est la seule planète à héberger la vie et sur laquelle l'humanité peut espérer vivre.<br><br>
+    <em>Notre responsabilité de préserver cette oasis, ce miracle, est donc immense.</em>
+  </p>
+
+  <div class="finale-cta reveal" style="transition-delay:0.5s">↓ &nbsp; Chapitre II</div>
+</section>
+
+<script>
+// ═══════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+(function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+})();
+
+// ═══════════════════════════════════
+// STARFIELD
+// ═══════════════════════════════════
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const stars = Array.from({length: 320}, () => ({
+  x: Math.random(),
+  y: Math.random(),
+  r: Math.random() * 1.4 + 0.2,
+  alpha: Math.random() * 0.7 + 0.15,
+  speed: Math.random() * 0.0008 + 0.0002,
+  phase: Math.random() * Math.PI * 2
+}));
+
+let time = 0;
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  time += 0.01;
+  stars.forEach(s => {
+    const a = s.alpha * (0.5 + 0.5 * Math.sin(time * s.speed * 300 + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200, 220, 255, ${a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// ═══════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-left').forEach(el => observer.observe(el));
+
+// ═══════════════════════════════════
+// TOOLTIP HELPER
+// ═══════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+function showTip(e, title, text) {
+  tooltip.innerHTML = `<strong>${title}</strong>${text}`;
+  tooltip.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e) {
+  tooltip.style.left = (e.clientX + 16) + 'px';
+  tooltip.style.top = (e.clientY - 10) + 'px';
+}
+function hideTip() { tooltip.classList.remove('show'); }
+
+document.addEventListener('mousemove', e => {
+  if (tooltip.classList.contains('show')) moveTip(e);
+});
+
+// ═══════════════════════════════════
+// VIZ 1 : SYSTÈME SOLAIRE
+// ═══════════════════════════════════
+(function buildSolarSystem() {
+  const container = document.getElementById('solar-system-viz');
+  const W = container.offsetWidth || 860;
+  const H = 340;
+
+  const svg = d3.select('#solar-system-viz')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', H)
+    .attr('viewBox', `0 0 ${W} ${H}`);
+
+  // Background subtle gradient
+  const defs = svg.append('defs');
+
+  const bg = defs.append('radialGradient').attr('id', 'sunGlow').attr('cx','0%').attr('cy','50%').attr('r','40%');
+  bg.append('stop').attr('offset','0%').attr('stop-color','rgba(255,180,50,0.15)');
+  bg.append('stop').attr('offset','100%').attr('stop-color','transparent');
+
+  svg.append('rect').attr('width', W).attr('height', H).attr('fill', 'url(#sunGlow)');
+
+  const planets = [
+    { name: 'Soleil',  r: 36, cx: 50,  color: '#f5c842', glow: '#f5c842', life: 'Notre étoile depuis 4,6 milliards d\'années', status: '⭐ Étoile',  orbit: false },
+    { name: 'Mercure', r: 6,  cx: 115, color: '#9a8a7a', glow: '#9a8a7a', life: 'Surface brûlante, sans atmosphère ni eau', status: '✗ Inhabitable', orbit: true },
+    { name: 'Vénus',   r: 10, cx: 178, color: '#e8c86a', glow: '#e8c86a', life: '465°C en surface, pression écrasante', status: '✗ Inhabitable', orbit: true },
+    { name: 'Terre',   r: 11, cx: 250, color: '#4d8fd4', glow: '#4d8fd4', life: 'La seule biosphère confirmée du système solaire', status: '✓ Habitée !',  orbit: true, highlight: true },
+    { name: 'Mars',    r: 8,  cx: 325, color: '#c0614a', glow: '#c0614a', life: 'Aucune activité biologique actuelle ou ancienne confirmée', status: '✗ Stérile confirmé', orbit: true },
+    { name: 'Jupiter', r: 26, cx: 430, color: '#c9a876', glow: '#c9a876', life: 'Géante gazeuse. Certaines lunes (Europa) pourraient abriter vie primitive', status: '? Lunes à explorer', orbit: true },
+    { name: 'Saturne', r: 22, cx: 540, color: '#d4c090', glow: '#d4c090', life: 'Géante gazeuse. Encelade possède de l\'eau liquide sous sa glace', status: '? Lunes à explorer', orbit: true },
+    { name: 'Uranus',  r: 15, cx: 630, color: '#78c8d4', glow: '#78c8d4', life: 'Géante de glace, conditions extrêmes', status: '✗ Inhabitable', orbit: true },
+    { name: 'Neptune', r: 14, cx: 720, color: '#4870d8', glow: '#4870d8', life: 'Géante de glace à -200°C, vents à 2000 km/h', status: '✗ Inhabitable', orbit: true },
+  ];
+
+  const cy = H / 2;
+
+  // Orbit lines
+  planets.filter(p => p.orbit).forEach(p => {
+    svg.append('line')
+      .attr('x1', 70).attr('x2', p.cx)
+      .attr('y1', cy).attr('y2', cy)
+      .attr('stroke', 'rgba(42,95,168,0.12)')
+      .attr('stroke-width', 1);
+  });
+
+  // Highlight ring for Earth
+  const earth = planets.find(p => p.highlight);
+  if (earth) {
+    svg.append('circle')
+      .attr('cx', earth.cx).attr('cy', cy).attr('r', earth.r + 8)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(77,143,212,0.4)')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '4 3');
+    // Animated pulse
+    const pulse = svg.append('circle')
+      .attr('cx', earth.cx).attr('cy', cy).attr('r', earth.r + 5)
+      .attr('fill', 'none').attr('stroke', 'rgba(77,143,212,0.6)').attr('stroke-width', 1);
+    (function pulsate() {
+      pulse.transition().duration(2000)
+        .attr('r', earth.r + 20).attr('stroke-opacity', 0)
+        .transition().duration(0)
+        .attr('r', earth.r + 5).attr('stroke-opacity', 0.6)
+        .on('end', pulsate);
+    })();
+  }
+
+  // Planets
+  planets.forEach(p => {
+    const grId = 'pg_' + p.name;
+    const gr = defs.append('radialGradient').attr('id', grId).attr('cx','35%').attr('cy','30%');
+    gr.append('stop').attr('offset','0%').attr('stop-color', d3.color(p.color) ? d3.color(p.color).brighter(1) : p.color);
+    gr.append('stop').attr('offset','100%').attr('stop-color', d3.color(p.color) ? d3.color(p.color).darker(1.5) : p.color);
+
+    // glow filter
+    const fId = 'gf_' + p.name;
+    const flt = defs.append('filter').attr('id', fId);
+    flt.append('feGaussianBlur').attr('stdDeviation', p.highlight ? '6' : '3').attr('result','blur');
+    flt.append('feMerge').selectAll('feMergeNode').data(['blur','SourceGraphic']).enter()
+      .append('feMergeNode').attr('in', d => d);
+
+    const g = svg.append('g').style('cursor','pointer');
+
+    g.append('circle')
+      .attr('cx', p.cx).attr('cy', cy)
+      .attr('r', p.r)
+      .attr('fill', `url(#${grId})`)
+      .attr('filter', `url(#${fId})`);
+
+    // Saturn rings
+    if (p.name === 'Saturne') {
+      svg.append('ellipse')
+        .attr('cx', p.cx).attr('cy', cy)
+        .attr('rx', p.r * 1.85).attr('ry', p.r * 0.4)
+        .attr('fill', 'none')
+        .attr('stroke', 'rgba(212,192,144,0.45)')
+        .attr('stroke-width', 4)
+        .lower();
+    }
+
+    // Label
+    g.append('text')
+      .attr('x', p.cx).attr('y', cy + p.r + 16)
+      .attr('text-anchor', 'middle')
+      .attr('fill', p.highlight ? '#7ab8f5' : 'rgba(170,190,220,0.65)')
+      .attr('font-family', "'Raleway', sans-serif")
+      .attr('font-size', '9')
+      .attr('letter-spacing', '1')
+      .text(p.name.toUpperCase());
+
+    g.on('mouseenter', (e) => showTip(e, p.name, `<br>${p.status}<br><em>${p.life}</em>`))
+     .on('mouseleave', hideTip);
+  });
+})();
+
+// ═══════════════════════════════════
+// VIZ 2 : EXOPLANÈTES
+// ═══════════════════════════════════
+(function buildExoplanets() {
+  const container = document.getElementById('exoplanets-viz');
+  const W = Math.min(container.offsetWidth || 860, 860);
+  const H = 420;
+
+  const svg = d3.select('#exoplanets-viz')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', H)
+    .attr('viewBox', `0 0 ${W} ${H}`);
+
+  const defs = svg.append('defs');
+  const total = 6100;
+  const habitable = 70;
+  const potHab = 25;
+
+  // Axis : distance vs size
+  const margin = { top: 30, right: 40, bottom: 60, left: 60 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  // Scales
+  const xScale = d3.scaleLinear().domain([0, 8000]).range([0, iW]);
+  const yScale = d3.scaleLinear().domain([0, 25]).range([iH, 0]);
+
+  // Grid
+  g.append('g').call(d3.axisLeft(yScale).ticks(5).tickFormat(d => d + '× Terre'))
+    .call(ax => ax.select('.domain').remove())
+    .call(ax => ax.selectAll('.tick line').attr('stroke','rgba(42,95,168,0.2)').attr('x2', iW))
+    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif"));
+
+  g.append('g').attr('transform', `translate(0,${iH})`)
+    .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => d + ' a.l.'))
+    .call(ax => ax.select('.domain').attr('stroke','rgba(42,95,168,0.2)'))
+    .call(ax => ax.selectAll('.tick text').attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif"))
+    .call(ax => ax.selectAll('.tick line').attr('stroke','rgba(42,95,168,0.2)'));
+
+  // Habitable zone band
+  const hzGrad = defs.append('linearGradient').attr('id','hzGrad').attr('x1','0%').attr('x2','100%');
+  hzGrad.append('stop').attr('offset','0%').attr('stop-color','rgba(42,95,168,0.0)');
+  hzGrad.append('stop').attr('offset','50%').attr('stop-color','rgba(42,95,168,0.08)');
+  hzGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(42,95,168,0.0)');
+
+  g.append('rect')
+    .attr('x', 0).attr('y', yScale(3)).attr('width', iW).attr('height', yScale(0.5) - yScale(3))
+    .attr('fill', 'url(#hzGrad)');
+
+  g.append('text')
+    .attr('x', iW - 4).attr('y', yScale(1.7)).attr('text-anchor','end')
+    .attr('fill','rgba(77,143,212,0.4)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .attr('letter-spacing','2')
+    .text('ZONE HABITABLE POTENTIELLE');
+
+  // Generate random exoplanet data
+  const rng = (min, max) => min + Math.random() * (max - min);
+  const exoData = Array.from({length: total}, (_, i) => {
+    const isHab = i < habitable;
+    const isPotHab = i < potHab;
+    return {
+      x: isHab ? rng(10, 2000) : rng(50, 7800),
+      y: isHab ? rng(0.6, 2.8) : rng(0.3, 22),
+      isHab, isPotHab,
+      r: rng(1.5, 4),
+    };
+  });
+
+  // Draw all exoplanets (non-hab first)
+  g.selectAll('.exo-plain')
+    .data(exoData.filter(d => !d.isHab))
+    .enter().append('circle')
+    .attr('cx', d => xScale(d.x)).attr('cy', d => yScale(d.y))
+    .attr('r', d => d.r * 0.7)
+    .attr('fill', 'rgba(80,100,140,0.25)')
+    .attr('stroke', 'none');
+
+  // Habitable
+  g.selectAll('.exo-hab')
+    .data(exoData.filter(d => d.isHab))
+    .enter().append('circle')
+    .attr('cx', d => xScale(d.x)).attr('cy', d => yScale(d.y))
+    .attr('r', d => d.r)
+    .attr('fill', d => d.isPotHab ? 'rgba(77,143,212,0.8)' : 'rgba(77,143,212,0.4)')
+    .attr('stroke', d => d.isPotHab ? 'rgba(122,184,245,0.6)' : 'none')
+    .attr('stroke-width', 1);
+
+  // Earth marker
+  const earthX = xScale(11), earthY = yScale(1);
+  g.append('circle').attr('cx', earthX).attr('cy', earthY).attr('r', 7)
+    .attr('fill', '#2a5fa8').attr('stroke', '#7ab8f5').attr('stroke-width', 2);
+  g.append('text').attr('x', earthX + 12).attr('y', earthY + 4)
+    .attr('fill', '#7ab8f5').attr('font-family',"'Raleway',sans-serif").attr('font-size','10').attr('letter-spacing','1')
+    .text('TERRE');
+
+  // Legend
+  const leg = g.append('g').attr('transform', `translate(${iW - 180}, 8)`);
+  [
+    {c:'rgba(80,100,140,0.4)', l: `~${total} exoplanètes connues`},
+    {c:'rgba(77,143,212,0.7)', l: `~${habitable} potentiellement habitables`},
+    {c:'#2a5fa8', l: 'La Terre (référence)', border:'#7ab8f5'},
+  ].forEach((item, i) => {
+    leg.append('circle').attr('cx',6).attr('cy', i*18).attr('r',5)
+      .attr('fill', item.c).attr('stroke', item.border || 'none').attr('stroke-width', 1);
+    leg.append('text').attr('x',16).attr('y', i*18+4)
+      .attr('fill','rgba(122,184,245,0.6)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+      .text(item.l);
+  });
+
+  // Axis labels
+  g.append('text').attr('x', iW/2).attr('y', iH+50)
+    .attr('text-anchor','middle').attr('fill','rgba(122,184,245,0.4)')
+    .attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .text('DISTANCE EN ANNÉES-LUMIÈRE');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-50)
+    .attr('text-anchor','middle').attr('fill','rgba(122,184,245,0.4)')
+    .attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .text('TAILLE (× TERRE)');
+})();
+
+// ═══════════════════════════════════
+// VIZ 3 : DISTANCE / GÉNÉRATIONS
+// ═══════════════════════════════════
+(function buildDistance() {
+  const container = document.getElementById('distance-viz');
+  const W = container.offsetWidth || 860;
+  const H = 180;
+
+  const svg = d3.select('#distance-viz')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', H)
+    .attr('viewBox', `0 0 ${W} ${H}`);
+
+  const total = 100; // represents 10 000 generations (each icon = 100 gen)
+  const cols = 50;
+  const cellW = (W - 80) / cols;
+  const cellH = 40;
+  const startX = 40;
+  const startY = 30;
+
+  // Labels
+  svg.append('text').attr('x', startX).attr('y', 18)
+    .attr('fill','rgba(122,184,245,0.5)').attr('font-size','9').attr('font-family',"'Raleway',sans-serif").attr('letter-spacing','2')
+    .text('10 000 GÉNÉRATIONS — CHAQUE POINT = 100 GÉNÉRATIONS');
+
+  // Reference : agriculture = 500 gen = 5 points
+  const agriRef = svg.append('g');
+  agriRef.append('line')
+    .attr('x1', startX).attr('x2', startX + 5 * cellW)
+    .attr('y1', startY + cellH + 28).attr('y2', startY + cellH + 28)
+    .attr('stroke','rgba(201,168,76,0.4)').attr('stroke-width',1).attr('stroke-dasharray','3 2');
+  agriRef.append('text').attr('x', startX + 2.5*cellW).attr('y', startY + cellH + 42)
+    .attr('text-anchor','middle').attr('fill','rgba(201,168,76,0.5)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .text('← Toute l\'agriculture humaine (500 gen)');
+
+  // Draw dots
+  for (let i = 0; i < total; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = startX + col * cellW + cellW / 2;
+    const y = startY + row * cellH;
+    const isNear = i < 5;
+
+    svg.append('circle')
+      .attr('cx', x).attr('cy', y)
+      .attr('r', 4)
+      .attr('fill', isNear ? 'rgba(201,168,76,0.7)' : 'rgba(42,95,168,0.35)')
+      .attr('stroke', isNear ? 'rgba(201,168,76,0.9)' : 'rgba(42,95,168,0.5)')
+      .attr('stroke-width', 0.5);
+  }
+
+  // Destination label
+  const lastX = startX + 49 * cellW + cellW / 2;
+  svg.append('text').attr('x', lastX + 8).attr('y', startY + 4)
+    .attr('fill','rgba(122,184,245,0.7)').attr('font-size','8').attr('font-family',"'Raleway',sans-serif")
+    .text('Ross 128 b');
+})();
+
+// ═══════════════════════════════════
+// VIZ 4 : ZOOM COSMIQUE
+// ═══════════════════════════════════
+(function buildZoom() {
+  const container = document.getElementById('zoom-viz');
+  const W = container.offsetWidth || 800;
+  const H = 460;
+
+  const svg = d3.select('#zoom-viz')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', H)
+    .attr('viewBox', `0 0 ${W} ${H}`);
+
+  const defs = svg.append('defs');
+
+  const levels = [
+    { label: 'Univers observable', sublabel: '~100 milliards de galaxies', r: 210, color: 'rgba(42,95,168,0.07)', stroke: 'rgba(42,95,168,0.2)', textColor: 'rgba(42,95,168,0.6)', detail: '93 milliards d\'années-lumière de diamètre', icon: null },
+    { label: 'Voie lactée', sublabel: '200–400 milliards d\'étoiles', r: 165, color: 'rgba(42,95,168,0.1)', stroke: 'rgba(42,95,168,0.28)', textColor: 'rgba(77,143,212,0.7)', detail: '100 000 années-lumière de diamètre', icon: '🌌' },
+    { label: 'Notre bras spiral', sublabel: 'Bras d\'Orion', r: 118, color: 'rgba(42,95,168,0.13)', stroke: 'rgba(77,143,212,0.35)', textColor: 'rgba(100,163,230,0.8)', detail: '3 500 années-lumière d\'épaisseur', icon: null },
+    { label: 'Système solaire', sublabel: '8 planètes, 200+ lunes', r: 68, color: 'rgba(42,95,168,0.2)', stroke: 'rgba(100,163,230,0.5)', textColor: 'rgba(122,184,245,0.9)', detail: '50 unités astronomiques de rayon', icon: '☀️' },
+    { label: 'La Terre', sublabel: 'L\'unique biosphère', r: 22, color: '#1e6eb0', stroke: '#7ab8f5', textColor: '#ffffff', detail: 'Notre seul foyer. Notre seule responsabilité.', icon: '🌍' },
+  ];
+
+  const cx = W / 2;
+  const cy = H / 2;
+
+  // Draw from largest to smallest
+  levels.forEach((lv, i) => {
+    const gId = 'zg_' + i;
+    const gr = defs.append('radialGradient').attr('id', gId).attr('cx','50%').attr('cy','50%');
+    gr.append('stop').attr('offset','0%').attr('stop-color', i === 4 ? '#1e6eb0' : 'rgba(10,22,40,0.0)');
+    gr.append('stop').attr('offset','100%').attr('stop-color','transparent');
+
+    svg.append('circle')
+      .attr('cx', cx).attr('cy', cy).attr('r', lv.r)
+      .attr('fill', lv.color)
+      .attr('stroke', lv.stroke)
+      .attr('stroke-width', i === 4 ? 2 : 1)
+      .attr('stroke-dasharray', i > 0 && i < 4 ? '4 3' : 'none')
+      .style('cursor', 'pointer')
+      .on('mouseenter', (e) => showTip(e, lv.label, `<br><em>${lv.sublabel}</em><br>${lv.detail}`))
+      .on('mouseleave', hideTip);
+
+    // Label on the right side of each ring
+    const angle = -Math.PI / 4 - i * 0.18;
+    const lx = cx + (lv.r + 10) * Math.cos(angle);
+    const ly = cy + (lv.r + 10) * Math.sin(angle);
+
+    if (i < 4) {
+      svg.append('text')
+        .attr('x', lx).attr('y', ly)
+        .attr('fill', lv.textColor)
+        .attr('font-family', "'Raleway', sans-serif")
+        .attr('font-size', '9')
+        .attr('letter-spacing', '1.5')
+        .attr('text-anchor', lx > cx ? 'start' : 'end')
+        .text(lv.label.toUpperCase());
+    }
+  });
+
+  // Earth center label
+  svg.append('text').attr('x', cx).attr('y', cy + 3)
+    .attr('text-anchor','middle').attr('fill','white')
+    .attr('font-family',"'Cinzel',serif").attr('font-size','9').attr('letter-spacing','1')
+    .text('TERRE');
+
+  // Pointer lines connecting labels to rings
+  // (decorative dots on ring edges)
+  [levels[1], levels[2], levels[3]].forEach((lv, ii) => {
+    const i = ii + 1;
+    const angle = -Math.PI / 4 - i * 0.18;
+    const rx = cx + lv.r * Math.cos(angle);
+    const ry = cy + lv.r * Math.sin(angle);
+    svg.append('circle').attr('cx', rx).attr('cy', ry).attr('r', 2.5)
+      .attr('fill', lv.stroke);
+  });
+
+  // Ambient sparkles
+  for (let s = 0; s < 60; s++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 175 + Math.random() * 35;
+    svg.append('circle')
+      .attr('cx', cx + dist * Math.cos(angle))
+      .attr('cy', cy + dist * Math.sin(angle))
+      .attr('r', Math.random() * 1.2 + 0.3)
+      .attr('fill', `rgba(200,220,255,${Math.random() * 0.5 + 0.1})`);
+  }
+})();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav">
+      <a href="index.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Accueil</div>
+          <div class="footer-name">Le Petit Livre Bleu</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-intro.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Introduction</div>
+          <div class="footer-name">Homo biospheris</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre1.html" class="footer-dalle footer-dalle-ch1">
+        <div class="footer-sphere fsp-ch1"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">I</div>
+          <div class="footer-name">La Terre</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre2.html" class="footer-dalle footer-dalle-ch2">
+        <div class="footer-sphere fsp-ch2"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">II</div>
+          <div class="footer-name">La Matière</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre3.html" class="footer-dalle footer-dalle-ch3">
+        <div class="footer-sphere fsp-ch3"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">III</div>
+          <div class="footer-name">La Vie</div>
+        </div>
+      </a>
+    </nav>
+    <div class="footer-bottom">
+      <div class="footer-brand">Le Petit Livre Bleu · Jean-Pierre Goux</div>
+      <div class="footer-copy">Une autre histoire de l'humanité</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

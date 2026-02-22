@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — En route vers Homo biospheris</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;900&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:        #01020a;
+  --deep:        #030611;
+  --blue-dim:    #0d1e42;
+  --blue-mid:    #1a3d7c;
+  --blue-bright: #3a6fbe;
+  --blue-glow:   #6aa8f0;
+  --life-green:  #3cbe78;
+  --life-dim:    #0d3020;
+  --danger-red:  #c03838;
+  --dawn-gold:   #e0b84c;
+  --dawn-pale:   #f0d898;
+  --text-main:   #c8d8f0;
+  --text-dim:    #6878a0;
+  --star-white:  #e8f0ff;
+  --homo-col:    #7ac8e8;   /* Homo biospheris signature */
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text-main);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+.cursor {
+  position:fixed; width:6px; height:6px; background:var(--dawn-gold);
+  border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%);
+  box-shadow: 0 0 10px var(--dawn-gold), 0 0 24px rgba(224,184,76,0.4);
+}
+.cursor-ring {
+  position:fixed; width:32px; height:32px;
+  border:1px solid rgba(224,184,76,0.3);
+  border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%);
+}
+
+#starfield { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+/* ═══════════════════════════════════════
+   HERO — full-screen opening
+═══════════════════════════════════════ */
+#hero {
+  position:relative; width:100vw; height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:1; text-align:center; overflow:hidden;
+}
+
+#hero-canvas {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
+}
+
+.hero-inner { position:relative; z-index:2; }
+
+.series-label {
+  font-family:'Raleway',sans-serif; font-weight:100;
+  letter-spacing:0.6em; font-size:0.65rem;
+  color:var(--blue-dim); text-transform:uppercase; margin-bottom:2.5rem;
+  animation: fadeSlideDown 1.5s ease both;
+}
+
+.intro-label {
+  font-family:'Cinzel',serif; font-weight:400; font-size:0.7rem;
+  letter-spacing:0.45em; color:var(--dawn-gold); opacity:0.6; text-transform:uppercase;
+  margin-bottom:2rem; animation: fadeSlideDown 1.5s 0.3s ease both;
+}
+
+.hero-title {
+  font-family:'Cinzel',serif; font-weight:900;
+  font-size: clamp(2rem, 5.5vw, 5.5rem);
+  line-height: 1.08; letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
+  animation: fadeSlideUp 1.8s 0.5s ease both;
+}
+
+.hero-title .word-homo,
+.hero-title .word-bio,
+.hero-title .word-speris {
+  display: inline;
+  background: none;
+  -webkit-text-fill-color: #4d8fd4;
+  color: #4d8fd4;
+  filter: drop-shadow(0 0 40px rgba(77,143,212,0.7)) drop-shadow(0 0 100px rgba(77,143,212,0.3));
+}
+
+.hero-subtitle {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1rem,2vw,1.3rem);
+  color:var(--text-dim); letter-spacing:0.2em; margin-bottom:4rem;
+  animation:fadeSlideUp 1.8s 0.9s ease both;
+}
+
+.earth-badge {
+  width:90px; height:90px; margin:0 auto 0;
+  position:relative; animation: fadeSlideUp 2s 1.2s ease both;
+}
+#badge-svg { width:100%; height:100%; animation: badge-rotate 40s linear infinite; }
+
+.scroll-hint {
+  position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:0.6rem;
+  animation:fadeIn 3s 2.5s ease both; z-index:2;
+}
+.scroll-hint span {
+  font-family:'Raleway',sans-serif; font-weight:200; font-size:0.6rem;
+  letter-spacing:0.4em; color:var(--text-dim); text-transform:uppercase;
+}
+.scroll-line {
+  width:1px; height:48px;
+  background:linear-gradient(to bottom,var(--dawn-gold),transparent);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════
+   PERILS SECTION
+═══════════════════════════════════════ */
+#perils-section {
+  position:relative; z-index:1; padding:7rem 2rem 4rem;
+  text-align:center; overflow:hidden;
+}
+.perils-intro {
+  max-width:680px; margin:0 auto 4rem;
+  font-size:clamp(1.1rem,2.3vw,1.5rem); line-height:1.85;
+  color:var(--text-main); font-weight:300; font-style:italic;
+}
+.perils-intro strong {
+  color:var(--star-white); font-weight:400; font-style:normal;
+}
+#perils-canvas { display:block; margin:0 auto; width:100%; max-width:860px; height:380px; }
+
+/* ═══════════════════════════════════════
+   NARRATIVE SECTIONS
+═══════════════════════════════════════ */
+.section {
+  position:relative; z-index:1;
+  max-width:780px; margin:0 auto; padding:4rem 2rem;
+}
+.section-label {
+  font-family:'Raleway',sans-serif; font-weight:200; font-size:0.65rem;
+  letter-spacing:0.5em; color:var(--blue-dim); text-transform:uppercase;
+  margin-bottom:2.5rem; display:flex; align-items:center; gap:1.5rem;
+}
+.section-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right,var(--blue-dim),transparent); max-width:80px;
+}
+.section p {
+  font-size:clamp(1rem,2vw,1.2rem); line-height:1.95;
+  color:var(--text-main); font-weight:300; margin-bottom:1.8rem;
+}
+.section p.lead {
+  font-size:clamp(1.1rem,2.2vw,1.35rem); color:var(--star-white);
+}
+.section p:first-of-type::first-letter {
+  font-family:'Cinzel',serif; font-size:4.5rem; line-height:0.75;
+  float:left; margin-right:0.15em; margin-top:0.1em;
+  color:var(--dawn-gold);
+  filter:drop-shadow(0 0 12px rgba(224,184,76,0.5));
+}
+.hl-blue    { color:var(--blue-glow);   font-style:italic; }
+.hl-green   { color:var(--life-green);  font-style:italic; }
+.hl-gold    { color:var(--dawn-gold);   font-style:italic; }
+.hl-danger  { color:#e06060;            font-style:italic; }
+.hl-homo    { color:var(--homo-col);    font-style:italic; }
+
+.pull-quote {
+  border-left:2px solid var(--dawn-gold);
+  padding:1.5rem 2rem; margin:3rem 0;
+  font-size:clamp(1.2rem,2.5vw,1.6rem); font-style:italic;
+  color:var(--star-white);
+  background:linear-gradient(to right,rgba(224,184,76,0.07),transparent);
+  line-height:1.65;
+}
+
+/* ═══════════════════════════════════════
+   REVOLUTION BLEUE VIZ
+═══════════════════════════════════════ */
+.viz-panel {
+  position:relative; z-index:1; padding:3rem 2rem 5rem; text-align:center;
+}
+.viz-title {
+  font-family:'Cinzel',serif; font-size:clamp(0.8rem,1.8vw,0.95rem);
+  letter-spacing:0.3em; color:var(--dawn-gold); text-transform:uppercase; margin-bottom:0.6rem;
+}
+.viz-subtitle {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:0.95rem; color:var(--text-dim); margin-bottom:3rem;
+}
+.viz-caption {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.2em; color:var(--text-dim); max-width:540px;
+  margin:2rem auto 0; line-height:1.8; text-transform:uppercase;
+}
+#revolution-canvas { width:100%; max-width:900px; height:420px; display:block; margin:0 auto; }
+
+/* ═══════════════════════════════════════
+   HOMO BIOSPHERIS PANEL
+═══════════════════════════════════════ */
+#homo-panel {
+  position:relative; z-index:1;
+  max-width:960px; margin:4rem auto;
+  padding:5rem 3rem; text-align:center;
+  border:1px solid rgba(122,200,232,0.15);
+  background:linear-gradient(135deg,rgba(3,6,17,0.97),rgba(1,2,10,0.99));
+  overflow:hidden;
+}
+#homo-panel::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,transparent,var(--homo-col),transparent);
+}
+#homo-panel::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+  background:linear-gradient(to right,transparent,rgba(60,190,120,0.3),transparent);
+}
+#homo-canvas { width:100%; height:300px; display:block; }
+.homo-text {
+  max-width:680px; margin:3rem auto 0;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(1.1rem,2.2vw,1.45rem); line-height:1.95; color:rgba(240,248,255,0.8);
+}
+.homo-text strong { color:var(--homo-col); font-style:normal; font-weight:400; }
+
+/* ═══════════════════════════════════════
+   HOLDERLIN QUOTE
+═══════════════════════════════════════ */
+.epigraph-mid {
+  position:relative; z-index:1;
+  max-width:700px; margin:6rem auto; padding:0 2rem; text-align:center;
+}
+.epigraph-mid blockquote {
+  font-style:italic; font-size:clamp(1.3rem,3vw,2.1rem); font-weight:300;
+  line-height:1.75; color:var(--dawn-pale); position:relative; padding:2rem 3rem;
+}
+.epigraph-mid blockquote::before {
+  content:'\201C'; position:absolute; top:-1rem; left:0.5rem;
+  font-size:5rem; line-height:1; color:rgba(224,184,76,0.2); font-family:Georgia,serif;
+}
+.epigraph-mid .src {
+  font-family:'Raleway',sans-serif; font-weight:200; font-size:0.72rem;
+  letter-spacing:0.3em; color:rgba(224,184,76,0.4); text-transform:uppercase; margin-top:1.2rem;
+}
+
+/* ═══════════════════════════════════════
+   TRANSITION TO CHAPTERS
+═══════════════════════════════════════ */
+#chapters-bridge {
+  position:relative; z-index:1;
+  min-height:70vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:6rem 2rem;
+}
+.bridge-text {
+  max-width:720px; font-size:clamp(1.1rem,2.3vw,1.45rem);
+  line-height:1.95; color:var(--star-white); font-weight:300;
+  margin-bottom:4rem;
+}
+.bridge-text em { color:var(--dawn-gold); }
+
+/* Chapter navigation pills */
+.chapters-nav {
+  display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap;
+}
+.chapter-pill {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.68rem;
+  letter-spacing:0.3em; text-transform:uppercase;
+  padding:0.9rem 2.2rem; border:1px solid rgba(255,255,255,0.1);
+  color:var(--text-dim); text-decoration:none;
+  position:relative; overflow:hidden; transition:all 0.4s;
+  display:inline-flex; align-items:center; gap:0.8rem;
+}
+.chapter-pill:hover { color:var(--star-white); border-color:rgba(255,255,255,0.3); }
+.chapter-pill .pill-num {
+  font-family:'Cinzel',serif; font-size:0.9rem; font-weight:600;
+}
+.ch1 { border-color:rgba(77,143,212,0.25); } .ch1:hover { border-color:rgba(77,143,212,0.7); } .ch1 .pill-num { color:#4d8fd4; }
+.ch2 { border-color:rgba(201,168,76,0.25); } .ch2:hover { border-color:rgba(201,168,76,0.7); } .ch2 .pill-num { color:#c9a84c; }
+.ch3 { border-color:rgba(60,190,120,0.25); } .ch3:hover { border-color:rgba(60,190,120,0.7); } .ch3 .pill-num { color:#3cbe78; }
+
+/* ═══════════════════════════════════════
+   DIVIDERS & UTILS
+═══════════════════════════════════════ */
+.cosmic-divider {
+  display:flex; align-items:center; justify-content:center;
+  padding:3rem 2rem; position:relative; z-index:1; gap:1.5rem;
+}
+.cosmic-divider::before,.cosmic-divider::after {
+  content:''; flex:1; height:1px; max-width:200px;
+  background:linear-gradient(to right,transparent,rgba(224,184,76,0.2));
+}
+.cosmic-divider::after { background:linear-gradient(to left,transparent,rgba(224,184,76,0.2)); }
+.divider-star { color:rgba(224,184,76,0.3); font-size:0.6rem; letter-spacing:0.5em; }
+
+.reveal { opacity:0; transform:translateY(40px); transition:opacity 0.9s ease,transform 0.9s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+.tooltip {
+  position:fixed; background:rgba(1,3,12,0.97);
+  border:1px solid rgba(224,184,76,0.25);
+  padding:0.8rem 1.2rem; font-family:'Raleway',sans-serif; font-weight:300;
+  font-size:0.75rem; letter-spacing:0.1em; color:var(--text-main);
+  pointer-events:none; z-index:1000; max-width:240px; line-height:1.6; opacity:0; transition:opacity 0.2s;
+}
+.tooltip.show { opacity:1; }
+.tooltip strong { display:block; color:var(--dawn-gold); margin-bottom:0.3rem; font-weight:400; }
+
+@keyframes fadeSlideDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeSlideUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn        { from{opacity:0} to{opacity:1} }
+@keyframes scrollPulse   { 0%,100%{opacity:.25} 50%{opacity:1} }
+@keyframes badge-rotate  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:var(--void); }
+::-webkit-scrollbar-thumb { background:rgba(224,184,76,0.3); border-radius:2px; }
+
+/* ══ SITE FOOTER ══ */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.footer-dalle:hover{background:rgba(8,14,32,0.9);}
+.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
+.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
+.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
+.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
+.footer-dalle-ch2 .footer-num{color:#c9a84c;}
+.footer-dalle-ch3 .footer-num{color:#3cbe78;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="series-label">Le Petit Livre Bleu &nbsp;·&nbsp; Introduction</div>
+    <div class="intro-label">En route vers</div>
+    <h1 class="hero-title">
+      <span class="word-homo">Homo </span><span class="word-bio">bio</span><span class="word-speris">spheris</span>
+    </h1>
+    <p class="hero-subtitle">Une métamorphose alimentée par les forces de vie</p>
+    <div class="earth-badge">
+      <svg id="badge-svg" viewBox="0 0 200 200">
+        <defs>
+          <radialGradient id="earthBadge" cx="38%" cy="35%">
+            <stop offset="0%" stop-color="#6ab8e8"/>
+            <stop offset="35%" stop-color="#1e6eb0"/>
+            <stop offset="100%" stop-color="#062040"/>
+          </radialGradient>
+          <clipPath id="bc"><circle cx="100" cy="100" r="75"/></clipPath>
+        </defs>
+        <circle cx="100" cy="100" r="75" fill="url(#earthBadge)"/>
+        <g clip-path="url(#bc)" fill="rgba(45,122,69,0.7)">
+          <ellipse cx="68" cy="85" rx="18" ry="28" transform="rotate(-15,68,85)"/>
+          <ellipse cx="108" cy="78" rx="14" ry="18" transform="rotate(10,108,78)"/>
+          <ellipse cx="138" cy="72" rx="22" ry="16" transform="rotate(-5,138,72)"/>
+        </g>
+        <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(100,180,255,0.25)" stroke-width="4"/>
+        <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(60,190,120,0.12)" stroke-width="8"/>
+        <!-- Orbit ring text-path style dots -->
+        <circle cx="100" cy="18" r="3" fill="rgba(224,184,76,0.8)"/>
+        <circle cx="182" cy="100" r="2" fill="rgba(122,200,232,0.6)"/>
+        <circle cx="100" cy="182" r="2.5" fill="rgba(60,190,120,0.7)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     ÉPIGRAPHE COELHO
+══════════════════════════════════ -->
+<div class="epigraph-mid reveal" style="margin-top:6rem;">
+  <blockquote>L'heure la plus sombre est celle qui vient juste avant le lever du soleil.</blockquote>
+  <div class="src">— Paulo Coelho</div>
+</div>
+
+<!-- ══════════════════════════════════
+     SECTION 1 — LA QUESTION EXISTENTIELLE
+══════════════════════════════════ -->
+<div class="section reveal">
+  <div class="section-label">L'heure sombre</div>
+  <p class="lead">L'aventure humaine pourrait-elle bientôt s'arrêter ?</p>
+  <p>La question est légitime tant les <span class="hl-danger">périls existentiels s'accumulent</span> : tensions grandissantes entre nations nucléarisées, polarisation des sociétés, recul démocratique, inégalités obscènes, emprise croissante des technologies, dérèglement climatique, effondrement de la biodiversité, pandémies, risques biotechnologiques — mais aussi crise de l'identité humaine à l'ère de l'IA et du vivant programmable.</p>
+  <p>Face à la multiplication et l'ampleur de ces crises, les peuples sont dépassés. La sidération, la peur et l'épuisement les paralysent. Leurs stratégies sont à bout de souffle.</p>
+</div>
+
+<!-- VIZ 1 : TOILE DES PÉRILS -->
+<div id="perils-section" class="reveal">
+  <p class="perils-intro">Sommes-nous condamnés à <strong>l'autodestruction</strong>, ou bien à agoniser, exploités par un empire, une poignée de trillionnaires ou une armée de machines sur une planète devenue inhabitable ?</p>
+  <canvas id="perils-canvas"></canvas>
+  <p style="font-family:'Raleway',sans-serif;font-weight:200;font-size:0.68rem;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;margin-top:1.5rem;text-align:center;">Survolez chaque péril — leurs interconnexions amplifient le danger</p>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════════════════════════════════
+     SECTION 2 — LA RÉVOLUTION BLEUE
+══════════════════════════════════ -->
+<div class="section reveal">
+  <div class="section-label">La transformation invisible</div>
+  <p>Rien n'est moins sûr. Derrière les apparences de ce spectacle mortifère, <span class="hl-blue">une transformation invisible est à l'œuvre</span>. La Révolution bleue. Elle n'est ni politique ni technologique, mais humaine. Une métamorphose d'une ampleur inédite — alimentée par les forces de vie et d'évolution.</p>
+  <p>Celles qui, depuis le Big Bang, ont conduit à des structures toujours plus organisées. Des <span class="hl-gold">sauts en complexité</span> qui ont permis l'émergence des atomes, des cellules, des êtres complexes puis de la biosphère, cette fine enveloppe du vivant qui rend la Terre habitable.</p>
+  <div class="pull-quote">"Notre espèce est à l'aube d'une transition de phase, similaire au passage du monocellulaire au multicellulaire."</div>
+</div>
+
+<!-- VIZ 2 : RÉVOLUTION BLEUE — sauts de complexité -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Les sauts en complexité</div>
+  <div class="viz-subtitle">Du Big Bang à Homo biospheris — une même logique évolutive</div>
+  <canvas id="revolution-canvas"></canvas>
+  <div class="viz-caption">Chaque saut crée un Tout radicalement nouveau — l'humanité unie est le prochain saut</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════════════════════════════════
+     HOMO BIOSPHERIS PANEL
+══════════════════════════════════ -->
+<div id="homo-panel" class="reveal">
+  <p style="font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.4em;color:rgba(122,200,232,0.6);text-transform:uppercase;margin-bottom:2rem;">La vision</p>
+  <canvas id="homo-canvas"></canvas>
+  <p class="homo-text">
+    L'humanité pourrait évoluer vers <strong>Homo biospheris</strong> : un collectif planétaire de huit milliards et demi de Sapiens, unis et au service de la biosphère.<br><br>
+    Cet élan imposera de répondre tous ensemble et pour la première fois à la question fondamentale :<br>
+    <em style="color:rgba(240,248,220,0.7)">À quoi sert l'humanité vis-à-vis de la Terre ?</em>
+  </p>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════════════════════════════════
+     SECTION 3 — LE CHEMIN
+══════════════════════════════════ -->
+<div class="section reveal">
+  <div class="section-label">L'amour de la Terre</div>
+  <p>L'établissement de cette vision partagée a le pouvoir de <span class="hl-gold">transmuter notre peur du futur en un désir de métamorphose collective</span>. En proposant un autre paradigme social et économique, la Révolution bleue rendra les transitions en cours irrésistibles — mais bousculera aussi les forces conservatrices.</p>
+  <p>Elle sera donc périlleuse. Mais ce rêve a aussi le pouvoir d'éclairer l'avenir en <span class="hl-green">fédérant tous les peuples autour d'un même lien : l'amour de la Terre.</span></p>
+</div>
+
+<!-- ══════════════════════════════════
+     HÖLDERLIN
+══════════════════════════════════ -->
+<div class="epigraph-mid reveal">
+  <blockquote>Là où croît le péril, croît aussi ce qui sauve.</blockquote>
+  <div class="src">— Friedrich Hölderlin</div>
+</div>
+
+<!-- ══════════════════════════════════
+     TRANSITION VERS LES CHAPITRES
+══════════════════════════════════ -->
+<section id="chapters-bridge">
+  <p class="bridge-text reveal">
+    Au moment précis où l'humanité risque de s'éteindre,<br>
+    elle peut aussi prendre conscience d'elle-même<br>
+    et de son rôle sur cette planète.<br><br>
+    <em>Retournons ensemble à l'origine —<br>
+    pour comprendre qui nous sommes vraiment.</em>
+  </p>
+  <div class="chapters-nav reveal" style="transition-delay:0.3s">
+    <a href="petit-livre-bleu-chapitre1.html" class="chapter-pill ch1">
+      <span class="pill-num">I</span> La Terre
+    </a>
+    <a href="petit-livre-bleu-chapitre2.html" class="chapter-pill ch2">
+      <span class="pill-num">II</span> La Matière
+    </a>
+    <a href="petit-livre-bleu-chapitre3.html" class="chapter-pill ch3">
+      <span class="pill-num">III</span> La Vie
+    </a>
+  </div>
+</section>
+
+<script>
+// ══════════════════════════
+// CURSOR
+// ══════════════════════════
+const cursor=document.getElementById('cursor');
+const cRing=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function ar(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;cRing.style.left=rx+'px';cRing.style.top=ry+'px';requestAnimationFrame(ar);})();
+
+// ══════════════════════════
+// STARFIELD — dawn-tinted
+// ══════════════════════════
+const sfC=document.getElementById('starfield');
+const sfX=sfC.getContext('2d');
+function rsf(){sfC.width=window.innerWidth;sfC.height=window.innerHeight;}
+rsf(); window.addEventListener('resize',rsf);
+const stars=Array.from({length:300},()=>({
+  x:Math.random(),y:Math.random(),
+  r:Math.random()*1.4+0.2,
+  alpha:Math.random()*0.6+0.1,
+  phase:Math.random()*Math.PI*2,
+  speed:Math.random()*0.001+0.0003,
+  hue: Math.random()<0.3 ? 200 : Math.random()<0.5 ? 40 : 220
+}));
+let sft=0;
+(function ds(){
+  sfX.clearRect(0,0,sfC.width,sfC.height);
+  sft+=0.01;
+  stars.forEach(s=>{
+    const a=s.alpha*(0.5+0.5*Math.sin(sft*s.speed*300+s.phase));
+    sfX.beginPath();sfX.arc(s.x*sfC.width,s.y*sfC.height,s.r,0,Math.PI*2);
+    sfX.fillStyle=`hsla(${s.hue},60%,80%,${a})`;sfX.fill();
+  });
+  requestAnimationFrame(ds);
+})();
+
+// ══════════════════════════
+// HERO CANVAS — dawn particles: chaos → order
+// ══════════════════════════
+(function heroCanvas(){
+  const c=document.getElementById('hero-canvas');
+  const ctx=c.getContext('2d');
+  function resize(){c.width=c.offsetWidth;c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  let t=0;
+  const N=80;
+  const pts=Array.from({length:N},(_,i)=>({
+    x:Math.random()*c.width, y:Math.random()*c.height,
+    vx:(Math.random()-0.5)*0.6, vy:(Math.random()-0.5)*0.6,
+    r:Math.random()*2.5+0.5,
+    hue: i < N/3 ? 30+Math.random()*30 : i < 2*N/3 ? 200+Math.random()*30 : 120+Math.random()*40,
+    alpha:Math.random()*0.4+0.05,
+    phase:Math.random()*Math.PI*2
+  }));
+  (function loop(){
+    ctx.clearRect(0,0,c.width,c.height);
+    t+=0.008;
+    // Slow drift toward center-ish (order emerging)
+    const attractStrength=0.000015;
+    pts.forEach(p=>{
+      p.vx+=(c.width/2-p.x)*attractStrength+(Math.random()-0.5)*0.04;
+      p.vy+=(c.height/2-p.y)*attractStrength+(Math.random()-0.5)*0.04;
+      p.vx*=0.99;p.vy*=0.99;
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+    });
+    // Connections
+    pts.forEach((p,i)=>{
+      pts.slice(i+1,i+8).forEach(q=>{
+        const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<100){
+          ctx.strokeStyle=`rgba(200,180,120,${(1-d/100)*0.06})`;
+          ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+        }
+      });
+      ctx.save();
+      ctx.globalAlpha=p.alpha*(0.6+0.4*Math.sin(t*2+p.phase));
+      ctx.fillStyle=`hsl(${p.hue},60%,70%)`;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══════════════════════════
+// SCROLL REVEAL
+// ══════════════════════════
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ══════════════════════════
+// TOOLTIP
+// ══════════════════════════
+const tooltip=document.getElementById('tooltip');
+function showTip(e,t2,txt){tooltip.innerHTML=`<strong>${t2}</strong>${txt}`;tooltip.classList.add('show');moveTip(e);}
+function moveTip(e){tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-10)+'px';}
+function hideTip(){tooltip.classList.remove('show');}
+document.addEventListener('mousemove',e=>{if(tooltip.classList.contains('show'))moveTip(e);});
+
+// ══════════════════════════════════════════════════════════
+// ██  VIZ 1 : TOILE DES PÉRILS (force-directed)  ██
+// ══════════════════════════════════════════════════════════
+(function buildPerils(){
+  const container=document.getElementById('perils-canvas');
+  const W=container.offsetWidth||840;
+  const H=380;
+  container.width=W; container.height=H;
+  const ctx=container.getContext('2d');
+
+  const perils=[
+    {id:0, label:'Nucléaire',    x:0,y:0, r:22, color:'#c03838', sub:'Tensions entre\npuissances nucléarisées'},
+    {id:1, label:'Climat',       x:0,y:0, r:28, color:'#e06820', sub:'Dérèglement climatique\net catastrophes'},
+    {id:2, label:'Biodiversité', x:0,y:0, r:24, color:'#a05820', sub:'Effondrement du vivant\net des écosystèmes'},
+    {id:3, label:'Inégalités',   x:0,y:0, r:20, color:'#904040', sub:'Inégalités obscènes\net démocraties affaiblies'},
+    {id:4, label:'IA',           x:0,y:0, r:22, color:'#507090', sub:'Emprise technologique\net crise identitaire'},
+    {id:5, label:'Pandémies',    x:0,y:0, r:18, color:'#607840', sub:'Risques biologiques\net épidémiques'},
+    {id:6, label:'Polarisation', x:0,y:0, r:20, color:'#803838', sub:'Fragmentation\ndes sociétés'},
+    {id:7, label:'Biotechs',     x:0,y:0, r:18, color:'#606060', sub:'Vivant programmable\net risques existentiels'},
+  ];
+
+  const links=[
+    [0,2],[0,4],[0,6],[1,2],[1,3],[1,5],[2,5],[3,6],[4,7],[4,6],[5,7],[1,6],[0,3]
+  ];
+
+  // Place in circle
+  const angles=perils.map((_,i)=>i*(Math.PI*2/perils.length)-Math.PI/2);
+  const R=Math.min(W,H)*0.36;
+  perils.forEach((p,i)=>{p.x=W/2+Math.cos(angles[i])*R; p.y=H/2+Math.sin(angles[i])*R;});
+
+  // Simple physics
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.01;
+
+    // Pulsing center glow
+    const cg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,120);
+    cg.addColorStop(0,'rgba(192,56,56,0.06)');
+    cg.addColorStop(1,'transparent');
+    ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(W/2,H/2,120,0,Math.PI*2); ctx.fill();
+
+    // Links
+    links.forEach(([a,b])=>{
+      const pa=perils[a],pb=perils[b];
+      const pulse=0.3+0.2*Math.sin(t*1.5+(a+b)*0.5);
+      ctx.strokeStyle=`rgba(200,80,80,${pulse})`;
+      ctx.lineWidth=1; ctx.setLineDash([3,5]);
+      ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Nodes
+    perils.forEach((p,i)=>{
+      const wobble=Math.sin(t*0.8+i*0.7)*4;
+      const px=p.x+wobble*0.5, py=p.y+wobble*0.5;
+
+      // Glow
+      const gr=ctx.createRadialGradient(px,py,0,px,py,p.r*2.5);
+      gr.addColorStop(0,p.color); gr.addColorStop(1,'transparent');
+      ctx.globalAlpha=0.2+0.1*Math.sin(t+i); ctx.fillStyle=gr;
+      ctx.beginPath(); ctx.arc(px,py,p.r*2.5,0,Math.PI*2); ctx.fill();
+
+      ctx.globalAlpha=0.75+0.15*Math.sin(t*1.2+i); ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2); ctx.fill();
+
+      // Shine
+      const sh=ctx.createRadialGradient(px-p.r*0.3,py-p.r*0.3,0,px,py,p.r);
+      sh.addColorStop(0,'rgba(255,255,255,0.25)'); sh.addColorStop(1,'transparent');
+      ctx.fillStyle=sh; ctx.fill();
+      ctx.globalAlpha=1;
+
+      // Label
+      ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+      ctx.fillStyle='rgba(220,200,180,0.8)'; ctx.textAlign='center';
+      ctx.fillText(p.label, px, py+p.r+13);
+
+      // Invisible hit area for tooltip
+      const hitEl=document.getElementById('perils-canvas');
+      p._px=px; p._py=py;
+    });
+
+    requestAnimationFrame(loop);
+  })();
+
+  container.addEventListener('mousemove',e=>{
+    const rect=container.getBoundingClientRect();
+    const mx2=e.clientX-rect.left, my2=e.clientY-rect.top;
+    let hit=null;
+    perils.forEach(p=>{
+      const dx=mx2-p._px, dy=my2-p._py;
+      if(Math.sqrt(dx*dx+dy*dy)<p.r+12) hit=p;
+    });
+    if(hit) showTip(e,hit.label,`<br><em>${hit.sub.replace('\n','<br>')}</em>`);
+    else hideTip();
+  });
+  container.addEventListener('mouseleave',hideTip);
+})();
+
+// ══════════════════════════════════════════════════════════
+// ██  VIZ 2 : SAUTS EN COMPLEXITÉ (révolution bleue)  ██
+// ══════════════════════════════════════════════════════════
+(function buildRevolution(){
+  const canvas=document.getElementById('revolution-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){
+    const r=canvas.parentElement.getBoundingClientRect();
+    W=canvas.width=Math.min(r.width,900); H=canvas.height=420;
+  }
+  resize(); window.addEventListener('resize',resize);
+
+  const steps=[
+    { label:'Big Bang',         sub:'13,8 Mds d\'ans', color:'#f0c870', r:16, detail:'Singularité initiale\nParticules élémentaires' },
+    { label:'Proton',           sub:'10⁻⁶ sec',        color:'#c8a0f0', r:20, detail:'Quarks assemblés\nMatière stable' },
+    { label:'Atome',            sub:'380 000 ans',      color:'#90b0e8', r:22, detail:'Noyau + électrons\nPremière chimie possible' },
+    { label:'Étoile',           sub:'200 M d\'ans',     color:'#f5c040', r:26, detail:'Fusion nucléaire\nForge des éléments' },
+    { label:'Cellule',          sub:'3,5 Mds d\'ans',   color:'#50e080', r:28, detail:'Premier vivant\nAuto-reproduction' },
+    { label:'Eucaryote',        sub:'2 Mds d\'ans',     color:'#70d070', r:30, detail:'Cellule complexe\nNoyau différencié' },
+    { label:'Multicellulaire',  sub:'700 M d\'ans',     color:'#90c060', r:32, detail:'Organismes complexes\nSpécialisation cellulaire' },
+    { label:'Biosphère',         sub:'500 M d\'ans',     color:'#4d8fd4', r:36, detail:'Fine enveloppe du vivant\nQui rend la Terre habitable\nL\'équipage et le vaisseau' },
+    { label:'Homo sapiens',     sub:'300 000 ans',      color:'#e0a060', r:34, detail:'Conscience, langage\nCulture et civilisation' },
+    { label:'Homo biospheris',  sub:'À venir',          color:'#7ac8e8', r:42, detail:'Collectif planétaire\nAu service de la biosphère\n8,5 milliards de Sapiens unis', future:true },
+  ];
+
+  const N=steps.length;
+  let t=0;
+  const margin={l:50,r:50,t:60,b:60};
+  const iW=W-margin.l-margin.r;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.012;
+
+    const cy=H/2;
+
+    // Spine line
+    const lineGrad=ctx.createLinearGradient(margin.l,0,W-margin.r,0);
+    lineGrad.addColorStop(0,'rgba(240,200,112,0.4)');
+    lineGrad.addColorStop(0.7,'rgba(80,200,100,0.4)');
+    lineGrad.addColorStop(1,'rgba(122,200,232,0.6)');
+    ctx.strokeStyle=lineGrad; ctx.lineWidth=1.5; ctx.setLineDash([5,6]);
+    ctx.beginPath(); ctx.moveTo(margin.l,cy); ctx.lineTo(W-margin.r,cy); ctx.stroke();
+    ctx.setLineDash([]);
+
+    steps.forEach((s,i)=>{
+      const x=margin.l+i*(iW/(N-1));
+      const wobble=Math.sin(t*0.7+i*0.5)*(s.future?5:2);
+      const py=cy+wobble;
+
+      // Vertical connector
+      ctx.strokeStyle=`rgba(255,255,255,0.08)`; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x,cy); ctx.lineTo(x,py); ctx.stroke();
+
+      // Jump arrow between steps
+      if(i<N-1){
+        const nx=margin.l+(i+1)*(iW/(N-1));
+        const jumpH=20+i*2+(s.future?10:0);
+        ctx.strokeStyle=`rgba(255,255,255,0.06)`; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(x+s.r,cy-10);
+        ctx.quadraticCurveTo((x+nx)/2,cy-jumpH,nx-steps[i+1].r,cy-10);
+        ctx.stroke();
+      }
+
+      // Glow
+      if(s.future){
+        const pulseR=s.r+8*Math.sin(t*1.2);
+        const gr=ctx.createRadialGradient(x,py,0,x,py,pulseR*2);
+        gr.addColorStop(0,'rgba(122,200,232,0.3)'); gr.addColorStop(1,'transparent');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(x,py,pulseR*2.5,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(122,200,232,0.35)'; ctx.lineWidth=1.5;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.arc(x,py,s.r+14+5*Math.sin(t),0,Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        const gr=ctx.createRadialGradient(x,py,0,x,py,s.r*2);
+        gr.addColorStop(0,s.color+'44'); gr.addColorStop(1,'transparent');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(x,py,s.r*2.2,0,Math.PI*2); ctx.fill();
+      }
+
+      // Circle
+      ctx.fillStyle=s.future?'rgba(122,200,232,0.15)':s.color;
+      ctx.globalAlpha=s.future?0.9:0.8;
+      ctx.beginPath(); ctx.arc(x,py,s.r,0,Math.PI*2); ctx.fill();
+      if(s.future){
+        ctx.strokeStyle='rgba(122,200,232,0.8)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(x,py,s.r,0,Math.PI*2); ctx.stroke();
+      }
+      // Shine
+      const sh=ctx.createRadialGradient(x-s.r*0.3,py-s.r*0.3,0,x,py,s.r);
+      sh.addColorStop(0,'rgba(255,255,255,0.3)'); sh.addColorStop(1,'transparent');
+      ctx.fillStyle=sh; ctx.beginPath(); ctx.arc(x,py,s.r,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+
+      // Label — alternating above/below
+      const above=i%2===0;
+      const labelY=above?py-s.r-26:py+s.r+26;
+      const subY=above?labelY-14:labelY+14;
+
+      ctx.textAlign='center';
+      ctx.font=`${s.future?'600':'400'} ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+      ctx.fillStyle=s.future?'rgba(122,200,232,0.95)':s.color;
+      ctx.fillText(s.label, x, labelY);
+
+      ctx.font=`200 ${Math.min(8,W*0.010)}px 'Raleway', sans-serif`;
+      ctx.fillStyle='rgba(160,180,160,0.45)';
+      ctx.fillText(s.sub, x, above?labelY+12:labelY-12);
+
+      // Tooltip target
+      s._x=x; s._y=py;
+    });
+
+    // "Homo biospheris" glowing label
+    const hs=steps[N-1];
+    ctx.font=`100 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+    ctx.fillStyle=`rgba(122,200,232,${0.4+0.2*Math.sin(t)})`;
+    ctx.textAlign='center';
+    ctx.fillText('— le prochain saut —', hs._x, hs._y+hs.r+42);
+
+    requestAnimationFrame(loop);
+  })();
+
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx2=e.clientX-rect.left, my2=e.clientY-rect.top;
+    const scaleX=W/rect.width, scaleY=H/rect.height;
+    const cx2=mx2*scaleX, cy2=my2*scaleY;
+    let hit=null;
+    steps.forEach(s=>{
+      if(!s._x) return;
+      const dx=cx2-s._x,dy=cy2-s._y;
+      if(Math.sqrt(dx*dx+dy*dy)<s.r+14) hit=s;
+    });
+    if(hit) showTip(e,hit.label,`<br><em>${hit.detail.replace(/\n/g,'<br>')}</em><br><span style="color:rgba(160,180,160,0.5)">${hit.sub}</span>`);
+    else hideTip();
+  });
+  canvas.addEventListener('mouseleave',hideTip);
+})();
+
+// ══════════════════════════════════════════════════════════
+// ██  VIZ 3 : HOMO BIOSPHERIS  ██
+// ══════════════════════════════════════════════════════════
+(function buildHomo(){
+  const canvas=document.getElementById('homo-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=canvas.offsetWidth; H=canvas.height=300;}
+  resize(); window.addEventListener('resize',resize);
+
+  const cx=()=>W/2, cy=()=>H/2;
+  let t=0;
+
+  // 8.5 billion represented as particles flowing toward a collective circle
+  const N=120;
+  const particles=Array.from({length:N},(_,i)=>({
+    // Start scattered
+    sx: (Math.random()-0.5)*W*0.9,
+    sy: (Math.random()-0.5)*H*0.9,
+    // End position: circle around Earth
+    angle: i*(Math.PI*2/N),
+    orbitR: 100+Math.random()*20,
+    phase: Math.random()*Math.PI*2,
+    speed: 0.003+Math.random()*0.004,
+    r: 1.5+Math.random()*2,
+    color: `hsl(${180+Math.random()*60},${60+Math.random()*30}%,${55+Math.random()*25}%)`,
+    alpha: 0.5+Math.random()*0.4,
+    assembled: Math.random() < 0.65, // 65% already moving toward assembly
+  }));
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.01;
+
+    const ccx=cx(), ccy=cy();
+
+    // Earth at center
+    const earthR=36;
+    const earthGrad=ctx.createRadialGradient(ccx-earthR*0.3,ccy-earthR*0.3,0,ccx,ccy,earthR);
+    earthGrad.addColorStop(0,'#6ab8e8');
+    earthGrad.addColorStop(0.4,'#1e6eb0');
+    earthGrad.addColorStop(1,'#062040');
+    ctx.fillStyle=earthGrad; ctx.beginPath(); ctx.arc(ccx,ccy,earthR,0,Math.PI*2); ctx.fill();
+
+    // Earth glow
+    const eg=ctx.createRadialGradient(ccx,ccy,earthR*0.7,ccx,ccy,earthR*2.5);
+    eg.addColorStop(0,'rgba(122,200,232,0.15)'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(ccx,ccy,earthR*2.5,0,Math.PI*2); ctx.fill();
+
+    // Orbit ring
+    ctx.strokeStyle='rgba(122,200,232,0.12)'; ctx.lineWidth=1; ctx.setLineDash([3,6]);
+    ctx.beginPath(); ctx.arc(ccx,ccy,110,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Particles
+    particles.forEach((p,i)=>{
+      let px,py;
+      if(p.assembled){
+        // Orbit around Earth
+        const a=p.angle+t*p.speed+(Math.sin(t*0.5+p.phase)*0.1);
+        px=ccx+Math.cos(a)*p.orbitR;
+        py=ccy+Math.sin(a)*p.orbitR;
+      } else {
+        // Still scattered, slowly drifting toward center
+        const progress=Math.min(1,(t*0.03+p.phase*0.05));
+        px=p.sx*(1-progress)+ccx;
+        py=p.sy*(1-progress)+ccy;
+        if(progress>0.95) p.assembled=true;
+      }
+
+      // Glow
+      const g=ctx.createRadialGradient(px,py,0,px,py,p.r*2.5);
+      g.addColorStop(0,p.color); g.addColorStop(1,'transparent');
+      ctx.globalAlpha=p.alpha*0.3; ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(px,py,p.r*2.5,0,Math.PI*2); ctx.fill();
+
+      ctx.globalAlpha=p.alpha; ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    });
+
+    // Labels
+    ctx.textAlign='center'; ctx.font=`200 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+    ctx.fillStyle='rgba(122,200,232,0.4)'; ctx.letterSpacing='2px';
+    ctx.fillText('8 500 000 000 SAPIENS', ccx, ccy+earthR*2.5+20);
+
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav">
+      <a href="index.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Accueil</div>
+          <div class="footer-name">Le Petit Livre Bleu</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-intro.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Introduction</div>
+          <div class="footer-name">Homo biospheris</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre1.html" class="footer-dalle footer-dalle-ch1">
+        <div class="footer-sphere fsp-ch1"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">I</div>
+          <div class="footer-name">La Terre</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre2.html" class="footer-dalle footer-dalle-ch2">
+        <div class="footer-sphere fsp-ch2"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">II</div>
+          <div class="footer-name">La Matière</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre3.html" class="footer-dalle footer-dalle-ch3">
+        <div class="footer-sphere fsp-ch3"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">III</div>
+          <div class="footer-name">La Vie</div>
+        </div>
+      </a>
+    </nav>
+    <div class="footer-bottom">
+      <div class="footer-brand">Le Petit Livre Bleu · Jean-Pierre Goux</div>
+      <div class="footer-copy">Une autre histoire de l'humanité</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

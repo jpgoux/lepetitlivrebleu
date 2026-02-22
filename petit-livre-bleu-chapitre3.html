@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Petit Livre Bleu — Chapitre 3 : La Vie</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #02040a;
+  --deep: #040c06;
+  --cosmos: #061408;
+  --text-primary: #c8d8c0;
+  --text-dim: #6a8870;
+  --star-white: #e8f5e0;
+  --gold: #c9a84c;
+  --gold-dim: #6a5020;
+  /* Chapter 3: life greens */
+  --life-bright: #50e080;
+  --life-mid:    #28a050;
+  --life-dim:    #145028;
+  --life-pale:   #a0d8b0;
+  --life-glow:   #80f0a0;
+  --membrane:    #60c870;
+  --amino:       #e8d060;
+  --rna:         #d080f0;
+  --atp:         #f06050;
+  --water:       #60a8e0;
+  --mystery:     #f0f0ff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text-primary);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+.cursor {
+  position:fixed; width:6px; height:6px;
+  background:var(--life-bright);
+  border-radius:50%; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 12px var(--life-bright),0 0 28px rgba(80,224,128,0.35);
+}
+.cursor-ring {
+  position:fixed; width:32px; height:32px;
+  border:1px solid rgba(80,224,128,0.3);
+  border-radius:50%; pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+}
+
+#starfield { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+/* ── COVER ── */
+#cover {
+  position:relative; height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:1; text-align:center; overflow:hidden;
+}
+#cover-canvas {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:-1; pointer-events:none;
+}
+.book-label {
+  font-family:'Raleway',sans-serif; font-weight:200;
+  letter-spacing:0.5em; font-size:0.7rem;
+  color:var(--life-dim); text-transform:uppercase;
+  margin-bottom:2.5rem; animation:fadeInDown 2s ease forwards;
+}
+.chapter-num {
+  font-family:'Cinzel',serif; font-weight:400; font-size:0.75rem;
+  letter-spacing:0.4em; color:var(--gold-dim); text-transform:uppercase;
+  margin-bottom:1.5rem; animation:fadeInDown 2s 0.3s ease both;
+}
+h1.title {
+  font-family:'Cinzel',serif; font-weight:600;
+  font-size:clamp(4rem,10vw,9.5rem); letter-spacing:0.05em; line-height:1;
+  background:linear-gradient(155deg,#e8f5e0 0%,#50e080 35%,#145028 90%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:1.8rem; animation:fadeInUp 2s 0.5s ease both;
+}
+.title-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:1.1rem; color:var(--text-dim); letter-spacing:0.15em;
+  animation:fadeInUp 2s 0.8s ease both; margin-bottom:4rem;
+}
+.scroll-hint {
+  position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:0.6rem;
+  animation:fadeIn 3s 2s ease both;
+}
+.scroll-hint span {
+  font-family:'Raleway',sans-serif; font-weight:200;
+  font-size:0.65rem; letter-spacing:0.35em; color:var(--text-dim); text-transform:uppercase;
+}
+.scroll-line {
+  width:1px; height:50px;
+  background:linear-gradient(to bottom,var(--life-dim),transparent);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── EPIGRAPH ── */
+.epigraph-section {
+  position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+  min-height:55vh; padding:5rem 2rem;
+}
+.epigraph-inner { max-width:660px; text-align:center; }
+blockquote {
+  font-style:italic; font-size:clamp(1.2rem,2.5vw,1.7rem); font-weight:300;
+  line-height:1.8; color:var(--star-white); position:relative; padding:2rem 3rem;
+}
+blockquote::before {
+  content:'\201C'; position:absolute; top:-0.5rem; left:0.5rem;
+  font-size:5rem; line-height:1; color:var(--life-dim); font-family:Georgia,serif;
+}
+.quote-source {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.75rem;
+  letter-spacing:0.3em; color:var(--gold-dim); text-transform:uppercase; margin-top:1.5rem;
+}
+
+/* ── SECTIONS ── */
+.section {
+  position:relative; z-index:1;
+  max-width:780px; margin:0 auto; padding:4rem 2rem;
+}
+.section-label {
+  font-family:'Raleway',sans-serif; font-weight:200; font-size:0.65rem;
+  letter-spacing:0.5em; color:var(--life-dim); text-transform:uppercase;
+  margin-bottom:2.5rem; display:flex; align-items:center; gap:1.5rem;
+}
+.section-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right,var(--life-dim),transparent); max-width:80px;
+}
+.section p {
+  font-size:clamp(1rem,2vw,1.2rem); line-height:1.95;
+  color:var(--text-primary); font-weight:300; margin-bottom:1.8rem;
+}
+.section p:first-of-type::first-letter {
+  font-family:'Cinzel',serif; font-size:4.5rem; line-height:0.75;
+  float:left; margin-right:0.15em; margin-top:0.1em;
+  color:var(--life-bright);
+  filter:drop-shadow(0 0 12px rgba(80,224,128,0.5));
+}
+.highlight { color:var(--life-glow); font-style:italic; }
+.highlight-mystery { color:var(--mystery); font-style:italic; }
+.pull-quote {
+  border-left:2px solid var(--life-mid);
+  padding:1.5rem 2rem; margin:3rem 0;
+  font-size:clamp(1.2rem,2.5vw,1.55rem); font-style:italic;
+  color:var(--star-white);
+  background:linear-gradient(to right,rgba(80,224,128,0.07),transparent);
+  line-height:1.6;
+}
+
+/* ── VIZ PANELS ── */
+.viz-panel {
+  position:relative; z-index:1; padding:3rem 2rem 5rem; text-align:center;
+}
+.viz-title {
+  font-family:'Cinzel',serif; font-size:clamp(0.8rem,1.8vw,0.95rem);
+  letter-spacing:0.3em; color:var(--life-bright); text-transform:uppercase; margin-bottom:0.6rem;
+}
+.viz-subtitle {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:0.95rem; color:var(--text-dim); margin-bottom:3rem;
+}
+.viz-caption {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.2em; color:var(--text-dim); max-width:540px;
+  margin:2rem auto 0; line-height:1.8; text-transform:uppercase;
+}
+
+/* ── MAIN ANIMATION ── */
+#assembly-viz { width:100%; max-width:980px; margin:0 auto; position:relative; }
+#assembly-canvas { width:100%; height:520px; display:block; cursor:pointer; }
+.assembly-controls {
+  display:flex; justify-content:center; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;
+}
+.assembly-btn {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.7rem;
+  letter-spacing:0.3em; text-transform:uppercase;
+  padding:0.6rem 1.8rem; border:1px solid rgba(80,224,128,0.25);
+  background:transparent; color:var(--text-dim); cursor:pointer; transition:all 0.3s;
+}
+.assembly-btn:hover,.assembly-btn.active {
+  border-color:var(--life-bright); color:var(--life-bright);
+  background:rgba(80,224,128,0.05);
+}
+
+/* ── MYSTERY PANEL ── */
+.mystery-panel {
+  position:relative; z-index:1;
+  max-width:900px; margin:4rem auto;
+  padding:4rem 3rem; text-align:center;
+  border:1px solid rgba(80,224,128,0.12);
+  background:linear-gradient(135deg,rgba(4,12,6,0.95),rgba(2,4,10,0.98));
+  overflow:hidden;
+}
+.mystery-panel::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,transparent,var(--life-mid),transparent);
+}
+.mystery-panel::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+  background:linear-gradient(to right,transparent,rgba(80,224,128,0.2),transparent);
+}
+.mystery-title {
+  font-family:'Cinzel',serif; font-size:clamp(0.8rem,1.5vw,0.95rem);
+  letter-spacing:0.4em; color:var(--life-mid); text-transform:uppercase; margin-bottom:2rem;
+}
+#mystery-canvas { width:100%; height:260px; display:block; }
+.mystery-text {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(1.1rem,2vw,1.35rem); line-height:1.9;
+  color:rgba(240,245,240,0.7); margin-top:2rem;
+}
+
+/* ── OSIRIS VIZ ── */
+#osiris-viz { width:100%; max-width:860px; margin:0 auto; height:280px; }
+
+/* ── TIMELINE LIFE ── */
+#lifeline-viz { width:100%; max-width:900px; margin:0 auto; height:240px; }
+
+/* ── STATS ── */
+.stats-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1.5rem; max-width:900px; margin:3rem auto; padding:0 2rem;
+  position:relative; z-index:1;
+}
+.stat-card {
+  background:linear-gradient(135deg,rgba(4,12,6,0.9),rgba(2,4,10,0.95));
+  border:1px solid rgba(40,160,80,0.18); border-radius:2px;
+  padding:2rem 1.5rem; text-align:center; position:relative; overflow:hidden;
+  transition:border-color 0.3s;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,transparent,var(--life-dim),transparent);
+}
+.stat-card:hover { border-color:rgba(80,224,128,0.35); }
+.stat-number {
+  font-family:'Cinzel',serif; font-size:clamp(1.6rem,3.5vw,2.4rem);
+  font-weight:600; color:var(--life-bright); line-height:1; margin-bottom:0.6rem;
+  filter:drop-shadow(0 0 10px rgba(80,224,128,0.35));
+}
+.stat-label {
+  font-family:'Raleway',sans-serif; font-weight:300; font-size:0.68rem;
+  letter-spacing:0.3em; color:var(--text-dim); text-transform:uppercase; line-height:1.5;
+}
+
+/* ── DIVIDERS ── */
+.cosmic-divider {
+  display:flex; align-items:center; justify-content:center;
+  padding:3rem 2rem; position:relative; z-index:1; gap:1.5rem;
+}
+.cosmic-divider::before,.cosmic-divider::after {
+  content:''; flex:1; height:1px; max-width:200px;
+  background:linear-gradient(to right,transparent,rgba(40,160,80,0.25));
+}
+.cosmic-divider::after { background:linear-gradient(to left,transparent,rgba(40,160,80,0.25)); }
+.divider-star { color:var(--life-dim); font-size:0.6rem; letter-spacing:0.5em; }
+
+/* ── FINALE ── */
+.finale-section {
+  position:relative; z-index:1; min-height:75vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:6rem 2rem;
+}
+.finale-text {
+  max-width:700px; font-size:clamp(1.1rem,2.5vw,1.4rem);
+  line-height:2; color:var(--star-white); font-weight:300;
+}
+.finale-text em { color:var(--life-glow); }
+.finale-cta {
+  margin-top:5rem; font-family:'Raleway',sans-serif; font-weight:200;
+  font-size:0.65rem; letter-spacing:0.5em; color:var(--text-dim); text-transform:uppercase;
+}
+
+/* ── REVEAL ── */
+.reveal { opacity:0; transform:translateY(40px); transition:opacity 0.9s ease,transform 0.9s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ── TOOLTIP ── */
+.tooltip {
+  position:fixed; background:rgba(2,8,4,0.97);
+  border:1px solid rgba(40,160,80,0.35);
+  padding:0.8rem 1.2rem; font-family:'Raleway',sans-serif; font-weight:300;
+  font-size:0.75rem; letter-spacing:0.1em; color:var(--text-primary);
+  pointer-events:none; z-index:1000; max-width:240px; line-height:1.6; opacity:0; transition:opacity 0.2s;
+}
+.tooltip.show { opacity:1; }
+.tooltip strong { display:block; color:var(--life-bright); margin-bottom:0.3rem; font-weight:400; }
+
+@keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn     { from{opacity:0} to{opacity:1} }
+@keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+@keyframes cellPulse {
+  0%,100% { box-shadow:0 0 20px rgba(80,224,128,0.2); }
+  50%     { box-shadow:0 0 60px rgba(80,224,128,0.5),0 0 120px rgba(80,224,128,0.15); }
+}
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:var(--void); }
+::-webkit-scrollbar-thumb { background:var(--life-dim); border-radius:2px; }
+
+/* ══ SITE FOOTER ══ */
+footer.site-footer{position:relative;z-index:1;background:rgba(1,3,12,0.98);border-top:1px solid rgba(255,255,255,0.05);padding:3rem 2rem 2.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+.footer-nav{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;}
+.footer-dalle{position:relative;overflow:hidden;background:rgba(4,8,20,0.6);border:1px solid rgba(255,255,255,0.05);padding:1.4rem 2rem 1.2rem;text-decoration:none;display:flex;align-items:center;gap:1.2rem;transition:background 0.3s,border-color 0.3s;flex:1;min-width:160px;max-width:280px;}
+.footer-dalle::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.footer-dalle-intro::before,.footer-dalle-ch1::before{background:linear-gradient(to right,transparent,rgba(77,143,212,0.5),transparent);}
+.footer-dalle-ch2::before{background:linear-gradient(to right,transparent,rgba(201,168,76,0.5),transparent);}
+.footer-dalle-ch3::before{background:linear-gradient(to right,transparent,rgba(60,190,120,0.5),transparent);}
+.footer-dalle:hover{background:rgba(8,14,32,0.9);}
+.footer-dalle-intro:hover,.footer-dalle-ch1:hover{border-color:rgba(77,143,212,0.2);}
+.footer-dalle-ch2:hover{border-color:rgba(201,168,76,0.2);}
+.footer-dalle-ch3:hover{border-color:rgba(60,190,120,0.2);}
+.footer-sphere{width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;}
+.footer-sphere::after{content:'';position:absolute;top:20%;left:22%;width:32%;height:26%;background:rgba(255,255,255,0.2);border-radius:50%;filter:blur(2px);}
+.fsp-intro,.fsp-ch1{background:radial-gradient(circle at 38% 32%,#7ab8f5,#2a5fa8,#040e28);box-shadow:0 0 12px rgba(77,143,212,0.4);}
+.fsp-ch2{background:radial-gradient(circle at 38% 32%,#f5d878,#c88030,#281408);box-shadow:0 0 12px rgba(201,168,76,0.4);}
+.fsp-ch3{background:radial-gradient(circle at 38% 32%,#80f0a0,#28a050,#041408);box-shadow:0 0 12px rgba(60,190,120,0.4);}
+.footer-dalle-text{display:flex;flex-direction:column;gap:0.2rem;}
+.footer-num{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;}
+.footer-dalle-intro .footer-num,.footer-dalle-ch1 .footer-num{color:#4d8fd4;}
+.footer-dalle-ch2 .footer-num{color:#c9a84c;}
+.footer-dalle-ch3 .footer-num{color:#3cbe78;}
+.footer-name{font-family:'Raleway',sans-serif;font-weight:300;font-size:0.68rem;letter-spacing:0.22em;color:rgba(200,216,240,0.55);text-transform:uppercase;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.3em;color:rgba(90,106,144,0.6);text-transform:uppercase;}
+.footer-copy{font-family:'Raleway',sans-serif;font-weight:100;font-size:0.6rem;letter-spacing:0.25em;color:rgba(90,106,144,0.4);}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="tooltip" id="tooltip"></div>
+<canvas id="starfield"></canvas>
+
+<!-- ══════ COVER ══════ -->
+<section id="cover">
+  <canvas id="cover-canvas"></canvas>
+  <div class="book-label">Le Petit Livre Bleu</div>
+  <div class="chapter-num">Chapitre III</div>
+  <h1 class="title">La Vie</h1>
+  <p class="title-sub">L'anomalie dynamique qui refuse de disparaître</p>
+  <div class="scroll-hint">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══════ ÉPIGRAPHE ══════ -->
+<section class="epigraph-section reveal">
+  <div class="epigraph-inner">
+    <blockquote>Si vous voulez faire une tarte aux pommes à partir de rien, il vous faudra d'abord inventer l'univers.</blockquote>
+    <div class="quote-source">— Carl Sagan</div>
+  </div>
+</section>
+
+<!-- ══════ SECTION 1 — LE VIVANT VS L'INERTE ══════ -->
+<div class="section reveal">
+  <div class="section-label">L'anomalie du vivant</div>
+  <p>Si l'ensemble de la matière est pétri des mêmes particules élémentaires, qu'est-ce qui distingue alors le vivant de l'inerte ? Tout, dans l'Univers, tend à se disperser. Les structures se défont, les différences s'effacent, l'ordre se dilue. La matière inerte obéit à cette <span class="highlight">pente irréversible inscrite au cœur des lois de la thermodynamique</span>.</p>
+  <p>La vie semble au contraire faire l'inverse. Elle se maintient, se répare, se reproduit, se structure et se complexifie au fil du temps. Elle persiste là où tout devrait se dissoudre — non pas en violant les lois de la physique, mais en <span class="highlight">s'organisant loin de l'équilibre</span> grâce à des flux constants d'énergie.</p>
+  <div class="pull-quote">"Une matière qui refuse de disparaître. Une insistance improbable de l'ordre au sein du chaos cosmique."</div>
+</div>
+
+<!-- VIZ 1 : Entropie vs vie -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Entropie vs Vie</div>
+  <div class="viz-subtitle">Deux directions opposées pour la même matière</div>
+  <div id="entropy-viz"></div>
+  <div class="viz-caption">La matière inerte se disperse inexorablement. La vie capte l'énergie pour construire localement de l'ordre — sans jamais violer les lois physiques</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ SECTION 2 — LA CELLULE ══════ -->
+<div class="section reveal">
+  <div class="section-label">Le miracle opérationnel</div>
+  <p>Une simple cellule est un miracle opérationnel : une frontière qui sépare l'intérieur de l'extérieur, une chimie interne extraordinairement réglée, ainsi qu'une capacité à copier son information et à la transmettre. <span class="highlight">Sa complexité dépasse celle de la plus sophistiquée de nos usines.</span></p>
+  <p>Certaines cellules, comme nos neurones, peuvent fonctionner <span class="highlight">toute une vie</span>. À ce jour, aucune technologie humaine n'est capable de produire un système autonome aussi compact, aussi sobre et aussi résilient.</p>
+</div>
+
+<!-- ══════ ANIMATION CENTRALE : BIOMOLÉCULES → CELLULE ══════ -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Le saut évolutif inexpliqué</div>
+  <div class="viz-subtitle">Des briques du vivant à la cellule — le mystère fondamental</div>
+  <div id="assembly-viz">
+    <canvas id="assembly-canvas"></canvas>
+    <div class="assembly-controls">
+      <button class="assembly-btn active" data-stage="0">Biomolécules libres</button>
+      <button class="assembly-btn" data-stage="1">Auto-organisation</button>
+      <button class="assembly-btn" data-stage="2">Première membrane</button>
+      <button class="assembly-btn" data-stage="3">Cellule vivante</button>
+    </div>
+  </div>
+  <div class="viz-caption">Ce passage n'a jamais été reproduit en laboratoire. Il reste l'un des mystères les plus profonds de la science.</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ SECTION 3 — L'ORIGINE ══════ -->
+<div class="section reveal">
+  <div class="section-label">Le bord du gouffre</div>
+  <p>Comment la matière inerte a-t-elle basculé vers le vivant ? Cela demeure largement un mystère. Les expériences depuis les années 1950 ont montré que plusieurs briques élémentaires de la chimie du vivant peuvent se former spontanément — à condition que la matière soit soumise à des environnements hors normes : <span class="highlight">éclairs dans des atmosphères primitives, sources hydrothermales, gradients thermiques violents</span>.</p>
+  <p>La mythologie parlait d'un monde né du Chaos, d'une béance. La vie, elle aussi, <span class="highlight">semble surgir au bord d'un gouffre</span>, là où la matière est poussée à ses limites, par une succession d'essais répétés sur des centaines de millions d'années.</p>
+</div>
+
+<!-- VIZ 2 : OSIRIS-Rex / Bénou ══════ -->
+<div class="viz-panel reveal">
+  <div class="viz-title">Mission OSIRIS-REx · 2025</div>
+  <div class="viz-subtitle">Les briques du vivant voyagent dans l'espace</div>
+  <div id="osiris-viz"></div>
+  <div class="viz-caption">L'analyse des échantillons de l'astéroïde Bénou a révélé les 5 bases nucléiques de l'ADN et de l'ARN — à 300 millions de kilomètres de la Terre</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card reveal">
+    <div class="stat-number">300M</div>
+    <div class="stat-label">Kilomètres parcourus<br>par OSIRIS-REx</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.15s">
+    <div class="stat-number">5</div>
+    <div class="stat-label">Bases nucléiques de l'ADN<br>trouvées sur Bénou</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:0.3s">
+    <div class="stat-number">3,5 Md</div>
+    <div class="stat-label">Années d'âge des<br>premières cellules terrestres</div>
+  </div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- VIZ 3 : TIMELINE DU VIVANT -->
+<div class="viz-panel reveal">
+  <div class="viz-title">L'histoire de la vie sur Terre</div>
+  <div class="viz-subtitle">3,5 milliards d'années d'une insistance improbable</div>
+  <div id="lifeline-viz"></div>
+  <div class="viz-caption">Survolez chaque étape — l'humain n'occupe qu'un infime fragment de cette histoire</div>
+</div>
+
+<div class="cosmic-divider reveal"><div class="divider-star">✦ ✦ ✦</div></div>
+
+<!-- ══════ LE MYSTÈRE — PANEL SPÉCIAL ══════ -->
+<div class="mystery-panel reveal">
+  <div class="mystery-title">✦ &nbsp; Le mystère fondamental &nbsp; ✦</div>
+  <canvas id="mystery-canvas"></canvas>
+  <p class="mystery-text">
+    À ce jour, cette phase de création d'une cellule à partir des molécules de bases du vivant<br>
+    <span style="color:var(--life-glow)">n'a jamais pu être reproduite ou synthétisée en laboratoire.</span><br><br>
+    Le miracle, et peut-être le caractère unique, de la vie réside dans le mystère de cette auto-organisation.<br>
+    <em style="color:rgba(240,245,240,0.5)">L'émergence de la vie défie notre intelligence.</em>
+  </p>
+</div>
+
+<!-- ══════ FINALE ══════ -->
+<section class="finale-section">
+  <p class="finale-text reveal">
+    La vie n'est pas une propriété de la matière.<br>
+    C'est une relation — un équilibre impossible<br>
+    maintenu de l'intérieur, contre tout.<br><br>
+    <em>Une anomalie dynamique durable.<br>
+    Une insistance.</em>
+  </p>
+  <div class="finale-cta reveal" style="transition-delay:0.5s">↓ &nbsp; Chapitre IV</div>
+</section>
+
+<script>
+// ══════════════════════
+// CURSOR
+// ══════════════════════
+const cursor=document.getElementById('cursor');
+const cursorRing=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+(function ar(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; cursorRing.style.left=rx+'px'; cursorRing.style.top=ry+'px'; requestAnimationFrame(ar); })();
+
+// ══════════════════════
+// STARFIELD — green-tinted
+// ══════════════════════
+const sfC=document.getElementById('starfield');
+const sfX=sfC.getContext('2d');
+function rsf(){ sfC.width=window.innerWidth; sfC.height=window.innerHeight; }
+rsf(); window.addEventListener('resize',rsf);
+const stars=Array.from({length:260},()=>({ x:Math.random(),y:Math.random(),r:Math.random()*1.3+0.2,alpha:Math.random()*0.5+0.1,phase:Math.random()*Math.PI*2,speed:Math.random()*0.001+0.0003 }));
+let sft=0;
+(function ds(){ sfX.clearRect(0,0,sfC.width,sfC.height); sft+=0.01;
+  stars.forEach(s=>{ const a=s.alpha*(0.5+0.5*Math.sin(sft*s.speed*300+s.phase));
+    sfX.beginPath(); sfX.arc(s.x*sfC.width,s.y*sfC.height,s.r,0,Math.PI*2);
+    sfX.fillStyle=`rgba(160,220,170,${a})`; sfX.fill(); }); requestAnimationFrame(ds); })();
+
+// ══════════════════════
+// COVER CANVAS — living particles drift
+// ══════════════════════
+const cc=document.getElementById('cover-canvas');
+const cx2=cc.getContext('2d');
+function rcc(){ cc.width=cc.offsetWidth; cc.height=cc.offsetHeight; }
+rcc(); window.addEventListener('resize',rcc);
+const cparts=Array.from({length:50},()=>({
+  x:Math.random()*cc.width, y:Math.random()*cc.height,
+  vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5,
+  r:Math.random()*4+1, alpha:Math.random()*0.3+0.05,
+  color:`hsl(${120+Math.random()*60},${60+Math.random()*30}%,${40+Math.random()*35}%)`
+}));
+(function dcc(){
+  cx2.clearRect(0,0,cc.width,cc.height);
+  // Connections
+  cparts.forEach((p,i)=>{ cparts.slice(i+1).forEach(q=>{
+    const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<120){ cx2.strokeStyle=`rgba(80,200,100,${(1-d/120)*0.08})`; cx2.lineWidth=0.5;
+      cx2.beginPath(); cx2.moveTo(p.x,p.y); cx2.lineTo(q.x,q.y); cx2.stroke(); }
+  }); });
+  cparts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=cc.width; if(p.x>cc.width)p.x=0;
+    if(p.y<0)p.y=cc.height; if(p.y>cc.height)p.y=0;
+    cx2.beginPath(); cx2.arc(p.x,p.y,p.r,0,Math.PI*2);
+    cx2.fillStyle=p.color; cx2.globalAlpha=p.alpha; cx2.fill(); cx2.globalAlpha=1;
+  });
+  requestAnimationFrame(dcc);
+})();
+
+// ══════════════════════
+// SCROLL REVEAL
+// ══════════════════════
+const ro=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ══════════════════════
+// TOOLTIP
+// ══════════════════════
+const tooltip=document.getElementById('tooltip');
+function showTip(e,t,txt){ tooltip.innerHTML=`<strong>${t}</strong>${txt}`; tooltip.classList.add('show'); moveTip(e); }
+function moveTip(e){ tooltip.style.left=(e.clientX+16)+'px'; tooltip.style.top=(e.clientY-10)+'px'; }
+function hideTip(){ tooltip.classList.remove('show'); }
+document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')) moveTip(e); });
+
+// ══════════════════════════════════════════════════════
+// ██  ANIMATION PRINCIPALE : BIOMOLÉCULES → CELLULE  ██
+// ══════════════════════════════════════════════════════
+(function buildAssembly(){
+  const canvas=document.getElementById('assembly-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){ const r=canvas.parentElement.getBoundingClientRect(); W=canvas.width=r.width; H=canvas.height=520; }
+  resize(); window.addEventListener('resize',()=>{ resize(); });
+
+  let stage=0;
+  let t=0;
+
+  // Molecule types
+  const MOLS={
+    amino:  {color:'#e8d060', label:'Acide aminé',   r:7},
+    rna:    {color:'#d080f0', label:'ARN',            r:6},
+    atp:    {color:'#f06050', label:'ATP',            r:5},
+    lipid:  {color:'#60c870', label:'Lipide',         r:5},
+    water:  {color:'#60a8e0', label:'Eau',            r:4},
+    sugar:  {color:'#e0a060', label:'Sucre',          r:5},
+  };
+  const TYPES=Object.keys(MOLS);
+
+  // Stage info
+  const INFO=[
+    { left:'Biomolécules libres', leftSub:'Acides aminés · ARN · ATP\nLipides · Sucres · Eau',
+      right:'Soupe primitive', rightSub:'Aucune structure\nn\'émerge spontanément',
+      arrow:'→ ?', arrowColor:'rgba(240,240,255,0.3)', mystery:true },
+    { left:'Auto-organisation', leftSub:'Les molécules s\'attirent\npar affinités chimiques',
+      right:'Proto-structures', rightSub:'Agrégats instables\nqui se forment et se défont',
+      arrow:'→ Des millions d\'essais', arrowColor:'rgba(80,200,100,0.5)', mystery:false },
+    { left:'Première membrane', leftSub:'Les lipides forment\nune vésicule spontanément',
+      right:'Intérieur / Extérieur', rightSub:'La frontière fondamentale\nde tout vivant apparaît',
+      arrow:'→ Le premier mur', arrowColor:'rgba(96,200,112,0.6)', mystery:false },
+    { left:'Cellule vivante', leftSub:'Membrane · Génome · Métabolisme\nReproduction · Évolution',
+      right:'???', rightSub:'Jamais reproduit\nen laboratoire',
+      arrow:'→ Le grand mystère', arrowColor:'rgba(255,255,200,0.5)', mystery:true },
+  ];
+
+  // Particles for each stage
+  let particles=[];
+
+  function makeParticles(s){
+    const pts=[];
+    const lx=W*0.27, rx=W*0.73, cy=H/2;
+
+    if(s===0){
+      // Left: scattered free biomolecules
+      for(let i=0;i<22;i++){
+        const type=TYPES[i%TYPES.length];
+        const m=MOLS[type];
+        const angle=Math.random()*Math.PI*2;
+        const dist=30+Math.random()*100;
+        pts.push({ x:lx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist,
+          tx:0,ty:0, r:m.r, color:m.color, alpha:0.85, type, label:m.label,
+          vx:(Math.random()-0.5)*0.7, vy:(Math.random()-0.5)*0.7, wobble:Math.random()*100,
+          side:'left', free:true });
+      }
+      // Right: same but more chaotic
+      for(let i=0;i<22;i++){
+        const type=TYPES[i%TYPES.length];
+        const m=MOLS[type];
+        const angle=Math.random()*Math.PI*2;
+        const dist=30+Math.random()*100;
+        pts.push({ x:rx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist,
+          tx:0,ty:0, r:m.r, color:m.color, alpha:0.35, type, label:m.label,
+          vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5, wobble:Math.random()*100,
+          side:'right', free:true });
+      }
+    }
+
+    else if(s===1){
+      // Left: molecules pulling together in clusters
+      const clusters=[{cx:lx-30,cy:cy-40},{cx:lx+35,cy:cy+20},{cx:lx-10,cy:cy+60}];
+      clusters.forEach((cl,ci)=>{
+        for(let i=0;i<6;i++){
+          const type=TYPES[(ci*6+i)%TYPES.length];
+          const m=MOLS[type];
+          const a=i*(Math.PI*2/6);
+          pts.push({ x:cl.cx+Math.cos(a)*22, y:cl.cy+Math.sin(a)*22,
+            tx:cl.cx+Math.cos(a)*18, ty:cl.cy+Math.sin(a)*18,
+            r:m.r, color:m.color, alpha:0.85, type, label:m.label,
+            vx:0, vy:0, wobble:a*20, side:'left', free:false, cluster:ci });
+        }
+      });
+      // Right: unstable proto-structures forming/dissolving
+      for(let i=0;i<18;i++){
+        const type=TYPES[i%TYPES.length];
+        const m=MOLS[type];
+        const a=i*(Math.PI*2/18);
+        const r=50+Math.sin(i*0.7)*25;
+        pts.push({ x:rx+Math.cos(a)*r, y:cy+Math.sin(a)*r,
+          tx:rx+Math.cos(a)*r, ty:cy+Math.sin(a)*r,
+          r:m.r, color:m.color, alpha:0.7, type, label:m.label,
+          vx:0, vy:0, wobble:a*15, side:'right', free:false, unstable:true });
+      }
+    }
+
+    else if(s===2){
+      // Left: lipids arranged in membrane-like bilayer
+      for(let i=0;i<20;i++){
+        const a=i*(Math.PI*2/20);
+        pts.push({ x:lx+Math.cos(a)*60, y:cy+Math.sin(a)*60,
+          tx:lx+Math.cos(a)*60, ty:cy+Math.sin(a)*60,
+          r:6, color:'#60c870', alpha:0.85, type:'lipid', label:'Lipide',
+          vx:0, vy:0, wobble:a*20, side:'left',
+          headAngle:a, isLipid:true });
+      }
+      // Inner lipids (bilayer)
+      for(let i=0;i<16;i++){
+        const a=i*(Math.PI*2/16);
+        pts.push({ x:lx+Math.cos(a)*40, y:cy+Math.sin(a)*40,
+          tx:lx+Math.cos(a)*40, ty:cy+Math.sin(a)*40,
+          r:5, color:'#40a850', alpha:0.6, type:'lipid', label:'Lipide (couche interne)',
+          vx:0, vy:0, wobble:a*20, side:'left', isLipidInner:true });
+      }
+      // Right: closed vesicle
+      for(let i=0;i<24;i++){
+        const a=i*(Math.PI*2/24);
+        pts.push({ x:rx+Math.cos(a)*65, y:cy+Math.sin(a)*65,
+          tx:rx+Math.cos(a)*65, ty:cy+Math.sin(a)*65,
+          r:6, color:'#60c870', alpha:0.9, type:'lipid', label:'Membrane lipidique',
+          vx:0, vy:0, wobble:a*20, side:'right', isVesicle:true });
+      }
+      for(let i=0;i<18;i++){
+        const a=i*(Math.PI*2/18);
+        pts.push({ x:rx+Math.cos(a)*45, y:cy+Math.sin(a)*45,
+          tx:rx+Math.cos(a)*45, ty:cy+Math.sin(a)*45,
+          r:5, color:'#40a850', alpha:0.65, type:'lipid', label:'Membrane lipidique (intérieur)',
+          vx:0, vy:0, wobble:a*20, side:'right', isVesicleInner:true });
+      }
+      // Interior content
+      for(let i=0;i<8;i++){
+        const type=TYPES[i%3+3];
+        const m=MOLS[type];
+        const a=Math.random()*Math.PI*2, r=Math.random()*30;
+        pts.push({ x:rx+Math.cos(a)*r, y:cy+Math.sin(a)*r,
+          tx:rx+Math.cos(a)*r, ty:cy+Math.sin(a)*r,
+          r:m.r*0.8, color:m.color, alpha:0.5, type, label:m.label,
+          vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3, wobble:Math.random()*50, side:'right' });
+      }
+    }
+
+    else if(s===3){
+      // Full cell: centered
+      const ccx=W/2, ccy=H/2;
+
+      // Outer membrane
+      for(let i=0;i<30;i++){
+        const a=i*(Math.PI*2/30);
+        pts.push({ x:ccx+Math.cos(a)*110, y:ccy+Math.sin(a)*110,
+          tx:ccx+Math.cos(a)*110, ty:ccy+Math.sin(a)*110,
+          r:6, color:'#60c870', alpha:0.85, isLipid:true, label:'Membrane cellulaire',
+          vx:0,vy:0,wobble:a*20 });
+      }
+      for(let i=0;i<22;i++){
+        const a=i*(Math.PI*2/22);
+        pts.push({ x:ccx+Math.cos(a)*88, y:ccy+Math.sin(a)*88,
+          tx:ccx+Math.cos(a)*88, ty:ccy+Math.sin(a)*88,
+          r:5, color:'#40a850', alpha:0.55, isLipidInner:true, label:'Membrane (couche interne)',
+          vx:0,vy:0,wobble:a*20 });
+      }
+      // Nucleus
+      for(let i=0;i<18;i++){
+        const a=i*(Math.PI*2/18);
+        pts.push({ x:ccx-15+Math.cos(a)*28, y:ccy-10+Math.sin(a)*28,
+          tx:ccx-15+Math.cos(a)*28, ty:ccy-10+Math.sin(a)*28,
+          r:4, color:'#d080f0', alpha:0.75, isNucleus:true, label:'Noyau (ADN)',
+          vx:0,vy:0,wobble:a*15 });
+      }
+      // DNA strands inside nucleus
+      for(let i=0;i<12;i++){
+        const a=i*(Math.PI/6);
+        pts.push({ x:ccx-15+Math.cos(a)*12, y:ccy-10+Math.sin(a)*12,
+          tx:ccx-15+Math.cos(a)*12, ty:ccy-10+Math.sin(a)*12,
+          r:3, color:'#b050d0', alpha:0.8, isDNA:true, label:'ADN',
+          vx:0,vy:0,wobble:a*10 });
+      }
+      // Ribosomes (ATP generators)
+      [[30,40],[60,-20],[20,-60],[-50,30],[-60,-20],[40,-55]].forEach(([dx,dy],i)=>{
+        pts.push({ x:ccx+dx,y:ccy+dy,tx:ccx+dx,ty:ccy+dy,
+          r:7, color:'#f06050', alpha:0.75, isRibosome:true, label:'Ribosome',
+          vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,wobble:i*40 });
+      });
+      // Mitochondria
+      [[-35,-45],[55,30]].forEach(([dx,dy],i)=>{
+        pts.push({ x:ccx+dx,y:ccy+dy,tx:ccx+dx,ty:ccy+dy,
+          r:11, color:'#e8a030', alpha:0.65, isMito:true, label:'Mitochondrie',
+          vx:0,vy:0,wobble:i*60 });
+      });
+      // Free molecules inside
+      for(let i=0;i<12;i++){
+        const a=Math.random()*Math.PI*2, r=30+Math.random()*45;
+        const type=TYPES[i%TYPES.length];
+        const m=MOLS[type];
+        pts.push({ x:ccx+Math.cos(a)*r,y:ccy+Math.sin(a)*r,
+          tx:ccx+Math.cos(a)*r,ty:ccy+Math.sin(a)*r,
+          r:m.r*0.8, color:m.color, alpha:0.45, type, label:m.label,
+          vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35,wobble:Math.random()*100 });
+      }
+    }
+
+    return pts;
+  }
+
+  particles=makeParticles(0);
+
+  document.querySelectorAll('.assembly-btn').forEach((btn,i)=>{
+    btn.addEventListener('click',()=>{
+      stage=i;
+      particles=makeParticles(i);
+      document.querySelectorAll('.assembly-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+    });
+  });
+
+  let autoCycle=setInterval(()=>{
+    const ns=(stage+1)%4;
+    stage=ns; particles=makeParticles(ns);
+    document.querySelectorAll('.assembly-btn').forEach((b,j)=>b.classList.toggle('active',j===ns));
+  },3500);
+  canvas.addEventListener('click',()=>clearInterval(autoCycle));
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.016;
+    const info=INFO[stage];
+
+    // Panel bg glows
+    if(stage<3){
+      [W*0.27,W*0.73].forEach((px,pi)=>{
+        const g=ctx.createRadialGradient(px,H/2,0,px,H/2,140);
+        g.addColorStop(0,pi===0?'rgba(80,200,100,0.05)':'rgba(80,200,100,0.03)');
+        g.addColorStop(1,'transparent');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(px,H/2,140,0,Math.PI*2); ctx.fill();
+      });
+    } else {
+      // Full cell glow
+      const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,130);
+      g.addColorStop(0,'rgba(80,200,100,0.08)');
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(W/2,H/2,130,0,Math.PI*2); ctx.fill();
+    }
+
+    // Mystery question mark overlay (stage 0 and 3)
+    if(info.mystery){
+      ctx.save();
+      ctx.font=`200 ${Math.min(60,W*0.07)}px 'Cormorant Garamond', serif`;
+      ctx.fillStyle='rgba(240,245,240,0.06)';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('?', W/2, H/2);
+      ctx.restore();
+    }
+
+    // Center arrow
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.font=`300 ${Math.min(10,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.fillStyle=info.arrowColor;
+    ctx.fillText(info.arrow, W/2, H/2+4);
+    if(stage<3){
+      ctx.strokeStyle=info.arrowColor; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(W*0.38,H/2-18); ctx.lineTo(W*0.62,H/2-18); ctx.stroke();
+      ctx.setLineDash([]);
+      // Arrowhead
+      ctx.fillStyle=info.arrowColor; ctx.beginPath();
+      ctx.moveTo(W*0.62,H/2-18); ctx.lineTo(W*0.62-9,H/2-24); ctx.lineTo(W*0.62-9,H/2-12); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+
+    // Connections (stage 1 clusters, stage 3 cell network)
+    if(stage===1){
+      const byCluster=[0,1,2].map(ci=>particles.filter(p=>p.cluster===ci));
+      byCluster.forEach(cl=>{
+        ctx.save(); ctx.strokeStyle='rgba(80,200,100,0.25)'; ctx.lineWidth=1;
+        cl.forEach((p,i)=>{ cl.forEach((q,j)=>{ if(i<j){
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }}); });
+        ctx.restore();
+      });
+    }
+    if(stage===3){
+      const ribos=particles.filter(p=>p.isRibosome);
+      const ccx=W/2,ccy=H/2;
+      ribos.forEach(r=>{
+        ctx.save(); ctx.strokeStyle='rgba(240,96,80,0.2)'; ctx.lineWidth=0.7;
+        ctx.setLineDash([2,4]);
+        ctx.beginPath(); ctx.moveTo(r.x,r.y); ctx.lineTo(ccx-15,ccy-10); ctx.stroke();
+        ctx.setLineDash([]); ctx.restore();
+      });
+    }
+
+    // DRAW PARTICLES
+    particles.forEach(p=>{
+      // Update position
+      if(p.free||p.unstable){
+        p.x+=p.vx+Math.sin(t*1.5+p.wobble)*0.5;
+        p.y+=p.vy+Math.cos(t*1.8+p.wobble)*0.5;
+        // Boundaries
+        const bx=(p.side==='left')?W*0.27:W*0.73;
+        const dx=p.x-bx, dy=p.y-H/2;
+        if(Math.sqrt(dx*dx+dy*dy)>130){ p.vx*=-0.8; p.vy*=-0.8; }
+      } else if(!p.isLipid&&!p.isLipidInner&&!p.isVesicle&&!p.isVesicleInner&&!p.isNucleus&&!p.isDNA&&!p.isRibosome&&!p.isMito){
+        p.x=p.tx+Math.sin(t*1.5+p.wobble)*2;
+        p.y=p.ty+Math.cos(t*1.8+p.wobble)*2;
+      } else if(p.isRibosome||p.isMito){
+        p.x=p.tx+Math.sin(t+p.wobble)*3;
+        p.y=p.ty+Math.cos(t*0.7+p.wobble)*3;
+      }
+
+      ctx.save();
+      // Glow halo
+      const gd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*2.5);
+      gd.addColorStop(0,p.color); gd.addColorStop(1,'transparent');
+      ctx.globalAlpha=p.alpha*0.25; ctx.fillStyle=gd;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2); ctx.fill();
+
+      // Main dot
+      ctx.globalAlpha=p.alpha; ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+
+      // Shine
+      if(p.r>4){
+        const sh=ctx.createRadialGradient(p.x-p.r*0.3,p.y-p.r*0.3,0,p.x,p.y,p.r);
+        sh.addColorStop(0,'rgba(255,255,255,0.35)'); sh.addColorStop(1,'transparent');
+        ctx.fillStyle=sh; ctx.fill();
+      }
+
+      // Lipid tail (stage 2 membranes)
+      if(p.isLipid&&p.headAngle!==undefined){
+        ctx.strokeStyle='rgba(96,200,112,0.4)'; ctx.lineWidth=1.5;
+        const tail=14;
+        ctx.beginPath(); ctx.moveTo(p.x,p.y);
+        ctx.lineTo(p.x-Math.cos(p.headAngle)*tail,p.y-Math.sin(p.headAngle)*tail);
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+
+    // LABELS
+    ctx.save(); ctx.textAlign='center';
+    if(stage<3){
+      const labelY=H*0.12;
+      [[W*0.27,info.left,info.leftSub],[W*0.73,info.right,info.rightSub]].forEach(([px,lbl,sub],li)=>{
+        ctx.font=`600 ${Math.min(12,W*0.015)}px 'Raleway', sans-serif`;
+        ctx.fillStyle=li===0?'rgba(80,200,100,0.9)':'rgba(160,215,170,0.7)';
+        ctx.fillText(lbl, px, labelY);
+        ctx.font=`300 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+        ctx.fillStyle='rgba(120,160,130,0.5)';
+        sub.split('\n').forEach((ln,si)=>ctx.fillText(ln,px,labelY+14+si*13));
+      });
+    } else {
+      ctx.font=`600 ${Math.min(12,W*0.015)}px 'Raleway', sans-serif`;
+      ctx.fillStyle='rgba(80,200,100,0.9)'; ctx.fillText('Cellule vivante', W/2, H*0.08);
+      ctx.font=`300 ${Math.min(9,W*0.011)}px 'Raleway', sans-serif`;
+      ctx.fillStyle='rgba(120,160,130,0.5)';
+      ctx.fillText('Membrane · Noyau · Ribosomes · Mitochondries', W/2, H*0.08+14);
+      // Legend
+      [{c:'#60c870',l:'Membrane'},{c:'#d080f0',l:'Noyau / ADN'},{c:'#f06050',l:'Ribosomes'},{c:'#e8a030',l:'Mitochondries'}]
+        .forEach((it,i)=>{
+          const lx=W/2-120+i*80, ly=H-30;
+          ctx.fillStyle=it.c; ctx.globalAlpha=0.8;
+          ctx.beginPath(); ctx.arc(lx,ly,5,0,Math.PI*2); ctx.fill();
+          ctx.globalAlpha=0.5; ctx.fillStyle='rgba(160,215,170,0.7)';
+          ctx.font=`300 ${Math.min(8,W*0.01)}px 'Raleway', sans-serif`;
+          ctx.fillText(it.l,lx,ly+14);
+        });
+      ctx.globalAlpha=1;
+    }
+    // Stage dots
+    for(let i=0;i<4;i++){
+      ctx.beginPath(); ctx.arc(W/2+(i-1.5)*18,H-14,i===stage?4:2.5,0,Math.PI*2);
+      ctx.fillStyle=i===stage?'rgba(80,200,100,0.9)':'rgba(80,200,100,0.2)'; ctx.fill();
+    }
+    ctx.restore();
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ══════════════════════════════════════════════
+// VIZ ENTROPIE VS VIE
+// ══════════════════════════════════════════════
+(function buildEntropy(){
+  const W2=Math.min(document.getElementById('entropy-viz').offsetWidth||860,860);
+  const H2=280;
+  const svg=d3.select('#entropy-viz').append('svg').attr('width','100%').attr('height',H2).attr('viewBox',`0 0 ${W2} ${H2}`);
+  const defs=svg.append('defs');
+  const margin={l:60,r:40,t:40,b:50};
+  const iW=W2-margin.l-margin.r, iH=H2-margin.t-margin.b;
+  const g=svg.append('g').attr('transform',`translate(${margin.l},${margin.t})`);
+  const x=d3.scaleLinear().domain([0,10]).range([0,iW]);
+  const y=d3.scaleLinear().domain([0,1]).range([iH,0]);
+
+  // Entropy line (increasing)
+  const entropyData=d3.range(0,11).map(i=>({x:i,y:0.05+i*0.09+Math.random()*0.02}));
+  // Life line (complex oscillating maintaining)
+  const lifeData=d3.range(0,11).map(i=>({x:i,y:0.7-i*0.02+Math.sin(i*1.2)*0.06}));
+
+  const lineGen=d3.line().x(d=>x(d.x)).y(d=>y(d.y)).curve(d3.curveCatmullRom);
+
+  // Entropy area
+  const eGrad=defs.append('linearGradient').attr('id','eGrad').attr('x1','0%').attr('x2','100%');
+  eGrad.append('stop').attr('offset','0%').attr('stop-color','rgba(200,100,80,0.1)');
+  eGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(200,100,80,0.35)');
+
+  const areaEntr=d3.area().x(d=>x(d.x)).y0(iH).y1(d=>y(d.y)).curve(d3.curveCatmullRom);
+  g.append('path').datum(entropyData).attr('d',areaEntr).attr('fill','url(#eGrad)');
+  g.append('path').datum(entropyData).attr('d',lineGen)
+    .attr('fill','none').attr('stroke','rgba(200,100,80,0.7)').attr('stroke-width',2);
+
+  // Life area
+  const lGrad=defs.append('linearGradient').attr('id','lGrad').attr('x1','0%').attr('x2','100%');
+  lGrad.append('stop').attr('offset','0%').attr('stop-color','rgba(80,200,100,0.05)');
+  lGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(80,200,100,0.2)');
+
+  const areaLife=d3.area().x(d=>x(d.x)).y0(iH).y1(d=>y(d.y)).curve(d3.curveCatmullRom);
+  g.append('path').datum(lifeData).attr('d',areaLife).attr('fill','url(#lGrad)');
+  g.append('path').datum(lifeData).attr('d',lineGen)
+    .attr('fill','none').attr('stroke','rgba(80,200,100,0.8)').attr('stroke-width',2.5)
+    .attr('stroke-dasharray','none');
+
+  // Labels
+  g.append('text').attr('x',x(9.5)).attr('y',y(0.96)).attr('fill','rgba(200,100,80,0.7)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('letter-spacing','1').text('ENTROPIE ↑');
+  g.append('text').attr('x',x(9.2)).attr('y',y(lifeData[10].y)-10).attr('fill','rgba(80,200,100,0.8)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','9').attr('letter-spacing','1').text('VIE');
+
+  // Axis
+  g.append('g').attr('transform',`translate(0,${iH})`).call(d3.axisBottom(x).ticks(0))
+    .call(ax=>ax.select('.domain').attr('stroke','rgba(80,200,100,0.15)'));
+  g.append('text').attr('x',iW/2).attr('y',iH+36).attr('text-anchor','middle')
+    .attr('fill','rgba(120,160,130,0.4)').attr('font-family',"'Raleway',sans-serif")
+    .attr('font-size','8').attr('letter-spacing','2').text('TEMPS →');
+
+  // Annotations
+  g.append('text').attr('x',x(1)).attr('y',y(0.5)).attr('text-anchor','middle')
+    .attr('fill','rgba(120,160,130,0.35)').attr('font-family',"'Cormorant Garamond',serif")
+    .attr('font-size','10').attr('font-style','italic').text('Matière inerte');
+  g.append('text').attr('x',x(5)).attr('y',y(0.82)).attr('text-anchor','middle')
+    .attr('fill','rgba(80,200,100,0.4)').attr('font-family',"'Cormorant Garamond',serif")
+    .attr('font-size','10').attr('font-style','italic').text('Matière vivante');
+})();
+
+// ══════════════════════════════════════════════
+// VIZ OSIRIS-REX
+// ══════════════════════════════════════════════
+(function buildOsiris(){
+  const W2=Math.min(document.getElementById('osiris-viz').offsetWidth||860,860);
+  const H2=280;
+  const svg=d3.select('#osiris-viz').append('svg').attr('width','100%').attr('height',H2).attr('viewBox',`0 0 ${W2} ${H2}`);
+  const defs=svg.append('defs');
+  const cx=W2/2, cy=H2/2;
+
+  // Sun
+  const sunG=defs.append('radialGradient').attr('id','sunG').attr('cx','50%').attr('cy','50%');
+  sunG.append('stop').attr('offset','0%').attr('stop-color','#f5e060');
+  sunG.append('stop').attr('offset','100%').attr('stop-color','#c08020');
+  svg.append('circle').attr('cx',80).attr('cy',cy).attr('r',28).attr('fill','url(#sunG)');
+  svg.append('circle').attr('cx',80).attr('cy',cy).attr('r',36)
+    .attr('fill','none').attr('stroke','rgba(245,224,96,0.2)').attr('stroke-width',6);
+
+  // Earth orbit
+  svg.append('ellipse').attr('cx',80).attr('cy',cy).attr('rx',140).attr('ry',60)
+    .attr('fill','none').attr('stroke','rgba(80,200,100,0.1)').attr('stroke-width',1).attr('stroke-dasharray','4 4');
+  // Earth
+  svg.append('circle').attr('cx',220).attr('cy',cy-20).attr('r',14)
+    .attr('fill','#1e6eb0').attr('stroke','rgba(80,200,100,0.5)').attr('stroke-width',1.5);
+  svg.append('text').attr('x',220).attr('y',cy-20+26)
+    .attr('text-anchor','middle').attr('fill','rgba(80,200,100,0.6)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','1').text('TERRE');
+
+  // Bennu orbit
+  svg.append('ellipse').attr('cx',80).attr('cy',cy).attr('rx',W2*0.43).attr('ry',90)
+    .attr('fill','none').attr('stroke','rgba(200,140,60,0.12)').attr('stroke-width',1).attr('stroke-dasharray','3 5');
+  // Bennu
+  const bx=W2-90, by=cy+30;
+  svg.append('circle').attr('cx',bx).attr('cy',by).attr('r',18)
+    .attr('fill','rgba(120,80,40,0.6)').attr('stroke','rgba(200,140,60,0.5)').attr('stroke-width',1.5);
+  svg.append('text').attr('x',bx).attr('y',by+30).attr('text-anchor','middle')
+    .attr('fill','rgba(200,140,60,0.7)').attr('font-family',"'Raleway',sans-serif")
+    .attr('font-size','8').attr('letter-spacing','1').text('BÉNOU');
+
+  // OSIRIS spacecraft path
+  svg.append('path').attr('d',`M ${220} ${cy-20} Q ${cx+80} ${cy-120} ${bx} ${by}`)
+    .attr('fill','none').attr('stroke','rgba(240,240,255,0.25)').attr('stroke-width',1.5)
+    .attr('stroke-dasharray','6 4');
+  // Spacecraft dot
+  svg.append('circle').attr('cx',cx+50).attr('cy',cy-70).attr('r',4)
+    .attr('fill','rgba(240,240,255,0.8)').attr('stroke','rgba(240,240,255,0.4)').attr('stroke-width',2);
+  svg.append('text').attr('x',cx+50).attr('y',cy-80).attr('text-anchor','middle')
+    .attr('fill','rgba(240,240,255,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','7').attr('letter-spacing','1').text('OSIRIS-REx');
+
+  // Findings
+  const bases=['Adénine','Guanine','Cytosine','Thymine','Uracile'];
+  bases.forEach((b,i)=>{
+    const bx2=bx+35+Math.cos(i*(Math.PI*2/5)-0.4)*55;
+    const by2=by+Math.sin(i*(Math.PI*2/5)-0.4)*50;
+    svg.append('circle').attr('cx',bx2).attr('cy',by2).attr('r',6)
+      .attr('fill','rgba(80,200,100,0.6)').attr('stroke','rgba(80,200,100,0.4)').attr('stroke-width',1)
+      .style('cursor','pointer')
+      .on('mouseenter',e=>showTip(e,b,'<br><em>Base nucléique de l\'ADN — trouvée sur Bénou en 2025</em>'))
+      .on('mouseleave',hideTip);
+    svg.append('line').attr('x1',bx).attr('y1',by).attr('x2',bx2).attr('y2',by2)
+      .attr('stroke','rgba(80,200,100,0.2)').attr('stroke-width',0.8);
+  });
+
+  // Distance label
+  svg.append('text').attr('x',cx).attr('y',H2-8)
+    .attr('text-anchor','middle').attr('fill','rgba(120,160,130,0.4)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','8').attr('letter-spacing','2')
+    .text('300 MILLIONS DE KILOMÈTRES — LES BRIQUES DU VIVANT VOYAGENT DANS L\'ESPACE');
+})();
+
+// ══════════════════════════════════════════════
+// VIZ TIMELINE DE LA VIE
+// ══════════════════════════════════════════════
+(function buildLifeline(){
+  const W2=Math.min(document.getElementById('lifeline-viz').offsetWidth||880,880);
+  const H2=240;
+  const svg=d3.select('#lifeline-viz').append('svg').attr('width','100%').attr('height',H2).attr('viewBox',`0 0 ${W2} ${H2}`);
+  const m={l:30,r:30,t:50,b:40};
+  const iW=W2-m.l-m.r;
+  const cy=H2/2;
+
+  const events=[
+    {t:0,   label:'-3,5 Mds', sub:'Premières cellules', color:'#50e080'},
+    {t:0.14, label:'-3 Mds',  sub:'Photosynthèse', color:'#70d880'},
+    {t:0.43, label:'-2 Mds',  sub:'Cellules eucaryotes', color:'#90d070'},
+    {t:0.71, label:'-1 Md',   sub:'Multicellulaires', color:'#a0c860'},
+    {t:0.83, label:'-600 M',  sub:'Explosion cambrienne', color:'#b0c050'},
+    {t:0.87, label:'-500 M',  sub:'Sortie des eaux', color:'#c0a840'},
+    {t:0.91, label:'-300 M',  sub:'Dinosaures', color:'#d09030'},
+    {t:0.955, label:'-65 M',  sub:'Extinction K-Pg', color:'#e06840'},
+    {t:0.984, label:'-6 M',   sub:'Hominidés', color:'#d08060'},
+    {t:0.9999, label:'Aujourd\'hui', sub:'Vous', color:'#7ab8f5'},
+  ];
+
+  const x=v=>m.l+v*iW;
+
+  // Gradient line
+  const defs=svg.append('defs');
+  const lg=defs.append('linearGradient').attr('id','llGrad').attr('x1','0%').attr('x2','100%');
+  lg.append('stop').attr('offset','0%').attr('stop-color','#50e080').attr('stop-opacity',0.8);
+  lg.append('stop').attr('offset','90%').attr('stop-color','#a0c860').attr('stop-opacity',0.6);
+  lg.append('stop').attr('offset','100%').attr('stop-color','#7ab8f5').attr('stop-opacity',0.9);
+
+  svg.append('line').attr('x1',x(0)).attr('x2',x(1)).attr('y1',cy).attr('y2',cy)
+    .attr('stroke','url(#llGrad)').attr('stroke-width',2);
+
+  events.forEach((ev,i)=>{
+    const ex=x(ev.t);
+    const above=i%2===0;
+    const yLabel=above?cy-44:cy+44;
+
+    svg.append('circle').attr('cx',ex).attr('cy',cy).attr('r',i===events.length-1?8:4)
+      .attr('fill',ev.color).attr('stroke',i===events.length-1?'white':'none').attr('stroke-width',1.5)
+      .style('cursor','pointer')
+      .on('mouseenter',e=>showTip(e,ev.label,`<br><em>${ev.sub}</em>`))
+      .on('mouseleave',hideTip);
+
+    svg.append('line').attr('x1',ex).attr('x2',ex)
+      .attr('y1',cy+(above?-5:5)).attr('y2',yLabel+(above?10:-10))
+      .attr('stroke',ev.color).attr('stroke-width',0.5).attr('stroke-opacity',0.4);
+
+    svg.append('text').attr('x',ex).attr('y',yLabel).attr('text-anchor','middle')
+      .attr('fill',ev.color).attr('font-family',"'Cinzel',serif").attr('font-size','8').attr('letter-spacing','0.5').text(ev.label);
+    svg.append('text').attr('x',ex).attr('y',yLabel+(above?12:-12)).attr('text-anchor','middle')
+      .attr('fill','rgba(140,180,150,0.5)').attr('font-family',"'Raleway',sans-serif").attr('font-size','7').text(ev.sub);
+  });
+
+  // "Human" highlight
+  const hx=x(0.9999);
+  svg.append('line').attr('x1',hx-2).attr('x2',hx-2).attr('y1',cy-12).attr('y2',cy+12)
+    .attr('stroke','rgba(122,184,245,0.6)').attr('stroke-width',3);
+
+  svg.append('text').attr('x',W2/2).attr('y',H2-6)
+    .attr('text-anchor','middle').attr('fill','rgba(80,160,100,0.3)')
+    .attr('font-family',"'Raleway',sans-serif").attr('font-size','7').attr('letter-spacing','2')
+    .text('L\'HUMAIN N\'OCCUPE QU\'UNE FRACTION IMPERCEPTIBLE DE CETTE HISTOIRE');
+})();
+
+// ══════════════════════════════════════════════
+// MYSTERY CANVAS — particules qui tentent de s'assembler mais n'y arrivent pas
+// ══════════════════════════════════════════════
+(function buildMystery(){
+  const canvas=document.getElementById('mystery-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){ W=canvas.width=canvas.offsetWidth; H=canvas.height=260; }
+  resize(); window.addEventListener('resize',resize);
+
+  const N=28;
+  let t=0;
+
+  // Particles that try to form a cell but keep failing
+  const pts=Array.from({length:N},(_,i)=>({
+    x:Math.random()*W,y:Math.random()*H,
+    vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,
+    r:4+Math.random()*5,
+    color:`hsl(${110+Math.random()*80},${50+Math.random()*30}%,${40+Math.random()*30}%)`,
+    phase:Math.random()*Math.PI*2,
+    attractT:Math.random()*Math.PI*2 // phase of attraction cycle
+  }));
+
+  const cx2=()=>W/2, cy2=()=>H/2;
+
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    t+=0.012;
+
+    // Pulsing attraction/repulsion cycle — never quite assembles
+    const attractPhase=Math.sin(t*0.4); // -1 to 1
+
+    pts.forEach(p=>{
+      const dx=cx2()-p.x, dy=cy2()-p.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      // Attraction pulls in, repulsion throws out — never stable
+      const force=attractPhase*0.015*(100-Math.min(dist,100))/100;
+      p.vx+=dx/dist*force+(Math.random()-0.5)*0.1;
+      p.vy+=dy/dist*force+(Math.random()-0.5)*0.1;
+      p.vx*=0.97; p.vy*=0.97;
+      p.x+=p.vx; p.y+=p.vy;
+
+      // Wrap
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+
+      // Draw
+      ctx.save();
+      ctx.globalAlpha=0.5+0.3*Math.sin(t+p.phase);
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*2);
+      g.addColorStop(0,p.color); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    });
+
+    // Connection lines — form and dissolve
+    pts.forEach((p,i)=>{
+      pts.slice(i+1).forEach(q=>{
+        const dx=q.x-p.x,dy=q.y-p.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<80){
+          const alpha=(1-d/80)*0.3*(0.5+0.5*attractPhase);
+          ctx.strokeStyle=`rgba(80,200,100,${alpha})`; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }
+      });
+    });
+
+    // Central question — pulsing
+    const qAlpha=0.06+0.04*Math.sin(t*0.8);
+    ctx.save();
+    ctx.font=`200 ${Math.min(80,W*0.1)}px 'Cormorant Garamond', serif`;
+    ctx.fillStyle=`rgba(200,240,210,${qAlpha})`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('?', cx2(), cy2());
+
+    // "Jamais reproduit" text
+    ctx.font=`200 ${Math.min(9,W*0.012)}px 'Raleway', sans-serif`;
+    ctx.fillStyle=`rgba(80,200,100,${0.2+0.1*Math.sin(t*0.5)})`;
+    ctx.letterSpacing='3px';
+    ctx.fillText('JAMAIS REPRODUIT EN LABORATOIRE', cx2(), H-16);
+    ctx.restore();
+
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav">
+      <a href="index.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Accueil</div>
+          <div class="footer-name">Le Petit Livre Bleu</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-intro.html" class="footer-dalle footer-dalle-intro">
+        <div class="footer-sphere fsp-intro"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">Introduction</div>
+          <div class="footer-name">Homo biospheris</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre1.html" class="footer-dalle footer-dalle-ch1">
+        <div class="footer-sphere fsp-ch1"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">I</div>
+          <div class="footer-name">La Terre</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre2.html" class="footer-dalle footer-dalle-ch2">
+        <div class="footer-sphere fsp-ch2"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">II</div>
+          <div class="footer-name">La Matière</div>
+        </div>
+      </a>
+      <a href="petit-livre-bleu-chapitre3.html" class="footer-dalle footer-dalle-ch3">
+        <div class="footer-sphere fsp-ch3"></div>
+        <div class="footer-dalle-text">
+          <div class="footer-num">III</div>
+          <div class="footer-name">La Vie</div>
+        </div>
+      </a>
+    </nav>
+    <div class="footer-bottom">
+      <div class="footer-brand">Le Petit Livre Bleu · Jean-Pierre Goux</div>
+      <div class="footer-copy">Une autre histoire de l'humanité</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
